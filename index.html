@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cat Photo Printer</title>
+<style>
+:root{
+  --bg:#f7f3f4;--fg:#211c1e;--mut:#6f6468;--card:#fff;--line:#e2d8dc;
+  --acc:#c23a6e;--accfg:#fff;--logbg:#161214;--logfg:#d9f5df;--err:#ff7b8a;--rx:#8fd3ff;--tx:#ffd98f;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#171214;--fg:#f1e9ec;--mut:#a89aa0;--card:#221b1e;--line:#3a2f34;--acc:#ff7aa8;--accfg:#2a0f1a;color-scheme:dark}
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 -apple-system,system-ui,"Segoe UI",sans-serif;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px))}
+h1{font-size:20px;margin:0 0 2px}
+.sub{color:var(--mut);font-size:13px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-weight:600;padding:12px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);flex:1;min-height:46px}
+button.main{background:var(--acc);color:var(--accfg);border-color:var(--acc)}
+button:disabled{opacity:.45}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#state{font-weight:600;margin:0 0 4px}
+#hint{color:var(--mut);font-size:13px;margin:0}
+input,select{font:inherit;width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);margin-top:8px}
+#log{background:var(--logbg);color:var(--logfg);font:12px/1.35 ui-monospace,Menlo,monospace;border-radius:10px;padding:8px;
+  height:46vh;overflow:auto;white-space:pre-wrap;word-break:break-all;-webkit-user-select:text;user-select:text}
+#log .err{color:var(--err)}#log .rx{color:var(--rx)}#log .tx{color:var(--tx)}#log .ok{font-weight:700}
+.label{font-size:13px;color:var(--mut);margin:0 0 6px}
+[hidden]{display:none!important}
+#view{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:8px;image-rendering:pixelated}
+#vid{width:100%;display:block;border-radius:8px;background:#000;margin-bottom:8px}
+input[type=range]{padding:0;border:0;background:none}
+.sl{display:block;margin-top:10px;font-size:14px}.sl b{float:right;font-weight:600}
+#info{color:var(--mut);font-size:12px;margin:6px 0 0}
+</style>
+</head>
+<body>
+<h1>Cat Photo Printer</h1>
+<p class="sub">Milestones 2–4 · print (unverified) · build 4</p>
+
+<div class="card">
+  <p id="state">Disconnected</p>
+  <p id="hint">Tap Connect, then pick your printer.</p>
+  <div class="row" style="margin-top:10px">
+    <button id="btnConnect" class="main">Connect</button>
+    <button id="btnDisc" disabled>Disconnect</button>
+  </div>
+</div>
+
+<div class="card">
+  <p class="label">Photo</p>
+  <video id="vid" playsinline muted autoplay hidden></video>
+  <canvas id="view" width="384" height="240"></canvas>
+  <p id="info">No photo yet.</p>
+  <div class="row" style="margin-top:8px">
+    <button id="btnLive" class="main">Live camera</button>
+    <button id="btnShot" hidden>Take photo</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button id="btnCam">Camera app</button>
+    <button id="btnLib">Library</button>
+    <button id="btnRot">Rotate</button>
+  </div>
+  <input id="fCam" type="file" accept="image/*" capture="environment" hidden>
+  <input id="fLib" type="file" accept="image/*" hidden>
+  <select id="mode" aria-label="Render mode">
+    <option value="atk">Dot: Atkinson (high contrast)</option>
+    <option value="fs">Dot: Floyd-Steinberg (smooth)</option>
+    <option value="stucki">Dot: Stucki (sharp, clean)</option>
+    <option value="bayer">Dot: Bayer 8×8 (ordered, retro)</option>
+    <option value="soft">Normal: soft threshold</option>
+  </select>
+  <label class="sl">Brightness <b id="brv"></b><input id="br" type="range" min="-100" max="100" value="0"></label>
+  <label class="sl">Contrast <b id="ctv"></b><input id="ct" type="range" min="-100" max="100" value="0"></label>
+  <label class="sl">Gamma <b id="gmv"></b><input id="gm" type="range" min="0.5" max="2.5" step="0.05" value="1"></label>
+  <label class="sl">Threshold <b id="thv"></b><input id="th" type="range" min="0" max="255" value="128"></label>
+  <label class="sl">Softness (soft threshold) <b id="sfv"></b><input id="sf" type="range" min="0" max="100" value="60"></label>
+</div>
+
+<div class="card">
+  <p class="label">Print</p>
+  <div class="row">
+    <button id="btnPrint" class="main" disabled>Print photo</button>
+    <button id="btnTest" disabled>Test pattern</button>
+  </div>
+  <label class="sl">Intensity <b id="inv"></b><input id="inten" type="range" min="0" max="100" value="60"></label>
+  <details style="margin-top:10px"><summary>Print settings (unverified defaults)</summary>
+    <label class="sl">Bit order <select id="bits"><option value="lsb">LSB first</option><option value="msb">MSB first</option></select></label>
+    <label class="sl">Chunk bytes <input id="chunk" type="number" value="48" min="20" max="240"></label>
+    <label class="sl">Delay ms <input id="delay" type="number" value="15" min="0" max="100"></label>
+    <label class="sl">Feed rows after image <input id="feed" type="number" value="40" min="0" max="200"></label>
+  </details>
+</div>
+
+<div class="card">
+  <p class="label">Debug console</p>
+  <div id="log" role="log" aria-live="polite"></div>
+  <div class="row" style="margin-top:8px">
+    <button id="btnCopy">Copy log</button>
+    <button id="btnClear">Clear</button>
+  </div>
+</div>
+
+<div class="card">
+  <p class="label">Raw hex send (debug only)</p>
+  <select id="wsel" aria-label="Writable characteristic"><option value="">No writable characteristic yet</option></select>
+  <input id="hexin" placeholder="e.g. 01 02 ff" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <div class="row" style="margin-top:8px"><button id="btnSend" disabled>Send</button></div>
+</div>
+
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const logEl = $('log');
+function log(msg, kind){
+  const d = document.createElement('div');
+  if(kind) d.className = kind;
+  d.textContent = new Date().toISOString().slice(11,23) + ' ' + msg;
+  logEl.appendChild(d);
+  while(logEl.childNodes.length > 600) logEl.removeChild(logEl.firstChild);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+const hex = dv => Array.from(new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength))
+  .map(b => b.toString(16).padStart(2,'0')).join(' ');
+const short = u => { u = String(u).toLowerCase(); return u.length === 4 ? u : u.slice(4,8); };
+function errStr(e){
+  if(e instanceof Error) return e.name+': '+e.message;
+  let j=''; try{ j=JSON.stringify(e, Object.getOwnPropertyNames(Object(e))); }catch(_){}
+  return 'non-Error '+typeof e+' -> '+String(e)+' '+j;
+}
+
+/* ---------- BLE layer (printer-agnostic) ---------- */
+// Candidate services requested up front; Web Bluetooth can only list services declared here.
+const SERVICES = ['ae30','ae00','af30','ff00','ffe0','fff0','18f0','fee7','180a','180f']
+  .map(s => '0000'+s+'-0000-1000-8000-00805f9b34fb');
+const PROPS = ['read','write','writeWithoutResponse','notify','indicate'];
+let dev = null, server = null, writable = [], catChars = {}, printing = false;
+
+function setState(connected, text){
+  $('state').textContent = text || (connected ? 'Connected' : 'Disconnected');
+  $('btnConnect').disabled = connected;
+  $('btnDisc').disabled = !connected;
+  $('btnSend').disabled = !connected || !writable.length;
+  updPrint();
+}
+
+// UNVERIFIED guess from the advertised name only; confirm with the service/characteristic log.
+function protocolHint(name){
+  if(/^MXW01/i.test(name||'')) return 'Name looks MXW01-style (0x22 0x21 framing) — unverified.';
+  if(/^(GB0[123]|GT01)/i.test(name||'')) return 'Name looks GB01-family (0x51 0x78 framing) — unverified.';
+  return 'Protocol unknown from name "'+(name||'')+'". Paste the log so we can decide.';
+}
+
+async function connect(){
+  if(!navigator.bluetooth){ log('Web Bluetooth is not available in this browser.','err'); return; }
+  try{
+    log('Requesting device…');
+    dev = null;
+    const attempts = [
+      ['all + optionalServices', {acceptAllDevices:true, optionalServices:SERVICES}],
+      ['all, no services',       {acceptAllDevices:true}]
+    ];
+    for(const [label, opts] of attempts){
+      try{ log('Trying: '+label); dev = await navigator.bluetooth.requestDevice(opts); break; }
+      catch(e){ log('Failed ('+label+'): '+errStr(e),'err'); if(e && e.name==='NotFoundError') throw e; }
+    }
+    if(!dev) throw new Error('requestDevice failed on all attempts');
+    log('Selected: name="'+dev.name+'" id='+dev.id);
+    $('hint').textContent = protocolHint(dev.name);
+    log($('hint').textContent);
+    dev.addEventListener('gattserverdisconnected', () => {
+      log('GATT disconnected','err'); writable = []; fillWritable(); setState(false);
+    });
+    setState(false,'Connecting…');
+    log('GATT connecting…');
+    server = await dev.gatt.connect();
+    log('GATT connected','ok');
+    setState(true,'Connected: '+(dev.name||'unnamed'));
+    await discover();
+    setState(true,'Connected: '+(dev.name||'unnamed'));
+  }catch(e){
+    log(errStr(e),'err');
+    setState(false);
+  }
+}
+
+async function discover(){
+  writable = []; catChars = {};
+  let services = [];
+  try{ services = await server.getPrimaryServices(); }
+  catch(e){ log('getPrimaryServices failed: '+e.name+': '+e.message,'err'); }
+  log('Services found: '+services.length);
+  for(const s of services){
+    log('SERVICE '+s.uuid);
+    let chars = [];
+    try{ chars = await s.getCharacteristics(); }
+    catch(e){ log('  getCharacteristics failed: '+e.message,'err'); continue; }
+    for(const c of chars){
+      const p = PROPS.filter(k => c.properties[k]);
+      log('  CHAR '+c.uuid+' ['+p.join(',')+']');
+      if(c.properties.write || c.properties.writeWithoutResponse) writable.push({svc:s.uuid, c});
+      if(short(s.uuid) === 'ae30') catChars[short(c.uuid)] = c;
+      if(c.properties.notify || c.properties.indicate){
+        try{
+          c.addEventListener('characteristicvaluechanged', ev => { log('RX '+short(c.uuid)+': '+hex(ev.target.value),'rx'); onNotify(short(c.uuid), ev.target.value); });
+          await c.startNotifications();
+          log('  notifications on for '+short(c.uuid));
+        }catch(e){ log('  startNotifications '+short(c.uuid)+' failed: '+e.message,'err'); }
+      }
+    }
+  }
+  fillWritable();
+  log('Discovery done.','ok');
+}
+
+function fillWritable(){
+  const sel = $('wsel');
+  sel.innerHTML = '';
+  if(!writable.length){ sel.innerHTML = '<option value="">No writable characteristic yet</option>'; return; }
+  writable.forEach((w,i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = short(w.svc)+' / '+short(w.c.uuid);
+    sel.appendChild(o);
+  });
+  const ae01 = writable.findIndex(w => short(w.c.uuid) === 'ae01');
+  if(ae01 >= 0) sel.value = ae01;
+}
+
+async function sendHex(){
+  const w = writable[+$('wsel').value];
+  if(!w){ log('No characteristic selected','err'); return; }
+  const clean = $('hexin').value.replace(/0x/gi,'').replace(/[^0-9a-f]/gi,'');
+  if(!clean || clean.length % 2){ log('Bad hex input','err'); return; }
+  const bytes = new Uint8Array(clean.match(/../g).map(h => parseInt(h,16)));
+  try{
+    log('TX '+short(w.c.uuid)+': '+hex(bytes),'tx');
+    if(w.c.properties.writeWithoutResponse && w.c.writeValueWithoutResponse) await w.c.writeValueWithoutResponse(bytes);
+    else await w.c.writeValue(bytes);
+    log('  write ok');
+  }catch(e){ log('Write failed: '+e.name+': '+e.message,'err'); }
+}
+
+function disconnect(){
+  if(dev && dev.gatt.connected){ log('Disconnecting…'); dev.gatt.disconnect(); }
+}
+
+async function copyLog(){
+  const text = logEl.innerText;
+  try{ await navigator.clipboard.writeText(text); log('Log copied.','ok'); return; }catch(e){}
+  const r = document.createRange(); r.selectNodeContents(logEl);
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  log('Clipboard blocked: log selected, use Copy from the iOS menu.','err');
+}
+
+/* ---------- image pipeline (printer-agnostic) ---------- */
+// Output contract for drivers: last = {mono: Uint8Array(w*h), w, h}; mono[i] === 1 means black (burn).
+const W = 384;
+const KERNELS = {   // error-diffusion kernels: [dx, dy, weight]
+  fs:[[1,0,7/16],[-1,1,3/16],[0,1,5/16],[1,1,1/16]],
+  atk:[[1,0,1/8],[2,0,1/8],[-1,1,1/8],[0,1,1/8],[1,1,1/8],[0,2,1/8]],
+  stucki:[[1,0,8/42],[2,0,4/42],[-2,1,2/42],[-1,1,4/42],[0,1,8/42],[1,1,4/42],[2,1,2/42],[-2,2,1/42],[-1,2,2/42],[0,2,4/42],[1,2,2/42],[2,2,1/42]]
+};
+const BAYER = (() => {   // 8x8 ordered-dither matrix, values 0..63
+  let m = [0], n = 1;
+  while(n < 8){
+    const nm = new Array(4*n*n);
+    for(let y = 0; y < n; y++) for(let x = 0; x < n; x++){
+      const v = m[y*n+x];
+      nm[y*2*n+x] = 4*v; nm[y*2*n+x+n] = 4*v+2; nm[(y+n)*2*n+x] = 4*v+3; nm[(y+n)*2*n+x+n] = 4*v+1;
+    }
+    m = nm; n *= 2;
+  }
+  return m;
+})();
+const view = $('view'), vid = $('vid'), work = document.createElement('canvas');
+let src = null, rot = 0, stream = null, last = null, raf = 0, lastUrl = null;
+
+function schedule(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+
+function blank(){
+  view.width = W; view.height = 240;
+  const c = view.getContext('2d');
+  c.fillStyle = '#fff'; c.fillRect(0,0,W,240);
+  c.fillStyle = '#888'; c.font = '20px sans-serif'; c.textAlign = 'center';
+  c.fillText('Take or choose a photo', W/2, 125);
+}
+
+function draw(){
+  ['br','ct','gm','th','sf'].forEach(k => { $(k+'v').textContent = $(k).value; });
+  if(!src) return;
+  const odd = rot % 2 === 1;
+  const sw = odd ? src.h : src.w, sh = odd ? src.w : src.h;
+  const H = Math.min(2000, Math.max(8, Math.round(W * sh / sw)));
+  work.width = W; work.height = H;
+  const c = work.getContext('2d', {willReadFrequently:true});
+  c.fillStyle = '#fff'; c.fillRect(0,0,W,H);
+  c.save(); c.translate(W/2, H/2); c.rotate(rot * Math.PI / 2);
+  const dw = odd ? H : W, dh = odd ? W : H;
+  c.drawImage(src.el, -dw/2, -dh/2, dw, dh);
+  c.restore();
+  const id = c.getImageData(0,0,W,H), d = id.data, g = new Float32Array(W*H);
+  const br = +$('br').value * 2.55, ct = +$('ct').value * 2.55, gm = +$('gm').value, t = +$('th').value;
+  const cf = (259 * (ct + 255)) / (255 * (259 - ct));
+  for(let i = 0, j = 0; i < g.length; i++, j += 4){
+    let v = 0.299*d[j] + 0.587*d[j+1] + 0.114*d[j+2] + br;
+    v = cf * (v - 128) + 128;
+    v = v < 0 ? 0 : v > 255 ? 255 : v;
+    g[i] = 255 * Math.pow(v / 255, 1 / gm);
+  }
+  const mono = new Uint8Array(W*H), mode = $('mode').value, K = KERNELS[mode];
+  const band = 8 + (+$('sf').value) * 1.2;
+  const add = (x,y,e) => { if(x >= 0 && x < W && y < H) g[y*W+x] += e; };
+  for(let y = 0; y < H; y++){
+    for(let x = 0; x < W; x++){
+      const i = y*W + x, old = g[i];
+      if(mode === 'soft'){   // smoothstep band around threshold + interleaved gradient noise
+        let sv = (old - (t - band)) / (2*band); sv = sv < 0 ? 0 : sv > 1 ? 1 : sv; sv = sv*sv*(3 - 2*sv);
+        const n = (52.9829189 * ((0.06711056*x + 0.00583715*y) % 1)) % 1;
+        mono[i] = sv > n ? 0 : 1; continue;
+      }
+      if(mode === 'bayer'){ mono[i] = old < (BAYER[(y&7)*8 + (x&7)] + 0.5) * 3.984375 + (t - 128) ? 1 : 0; continue; }
+      const nw = old < t ? 0 : 255, e = old - nw;
+      mono[i] = nw === 0 ? 1 : 0;
+      for(const k of K) add(x+k[0], y+k[1], e*k[2]);
+    }
+  }
+  for(let i = 0, j = 0; i < mono.length; i++, j += 4){ const v = mono[i] ? 0 : 255; d[j] = d[j+1] = d[j+2] = v; d[j+3] = 255; }
+  view.width = W; view.height = H;
+  view.getContext('2d').putImageData(id, 0, 0);
+  last = {mono, w:W, h:H};
+  updPrint();
+  $('info').textContent = 'Print size: '+W+' × '+H+' px (rotation '+(rot*90)+'°)';
+}
+
+/* ---------- capture ---------- */
+function stopCam(){
+  if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+  vid.srcObject = null; vid.hidden = true; view.hidden = false;
+  $('btnShot').hidden = true; $('btnLive').textContent = 'Live camera';
+}
+async function startCam(){
+  if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){
+    log('Live camera unavailable here (needs HTTPS). Use Camera app or Library.','err'); return;
+  }
+  try{
+    log('Starting camera…');
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:960}}, audio:false});
+    vid.srcObject = stream; await vid.play();
+    vid.hidden = false; view.hidden = true; $('btnShot').hidden = false; $('btnLive').textContent = 'Stop camera';
+    log('Camera on: '+vid.videoWidth+'×'+vid.videoHeight,'ok');
+  }catch(e){ log('Camera failed: '+errStr(e),'err'); stopCam(); }
+}
+function shot(){
+  const w = vid.videoWidth, h = vid.videoHeight;
+  if(!w){ log('Camera has no frame yet','err'); return; }
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  c.getContext('2d').drawImage(vid,0,0);
+  src = {el:c, w, h}; rot = 0; stopCam(); draw(); log('Captured '+w+'×'+h);
+}
+async function loadFile(f){
+  if(!f) return;
+  try{
+    if(lastUrl) URL.revokeObjectURL(lastUrl);
+    lastUrl = URL.createObjectURL(f);
+    const im = new Image(); im.src = lastUrl; await im.decode();   // <img> applies EXIF orientation
+    src = {el:im, w:im.naturalWidth, h:im.naturalHeight}; rot = 0; stopCam(); draw();
+    log('Loaded '+src.w+'×'+src.h+' ('+Math.round(f.size/1024)+' KB)');
+  }catch(e){ log('Image load failed: '+errStr(e),'err'); }
+}
+
+$('btnLive').addEventListener('click', () => stream ? stopCam() : startCam());
+$('btnShot').addEventListener('click', shot);
+$('btnCam').addEventListener('click', () => $('fCam').click());
+$('btnLib').addEventListener('click', () => $('fLib').click());
+$('btnRot').addEventListener('click', () => { rot = (rot + 1) % 4; schedule(); });
+['fCam','fLib'].forEach(id => $(id).addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; }));
+['mode','br','ct','gm','th','sf'].forEach(id => $(id).addEventListener('input', schedule));
+blank(); draw();
+
+/* ---------- printer driver: MXW01 (ALL PROTOCOL DETAILS UNVERIFIED) ---------- */
+// Assumed (unverified): service ae30; commands on ae01 as 22 21 CMD 00 LEN_LO LEN_HI PAYLOAD CRC8(payload) FF;
+// responses on ae02; image rows (48 bytes each) on ae03; 0xA2 intensity, 0xA9 print request, 0xAD flush, 0xAA print done.
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function crc8(arr){ let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ 0x07) & 0xff : (c << 1) & 0xff; } return c; }  // poly 0x07: unverified
+function pkt(cmd, payload){
+  const p = Uint8Array.from(payload), n = p.length, o = new Uint8Array(8 + n);
+  o.set([0x22,0x21,cmd,0x00,n & 255,n >> 8]); o.set(p,6); o[6+n] = crc8(p); o[7+n] = 0xFF; return o;
+}
+async function wr(ch, bytes){
+  if(ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) await ch.writeValueWithoutResponse(bytes);
+  else await ch.writeValue(bytes);
+}
+let waiters = [];
+function onNotify(id, dv){
+  if(id !== 'ae02') return;
+  const b = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
+  if(b.length < 8 || b[0] !== 0x22 || b[1] !== 0x21){ log('  (unparsed notify)'); return; }
+  const n = b[4] | (b[5] << 8);
+  log('  RX cmd 0x'+b[2].toString(16)+' payload: '+hex(b.subarray(6, 6+n)));
+  waiters = waiters.filter(w => { if(w.cmd === b[2]){ w.res(b); return false; } return true; });
+}
+function waitCmd(cmd, ms){
+  return new Promise(res => {
+    const w = {cmd, res}; waiters.push(w);
+    setTimeout(() => { if(waiters.includes(w)){ waiters = waiters.filter(x => x !== w); res(null); } }, ms);
+  });
+}
+function packRows(mono, w, h, lsb, rows){   // 1 = black. Bit order is unverified, selectable in UI.
+  const rb = w >> 3, out = new Uint8Array(rb * rows);
+  for(let y = 0; y < h; y++) for(let x = 0; x < w; x++)
+    if(mono[y*w+x]) out[y*rb + (x >> 3)] |= lsb ? (1 << (x & 7)) : (0x80 >> (x & 7));
+  return out;
+}
+const catDriver = {
+  name:'MXW01 (unverified protocol)', widthPx:384,
+  connect, disconnect,
+  async printBitmap(mono, w, h){
+    const c1 = catChars.ae01, c3 = catChars.ae03;
+    if(!(dev && dev.gatt.connected && c1 && c3)) throw new Error('Not connected (need ae01 + ae03)');
+    if(w !== 384) throw new Error('Width must be 384');
+    const rows = h + (+$('feed').value | 0), lsb = $('bits').value === 'lsb';
+    const data = packRows(mono, w, h, lsb, rows);
+    const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
+    log('Print start: '+w+' × '+rows+' rows, '+data.length+' bytes, bit order '+(lsb ? 'LSB' : 'MSB')+' (unverified)');
+    await ctl(0xA2, [+$('inten').value]);
+    await sleep(50);
+    const ack = waitCmd(0xA9, 3000);
+    await ctl(0xA9, [rows & 255, rows >> 8, 0x30, 0x00]);   // payload layout unverified
+    log((await ack) ? 'Print request answered' : 'No answer to 0xA9 within 3 s, continuing anyway', (await ack) ? 'ok' : 'err');
+    const ch = Math.max(20, +$('chunk').value | 0), dl = +$('delay').value | 0;
+    for(let o = 0, n = 0; o < data.length; o += ch, n++){
+      await wr(c3, data.subarray(o, o + ch));
+      if(dl) await sleep(dl);
+      if(n % 150 === 0) log('  data '+Math.round(o * 100 / data.length)+'%');
+    }
+    log('Data sent','ok');
+    const done = waitCmd(0xAA, 30000);
+    await ctl(0xAD, [0x00]);
+    log((await done) ? 'Print-complete notice received' : 'No complete notice within 30 s (check paper/printer)', (await done) ? 'ok' : 'err');
+  }
+};
+
+function testPattern(){   // asymmetric "F" + border: shows mirroring/bit-order errors at a glance
+  const w = 384, h = 160, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0,0,w,h); x.fillStyle = '#000';
+  x.fillRect(0,0,w,6); x.fillRect(0,h-6,w,6); x.fillRect(0,0,6,h); x.fillRect(w-6,0,6,h); x.fillRect(12,12,28,28);
+  x.font = 'bold 110px sans-serif'; x.textBaseline = 'top'; x.fillText('F', 70, 20);
+  const d = x.getImageData(0,0,w,h).data, m = new Uint8Array(w*h);
+  for(let i = 0; i < m.length; i++) m[i] = d[i*4] < 128 ? 1 : 0;
+  return {mono:m, w, h};
+}
+function updPrint(){
+  const ok = !!(dev && dev.gatt && dev.gatt.connected && catChars.ae01 && catChars.ae03) && !printing;
+  $('btnPrint').disabled = !ok || !last; $('btnTest').disabled = !ok;
+}
+async function doPrint(m){
+  if(printing) return;
+  printing = true; updPrint();
+  try{ await catDriver.printBitmap(m.mono, m.w, m.h); }
+  catch(e){ log('Print failed: '+errStr(e),'err'); }
+  printing = false; updPrint();
+}
+$('btnPrint').addEventListener('click', () => last && doPrint(last));
+$('btnTest').addEventListener('click', () => doPrint(testPattern()));
+$('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
+$('inv').textContent = $('inten').value;
+
+/* ---------- wiring ---------- */
+$('btnConnect').addEventListener('click', connect);   // must stay a direct user tap (iOS rule)
+$('btnDisc').addEventListener('click', disconnect);
+$('btnSend').addEventListener('click', sendHex);
+$('btnCopy').addEventListener('click', copyLog);
+$('btnClear').addEventListener('click', () => { logEl.textContent = ''; });
+
+log('UA: '+navigator.userAgent);
+log('Secure context: '+window.isSecureContext+' | Web Bluetooth: '+!!navigator.bluetooth);
+</script>
+</body>
+</html>
