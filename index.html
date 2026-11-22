@@ -42,7 +42,7 @@ input[type=range]{padding:0;border:0;background:none}
 </head>
 <body>
 <h1>Cat Photo Printer</h1>
-<p class="sub">Milestones 2–4 · print (unverified) · build 4</p>
+<p class="sub">Milestones 2–4 · print (unverified) · build 5</p>
 
 <div class="card">
   <p id="state">Disconnected</p>
@@ -88,9 +88,12 @@ input[type=range]{padding:0;border:0;background:none}
   <div class="row">
     <button id="btnPrint" class="main" disabled>Print photo</button>
     <button id="btnTest" disabled>Test pattern</button>
+    <button id="btnStat" disabled>Status</button>
   </div>
   <label class="sl">Intensity <b id="inv"></b><input id="inten" type="range" min="0" max="100" value="60"></label>
   <details style="margin-top:10px"><summary>Print settings (unverified defaults)</summary>
+    <label class="sl">Request byte 3, hex (default 30) <input id="rq3" value="30" autocomplete="off"></label>
+    <label class="sl">Request byte 4 / mode, hex (default 00) <input id="rq4" value="00" autocomplete="off"></label>
     <label class="sl">Bit order <select id="bits"><option value="lsb">LSB first</option><option value="msb">MSB first</option></select></label>
     <label class="sl">Chunk bytes <input id="chunk" type="number" value="48" min="20" max="240"></label>
     <label class="sl">Delay ms <input id="delay" type="number" value="15" min="0" max="100"></label>
@@ -432,7 +435,8 @@ const catDriver = {
     await ctl(0xA2, [+$('inten').value]);
     await sleep(50);
     const ack = waitCmd(0xA9, 3000);
-    await ctl(0xA9, [rows & 255, rows >> 8, 0x30, 0x00]);   // payload layout unverified
+    const r3 = parseInt($('rq3').value, 16) & 255, r4 = parseInt($('rq4').value, 16) & 255;
+    await ctl(0xA9, [rows & 255, rows >> 8, r3, r4]);   // payload layout unverified
     log((await ack) ? 'Print request answered' : 'No answer to 0xA9 within 3 s, continuing anyway', (await ack) ? 'ok' : 'err');
     const ch = Math.max(20, +$('chunk').value | 0), dl = +$('delay').value | 0;
     for(let o = 0, n = 0; o < data.length; o += ch, n++){
@@ -458,7 +462,7 @@ function testPattern(){   // asymmetric "F" + border: shows mirroring/bit-order 
 }
 function updPrint(){
   const ok = !!(dev && dev.gatt && dev.gatt.connected && catChars.ae01 && catChars.ae03) && !printing;
-  $('btnPrint').disabled = !ok || !last; $('btnTest').disabled = !ok;
+  $('btnPrint').disabled = !ok || !last; $('btnTest').disabled = !ok; $('btnStat').disabled = !ok;
 }
 async function doPrint(m){
   if(printing) return;
@@ -469,6 +473,12 @@ async function doPrint(m){
 }
 $('btnPrint').addEventListener('click', () => last && doPrint(last));
 $('btnTest').addEventListener('click', () => doPrint(testPattern()));
+$('btnStat').addEventListener('click', async () => {
+  const c1 = catChars.ae01; if(!c1) return;
+  const w = waitCmd(0xA1, 3000), p = pkt(0xA1, [0x00]);   // status query payload unverified
+  log('TX ae01: '+hex(p),'tx'); await wr(c1, p);
+  log((await w) ? 'Status answered' : 'No status answer within 3 s', (await w) ? 'ok' : 'err');
+});
 $('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
 $('inv').textContent = $('inten').value;
 
