@@ -42,7 +42,7 @@ input[type=range]{padding:0;border:0;background:none}
 </head>
 <body>
 <h1>Cat Photo Printer</h1>
-<p class="sub">Milestones 2–4 · print · build 8</p>
+<p class="sub">Milestones 2–4 · print · build 9</p>
 
 <div class="card">
   <p id="state">Disconnected</p>
@@ -97,9 +97,16 @@ input[type=range]{padding:0;border:0;background:none}
     <label class="sl">Request byte 3, hex (default 30) <input id="rq3" value="30" autocomplete="off"></label>
     <label class="sl">Request byte 4 / mode, hex (default 00) <input id="rq4" value="00" autocomplete="off"></label>
     <label class="sl">Bit order <select id="bits"><option value="lsb">LSB first</option><option value="msb">MSB first</option></select></label>
+    <label class="sl">Pacing preset <select id="preset">
+      <option value="48,25">Mac Chrome: 48 B / 25 ms (works)</option>
+      <option value="144,60">Bluefy A: 144 B / 60 ms</option>
+      <option value="96,40">Bluefy B: 96 B / 40 ms</option>
+      <option value="48,60">Bluefy D: 48 B / 60 ms (diagnostic)</option>
+      <option value="20,25">Old: 20 B / 25 ms (too slow)</option>
+    </select></label>
     <label class="sl">Chunk bytes <input id="chunk" type="number" value="20" min="20" max="240"></label>
     <label class="sl">Delay ms <input id="delay" type="number" value="25" min="0" max="100"></label>
-    <label class="sl"><input id="rot180" type="checkbox" checked style="width:auto"> Rotate 180° when printing</label>
+    <label class="sl"><input id="rot180" type="checkbox" style="width:auto"> Rotate 180° when printing</label>
     <label class="sl"><input id="poll" type="checkbox" style="width:auto"> Poll status while printing</label>
     <label class="sl">Feed rows after image <input id="feed" type="number" value="40" min="0" max="200"></label>
   </details>
@@ -214,7 +221,7 @@ async function discover(){
       log('  CHAR '+c.uuid+' ['+p.join(',')+']');
       if(c.properties.write || c.properties.writeWithoutResponse) writable.push({svc:s.uuid, c});
       if(short(s.uuid) === 'ae30') catChars[short(c.uuid)] = c;
-      if(c.properties.notify || c.properties.indicate){
+      if((c.properties.notify || c.properties.indicate) && short(s.uuid) === 'ae30'){
         try{
           c.addEventListener('characteristicvaluechanged', ev => { log('RX '+short(c.uuid)+': '+hex(ev.target.value),'rx'); onNotify(short(c.uuid), ev.target.value); });
           await c.startNotifications();
@@ -464,13 +471,13 @@ const catDriver = {
     if(!a) throw new Error('No answer to print request: power-cycle the printer and reconnect');
     if(a[6] !== 0) throw new Error('Print request rejected (code '+a[6]+'). Try the other CRC polynomial, then power-cycle the printer.');
     log('Print request accepted','ok');
-    let n = 0;
+    const rx0 = rxCount; let n = 0;
     for(let o = 0; o < data.length; o += ch, n++){
       await wr(c3, data.subarray(o, o + ch));
       if(dl) await sleep(dl);
       if(n % 150 === 0) log('  data '+Math.round(o * 100 / data.length)+'%');
     }
-    log('Data sent: '+n+' writes','ok');
+    log('Data sent: '+n+' writes. Printer messages during data phase: '+(rxCount - rx0)+' (0 = printer probably never received the rows)', 'ok');
     const done = waitCmd(0xAA, 45000);
     await ctl(0xAD, [0x00]);
     let polling = $('poll').checked;
@@ -533,6 +540,10 @@ async function doPrint(m){
 $('btnPrint').addEventListener('click', () => last && doPrint(last));
 $('btnTest').addEventListener('click', () => doPrint(testPattern()));
 $('btnProbe').addEventListener('click', probeSize);
+function applyPreset(){ const v = $('preset').value.split(','); $('chunk').value = v[0]; $('delay').value = v[1]; }
+$('preset').addEventListener('change', applyPreset);
+if(/Bluefy/i.test(navigator.userAgent)) $('preset').value = '144,60';
+applyPreset();
 $('btnStat').addEventListener('click', () => getStatus());
 $('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
 $('inv').textContent = $('inten').value;
