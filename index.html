@@ -42,7 +42,7 @@ input[type=range]{padding:0;border:0;background:none}
 </head>
 <body>
 <h1>Cat Photo Printer</h1>
-<p class="sub">Milestones 2–4 · print · build 7</p>
+<p class="sub">Milestones 2–4 · print · build 8</p>
 
 <div class="card">
   <p id="state">Disconnected</p>
@@ -89,6 +89,7 @@ input[type=range]{padding:0;border:0;background:none}
     <button id="btnPrint" class="main" disabled>Print photo</button>
     <button id="btnTest" disabled>Test pattern</button>
     <button id="btnStat" disabled>Status</button>
+    <button id="btnProbe" disabled>Probe size</button>
   </div>
   <label class="sl">Intensity <b id="inv"></b><input id="inten" type="range" min="0" max="255" value="93"></label>
   <details style="margin-top:10px"><summary>Print settings (unverified defaults)</summary>
@@ -99,7 +100,7 @@ input[type=range]{padding:0;border:0;background:none}
     <label class="sl">Chunk bytes <input id="chunk" type="number" value="20" min="20" max="240"></label>
     <label class="sl">Delay ms <input id="delay" type="number" value="25" min="0" max="100"></label>
     <label class="sl"><input id="rot180" type="checkbox" checked style="width:auto"> Rotate 180° when printing</label>
-    <label class="sl"><input id="poll" type="checkbox" checked style="width:auto"> Poll status while printing</label>
+    <label class="sl"><input id="poll" type="checkbox" style="width:auto"> Poll status while printing</label>
     <label class="sl">Feed rows after image <input id="feed" type="number" value="40" min="0" max="200"></label>
   </details>
 </div>
@@ -403,8 +404,9 @@ async function wr(ch, bytes){
   if(ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) await ch.writeValueWithoutResponse(bytes);
   else await ch.writeValue(bytes);
 }
-let waiters = [];
+let waiters = [], rxCount = 0;
 function onNotify(id, dv){
+  rxCount++;
   if(id !== 'ae02') return;
   const b = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
   if(b.length < 8 || b[0] !== 0x22 || b[1] !== 0x21){ log('  (unparsed notify)'); return; }
@@ -490,7 +492,36 @@ function testPattern(){   // asymmetric "F" + border: shows mirroring/bit-order 
 }
 function updPrint(){
   const ok = !!(dev && dev.gatt && dev.gatt.connected && catChars.ae01 && catChars.ae03) && !printing;
-  $('btnPrint').disabled = !ok || !last; $('btnTest').disabled = !ok; $('btnStat').disabled = !ok;
+  $('btnPrint').disabled = !ok || !last; $('btnTest').disabled = !ok; $('btnStat').disabled = !ok; $('btnProbe').disabled = !ok;
+}
+// Probe: the printer stays silent after our data, so it may expect MORE bytes than we send (or some writes are lost).
+// Stream the test pattern, then blank rows, until ANY notification arrives; log how many bytes that took.
+async function probeSize(){
+  if(printing) return;
+  printing = true; updPrint();
+  try{
+    const c1 = catChars.ae01, c3 = catChars.ae03;
+    if(!(dev && dev.gatt.connected && c1 && c3)) throw new Error('Not connected');
+    const t = testPattern(), rows = t.h, img = packRows(t.mono, t.w, t.h, true, rows), exp = img.length;
+    const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
+    const ch = 20, dl = +$('delay').value | 0, cap = exp * 4;
+    log('PROBE: '+rows+' rows requested; 1 bit/pixel would need '+exp+' bytes. Streaming up to '+cap+' bytes, stopping at the first printer message.');
+    await ctl(0xA2, [+$('inten').value & 255]); await sleep(50);
+    const ack = waitCmd(0xA9, 3000);
+    await ctl(0xA9, [rows & 255, rows >> 8, parseInt($('rq3').value, 16) & 255, parseInt($('rq4').value, 16) & 255]);
+    if(!(await ack)) throw new Error('No answer to print request: power-cycle the printer');
+    const rx0 = rxCount; let sent = 0;
+    while(sent < cap && rxCount === rx0){
+      const part = sent < exp ? img.subarray(sent, sent + ch) : new Uint8Array(ch);
+      await wr(c3, part); sent += part.length;
+      if(dl) await sleep(dl);
+      if(sent % 2400 === 0) log('  sent '+sent+' B');
+    }
+    log(rxCount > rx0 ? 'Printer spoke after '+sent+' bytes (1-bit expectation was '+exp+')' : 'No message after '+sent+' bytes', rxCount > rx0 ? 'ok' : 'err');
+    await ctl(0xAD, [0x00]);
+    await sleep(6000);
+  }catch(e){ log('Probe failed: '+errStr(e),'err'); }
+  printing = false; updPrint();
 }
 async function doPrint(m){
   if(printing) return;
@@ -501,6 +532,7 @@ async function doPrint(m){
 }
 $('btnPrint').addEventListener('click', () => last && doPrint(last));
 $('btnTest').addEventListener('click', () => doPrint(testPattern()));
+$('btnProbe').addEventListener('click', probeSize);
 $('btnStat').addEventListener('click', () => getStatus());
 $('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
 $('inv').textContent = $('inten').value;
