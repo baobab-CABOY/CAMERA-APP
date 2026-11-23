@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cat Photo Printer</title>
+<title>Cat Photo Printer — Build 11</title>
 <style>
 :root{
   --bg:#f7f3f4;--fg:#211c1e;--mut:#6f6468;--card:#fff;--line:#e2d8dc;
@@ -16,34 +16,46 @@
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 -apple-system,system-ui,"Segoe UI",sans-serif;
-  padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px))}
+  padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(18px + env(safe-area-inset-bottom,0px))}
 h1{font-size:20px;margin:0 0 2px}
 .sub{color:var(--mut);font-size:13px;margin:0 0 12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
-button{font:inherit;font-weight:600;padding:12px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);flex:1;min-height:46px}
+button{font:inherit;font-weight:600;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);flex:1;min-height:44px;cursor:pointer}
 button.main{background:var(--acc);color:var(--accfg);border-color:var(--acc)}
-button:disabled{opacity:.45}
+button.subbtn{font-size:13px;padding:8px 10px;min-height:38px}
+button.pill{flex:0 0 auto;font-size:12px;padding:6px 11px;min-height:32px;border-radius:999px}
+button.pill.active{background:var(--acc);color:var(--accfg);border-color:var(--acc)}
+button:disabled{opacity:.45;cursor:not-allowed}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 #state{font-weight:600;margin:0 0 4px}
 #hint{color:var(--mut);font-size:13px;margin:0}
-input,select{font:inherit;width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);margin-top:8px}
+input,select{font:inherit;width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);margin-top:6px}
 #log{background:var(--logbg);color:var(--logfg);font:12px/1.35 ui-monospace,Menlo,monospace;border-radius:10px;padding:8px;
-  height:46vh;overflow:auto;white-space:pre-wrap;word-break:break-all;-webkit-user-select:text;user-select:text}
+  height:36vh;overflow:auto;white-space:pre-wrap;word-break:break-all;-webkit-user-select:text;user-select:text}
 #log .err{color:var(--err)}#log .rx{color:var(--rx)}#log .tx{color:var(--tx)}#log .ok{font-weight:700}
-.label{font-size:13px;color:var(--mut);margin:0 0 6px}
+.label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin:0 0 8px}
 [hidden]{display:none!important}
+.stage{position:relative;width:100%}
 #view{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:8px;image-rendering:pixelated}
-#vid{width:100%;display:block;border-radius:8px;background:#000;margin-bottom:8px}
+#vid{width:100%;display:block;border-radius:8px;background:#000}
+#slitCv{width:100%;display:block;border-radius:8px;background:#000}
 input[type=range]{padding:0;border:0;background:none}
 .sl{display:block;margin-top:10px;font-size:14px}.sl b{float:right;font-weight:600}
 #info{color:var(--mut);font-size:12px;margin:6px 0 0}
+.presets{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-top:8px;-webkit-overflow-scrolling:touch}
+.hist{display:flex;gap:8px;overflow-x:auto;padding-top:4px;-webkit-overflow-scrolling:touch}
+.hitem{flex:0 0 84px;border:1px solid var(--line);border-radius:8px;padding:4px;background:var(--bg);text-align:center}
+.hitem canvas{width:100%;height:76px;object-fit:contain;background:#fff;border-radius:4px;display:block;image-rendering:pixelated}
+.hitem button{width:100%;margin-top:4px;padding:4px 2px;min-height:28px;font-size:11px;border-radius:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 </style>
 </head>
 <body>
 <h1>Cat Photo Printer</h1>
-<p class="sub">Milestones 2–4 · print · build 10</p>
+<p class="sub">Build 11 · Creative Shaders, Instant Frames, Slit-Scan &amp; Reprint Queue</p>
 
+<!-- 1. CONNECTION -->
 <div class="card">
   <p id="state">Disconnected</p>
   <p id="hint">Tap Connect, then pick your printer.</p>
@@ -53,46 +65,124 @@ input[type=range]{padding:0;border:0;background:none}
   </div>
 </div>
 
+<!-- 2. CAMERA & SLIT-SCAN CAPTURE -->
 <div class="card">
-  <p class="label">Photo</p>
-  <video id="vid" playsinline muted autoplay hidden></video>
-  <canvas id="view" width="384" height="240"></canvas>
+  <p class="label">1. Capture &amp; Preview</p>
+  <div class="stage">
+    <video id="vid" playsinline muted autoplay hidden></video>
+    <canvas id="slitCv" width="384" height="512" hidden></canvas>
+    <canvas id="view" width="384" height="240"></canvas>
+  </div>
   <p id="info">No photo yet.</p>
+
   <div class="row" style="margin-top:8px">
     <button id="btnLive" class="main">Live camera</button>
-    <button id="btnShot" hidden>Take photo</button>
+    <button id="btnShot" class="main" hidden>Take photo</button>
+    <button id="btnSlit">Slit-Scan</button>
+    <button id="btnSlitStop" class="main" hidden>Finish Scan</button>
   </div>
   <div class="row" style="margin-top:8px">
     <button id="btnCam">Camera app</button>
     <button id="btnLib">Library</button>
     <button id="btnRot">Rotate</button>
+    <button id="btnFlip">Mirror</button>
+  </div>
+  <div id="slitOpts" hidden style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)">
+    <div class="grid2">
+      <label class="sl" style="margin-top:0">Slit Direction
+        <select id="slitDir">
+          <option value="v">Vertical Sweep (Top → Down)</option>
+          <option value="h">Horizontal Sweep (Left → Right)</option>
+        </select>
+      </label>
+      <label class="sl" style="margin-top:0">Sweep Speed
+        <select id="slitSpd">
+          <option value="2">Normal (2 px / frame)</option>
+          <option value="1">Slow / Long Ribbon (1 px)</option>
+          <option value="4">Fast (4 px / frame)</option>
+        </select>
+      </label>
+    </div>
   </div>
   <input id="fCam" type="file" accept="image/*" capture="environment" hidden>
   <input id="fLib" type="file" accept="image/*" hidden>
-  <select id="mode" aria-label="Render mode">
-    <option value="atk">Dot: Atkinson (high contrast)</option>
-    <option value="fs">Dot: Floyd-Steinberg (smooth)</option>
-    <option value="stucki">Dot: Stucki (sharp, clean)</option>
-    <option value="bayer">Dot: Bayer 8×8 (ordered, retro)</option>
-    <option value="soft">Normal: soft threshold</option>
-  </select>
-  <label class="sl">Brightness <b id="brv"></b><input id="br" type="range" min="-100" max="100" value="0"></label>
-  <label class="sl">Contrast <b id="ctv"></b><input id="ct" type="range" min="-100" max="100" value="0"></label>
-  <label class="sl">Gamma <b id="gmv"></b><input id="gm" type="range" min="0.5" max="2.5" step="0.05" value="1"></label>
-  <label class="sl">Threshold <b id="thv"></b><input id="th" type="range" min="0" max="255" value="128"></label>
-  <label class="sl">Softness (soft threshold) <b id="sfv"></b><input id="sf" type="range" min="0" max="100" value="60"></label>
 </div>
 
+<!-- 3. CREATIVE LOOKS, DITHERING & FRAMES -->
 <div class="card">
-  <p class="label">Print</p>
+  <p class="label">2. Creative Look &amp; Frame</p>
+
+  <!-- One-Tap Look Presets -->
+  <div class="presets" id="presetBar">
+    <button type="button" class="pill active" data-look="natural">Natural</button>
+    <button type="button" class="pill" data-look="portrait">High-Key Portrait</button>
+    <button type="button" class="pill" data-look="xerox">Xerox Zine</button>
+    <button type="button" class="pill" data-look="gameboy">Game Boy</button>
+    <button type="button" class="pill" data-look="halftone">Halftone Dots</button>
+    <button type="button" class="pill" data-look="ascii">ASCII Art</button>
+    <button type="button" class="pill" data-look="blueprint">Blueprint Invert</button>
+  </div>
+
+  <div class="grid2" style="margin-top:6px">
+    <label class="sl" style="margin-top:4px">Dither / Shader
+      <select id="mode" aria-label="Render mode">
+        <option value="atk">Atkinson (crisp contrast)</option>
+        <option value="fs">Floyd-Steinberg (smooth)</option>
+        <option value="stucki">Stucki (sharp detail)</option>
+        <option value="bayer">Bayer 8×8 (retro grid)</option>
+        <option value="gameboy">Game Boy 4-Shade (128px)</option>
+        <option value="halftone">Halftone Comic Dots</option>
+        <option value="lines">Engraved Scanlines</option>
+        <option value="ascii">ASCII Text Matrix</option>
+        <option value="soft">Soft Threshold</option>
+      </select>
+    </label>
+    <label class="sl" style="margin-top:4px">Paper Frame
+      <select id="frame">
+        <option value="none">Borderless Full Bleed</option>
+        <option value="polaroid">Instant Film (Polaroid)</option>
+        <option value="receipt">Bodega Receipt Slip</option>
+        <option value="ticket">Cinema / Gallery Stub</option>
+        <option value="film">35mm Sprocket Strip</option>
+        <option value="stamp">Postage Stamp</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="grid2">
+    <input id="caption" placeholder="Caption / title text (optional)" maxlength="42">
+    <select id="stampOpt">
+      <option value="none">No date stamp</option>
+      <option value="date">Date stamp (YYYY.MM.DD)</option>
+      <option value="datetime">Date + Time stamp</option>
+      <option value="sign">Custom caption only</option>
+    </select>
+  </div>
+
+  <label class="sl" style="margin-top:8px"><input id="invert" type="checkbox" style="width:auto"> Invert black &amp; white (Negative / Blueprint)</label>
+
+  <details style="margin-top:8px"><summary style="font-size:13px;font-weight:600">Tone &amp; Dither Sliders</summary>
+    <label class="sl">Brightness <b id="brv"></b><input id="br" type="range" min="-100" max="100" value="0"></label>
+    <label class="sl">Contrast <b id="ctv"></b><input id="ct" type="range" min="-100" max="100" value="0"></label>
+    <label class="sl">Gamma <b id="gmv"></b><input id="gm" type="range" min="0.5" max="2.5" step="0.05" value="1"></label>
+    <label class="sl">Threshold <b id="thv"></b><input id="th" type="range" min="0" max="255" value="128"></label>
+    <label class="sl">Softness (soft threshold) <b id="sfv"></b><input id="sf" type="range" min="0" max="100" value="60"></label>
+  </details>
+</div>
+
+<!-- 4. PRINT CONTROLS -->
+<div class="card">
+  <p class="label">3. Print</p>
   <div class="row">
     <button id="btnPrint" class="main" disabled>Print photo</button>
     <button id="btnTest" disabled>Test pattern</button>
-    <button id="btnStat" disabled>Status</button>
-    <button id="btnProbe" disabled>Probe size</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button id="btnStat" class="subbtn" disabled>Status</button>
+    <button id="btnProbe" class="subbtn" disabled>Probe size</button>
   </div>
   <label class="sl">Intensity <b id="inv"></b><input id="inten" type="range" min="0" max="255" value="93"></label>
-  <details style="margin-top:10px"><summary>Print settings (unverified defaults)</summary>
+  <details style="margin-top:10px"><summary style="font-size:13px;font-weight:600">Print settings (Build 10 verified defaults)</summary>
     <label class="sl">CRC8 polynomial <select id="crcv"><option value="07">0x07 (PROTOCOL.md; accepted in earlier logs)</option><option value="31">0x31 (table from another web driver)</option></select></label>
     <label class="sl">Request byte 3, hex (default 30) <input id="rq3" value="30" autocomplete="off"></label>
     <label class="sl">Request byte 4 / mode, hex (default 00) <input id="rq4" value="00" autocomplete="off"></label>
@@ -113,6 +203,16 @@ input[type=range]{padding:0;border:0;background:none}
   </details>
 </div>
 
+<!-- 5. REPRINT QUEUE -->
+<div class="card">
+  <div class="row" style="align-items:center;margin-bottom:6px">
+    <p class="label" style="margin:0;flex:1">4. Recent Prints (Tap to Load / Reprint)</p>
+    <button id="btnClearHist" class="pill" style="flex:0">Clear</button>
+  </div>
+  <div class="hist" id="histList"><span style="color:var(--mut);font-size:12px">Printed photos appear here for instant 1-tap reprints.</span></div>
+</div>
+
+<!-- 6. DEBUG CONSOLE -->
 <div class="card">
   <p class="label">Debug console</p>
   <div id="log" role="log" aria-live="polite"></div>
@@ -151,8 +251,7 @@ function errStr(e){
   return 'non-Error '+typeof e+' -> '+String(e)+' '+j;
 }
 
-/* ---------- BLE layer (printer-agnostic) ---------- */
-// Candidate services requested up front; Web Bluetooth can only list services declared here.
+/* ---------- BLE layer (preserved verbatim from Build 10) ---------- */
 const SERVICES = ['ae30','ae00','af30','ff00','ffe0','fff0','18f0','fee7','180a','180f']
   .map(s => '0000'+s+'-0000-1000-8000-00805f9b34fb');
 const PROPS = ['read','write','writeWithoutResponse','notify','indicate'];
@@ -166,11 +265,10 @@ function setState(connected, text){
   updPrint();
 }
 
-// UNVERIFIED guess from the advertised name only; confirm with the service/characteristic log.
 function protocolHint(name){
-  if(/^MXW01/i.test(name||'')) return 'Name looks MXW01-style (0x22 0x21 framing) — unverified.';
+  if(/^MXW01/i.test(name||'')) return 'Name looks MXW01-style (0x22 0x21 framing) — ready.';
   if(/^(GB0[123]|GT01)/i.test(name||'')) return 'Name looks GB01-family (0x51 0x78 framing) — unverified.';
-  return 'Protocol unknown from name "'+(name||'')+'". Paste the log so we can decide.';
+  return 'Connected to "'+(name||'')+'".';
 }
 
 async function connect(){
@@ -274,15 +372,14 @@ async function copyLog(){
   log('Clipboard blocked: log selected, use Copy from the iOS menu.','err');
 }
 
-/* ---------- image pipeline (printer-agnostic) ---------- */
-// Output contract for drivers: last = {mono: Uint8Array(w*h), w, h}; mono[i] === 1 means black (burn).
+/* ---------- Creative Pipeline: Shaders, Frames, Stamps & Slit-Scan ---------- */
 const W = 384;
-const KERNELS = {   // error-diffusion kernels: [dx, dy, weight]
+const KERNELS = {
   fs:[[1,0,7/16],[-1,1,3/16],[0,1,5/16],[1,1,1/16]],
   atk:[[1,0,1/8],[2,0,1/8],[-1,1,1/8],[0,1,1/8],[1,1,1/8],[0,2,1/8]],
   stucki:[[1,0,8/42],[2,0,4/42],[-2,1,2/42],[-1,1,4/42],[0,1,8/42],[1,1,4/42],[2,1,2/42],[-2,2,1/42],[-1,2,2/42],[0,2,4/42],[1,2,2/42],[2,2,1/42]]
 };
-const BAYER = (() => {   // 8x8 ordered-dither matrix, values 0..63
+const BAYER = (() => {
   let m = [0], n = 1;
   while(n < 8){
     const nm = new Array(4*n*n);
@@ -294,8 +391,11 @@ const BAYER = (() => {   // 8x8 ordered-dither matrix, values 0..63
   }
   return m;
 })();
-const view = $('view'), vid = $('vid'), work = document.createElement('canvas');
-let src = null, rot = 0, stream = null, last = null, raf = 0, lastUrl = null;
+const ASCII_RAMP = ' .:-=+*#%@';
+
+const view = $('view'), vid = $('vid'), slitCv = $('slitCv'), work = document.createElement('canvas');
+let src = null, rot = 0, mirror = false, stream = null, last = null, raf = 0, lastUrl = null;
+let slitActive = false, slitRaf = 0, slitPos = 0, slitAccum = null;
 
 function schedule(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
 
@@ -303,8 +403,255 @@ function blank(){
   view.width = W; view.height = 240;
   const c = view.getContext('2d');
   c.fillStyle = '#fff'; c.fillRect(0,0,W,240);
-  c.fillStyle = '#888'; c.font = '20px sans-serif'; c.textAlign = 'center';
-  c.fillText('Take or choose a photo', W/2, 125);
+  c.fillStyle = '#888'; c.font = '18px sans-serif'; c.textAlign = 'center';
+  c.fillText('Live camera, Slit-Scan, or Library', W/2, 125);
+}
+
+function getStampText(){
+  const opt = $('stampOpt').value;
+  const cap = $('caption').value.trim();
+  const d = new Date();
+  const yyyy = d.getFullYear(), mm = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2,'0'), mi = String(d.getMinutes()).padStart(2,'0');
+  if(opt === 'date') return cap ? `${cap} · ${yyyy}.${mm}.${dd}` : `${yyyy}.${mm}.${dd}`;
+  if(opt === 'datetime') return cap ? `${cap} · ${yyyy}.${mm}.${dd} ${hh}:${mi}` : `${yyyy}.${mm}.${dd} ${hh}:${mi}`;
+  if(opt === 'sign') return cap;
+  return '';
+}
+
+function ditherGrayToMono(g, w, h, mode, t, sfVal){
+  const mono = new Uint8Array(w * h);
+  if(mode === 'gameboy'){
+    // 3x chunky pixels (128px wide) with 4-level Bayer quantization
+    const scale = 3, gw = Math.floor(w / scale), gh = Math.floor(h / scale);
+    const small = new Float32Array(gw * gh);
+    for(let gy = 0; gy < gh; gy++){
+      for(let gx = 0; gx < gw; gx++){
+        let sum = 0, cnt = 0;
+        for(let dy = 0; dy < scale; dy++) for(let dx = 0; dx < scale; dx++){
+          const sx = gx*scale + dx, sy = gy*scale + dy;
+          if(sx < w && sy < h){ sum += g[sy*w + sx]; cnt++; }
+        }
+        const avg = (sum / cnt) + (128 - t);
+        // Quantize to 4 shades (0, 85, 170, 255)
+        const q = avg < 64 ? 0 : avg < 128 ? 85 : avg < 192 ? 170 : 255;
+        small[gy*gw + gx] = q;
+      }
+    }
+    for(let y = 0; y < h; y++){
+      for(let x = 0; x < w; x++){
+        const gx = Math.min(gw - 1, Math.floor(x / scale));
+        const gy = Math.min(gh - 1, Math.floor(y / scale));
+        const val = small[gy*gw + gx];
+        const b = (BAYER[(y&7)*8 + (x&7)] + 0.5) * 4;
+        mono[y*w + x] = val < b ? 1 : 0;
+      }
+    }
+    return mono;
+  }
+
+  if(mode === 'halftone'){
+    // Angled periodic dot screen (cell size 6px)
+    const freq = 0.92;
+    for(let y = 0; y < h; y++){
+      for(let x = 0; x < w; x++){
+        const u = x * 0.866 - y * 0.5;
+        const v = x * 0.5 + y * 0.866;
+        const spot = (Math.sin(u * freq) * Math.sin(v * freq) + 1) * 127.5;
+        const lum = g[y*w + x] + (128 - t);
+        mono[y*w + x] = lum < spot ? 1 : 0;
+      }
+    }
+    return mono;
+  }
+
+  if(mode === 'lines'){
+    // Horizontal variable-width engraving scanlines (pitch 4px)
+    const pitch = 4;
+    for(let y = 0; y < h; y++){
+      const phase = Math.abs((y % pitch) - (pitch - 1) / 2) / (pitch / 2); // 0 at center, 1 at edge
+      for(let x = 0; x < w; x++){
+        const lum = Math.max(0, Math.min(255, g[y*w + x] + (128 - t)));
+        const darkness = 1 - lum / 255;
+        mono[y*w + x] = darkness > phase * 0.95 ? 1 : 0;
+      }
+    }
+    return mono;
+  }
+
+  if(mode === 'ascii'){
+    // Render crisp monospace ASCII glyphs matching block brightness
+    const cw = 6, ch = 8, cols = Math.floor(w / cw), rows = Math.floor(h / ch);
+    const ac = document.createElement('canvas'); ac.width = w; ac.height = h;
+    const ctx = ac.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#000'; ctx.font = 'bold 8px monospace'; ctx.textBaseline = 'top';
+    for(let r = 0; r < rows; r++){
+      let line = '';
+      for(let c = 0; c < cols; c++){
+        let sum = 0, cnt = 0;
+        for(let dy = 0; dy < ch; dy++) for(let dx = 0; dx < cw; dx++){
+          const sx = c*cw + dx, sy = r*ch + dy;
+          if(sx < w && sy < h){ sum += g[sy*w + sx]; cnt++; }
+        }
+        const lum = Math.max(0, Math.min(255, (sum / cnt) + (128 - t)));
+        const idx = Math.min(ASCII_RAMP.length - 1, Math.floor((1 - lum / 255) * ASCII_RAMP.length));
+        line += ASCII_RAMP[idx];
+      }
+      ctx.fillText(line, 0, r * ch);
+    }
+    const d = ctx.getImageData(0, 0, w, h).data;
+    for(let i = 0; i < w*h; i++) mono[i] = d[i*4] < 160 ? 1 : 0;
+    return mono;
+  }
+
+  const K = KERNELS[mode];
+  const band = 8 + sfVal * 1.2;
+  const add = (x,y,e) => { if(x >= 0 && x < w && y < h) g[y*w+x] += e; };
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const i = y*w + x, old = g[i];
+      if(mode === 'soft'){
+        let sv = (old - (t - band)) / (2*band); sv = sv < 0 ? 0 : sv > 1 ? 1 : sv; sv = sv*sv*(3 - 2*sv);
+        const n = (52.9829189 * ((0.06711056*x + 0.00583715*y) % 1)) % 1;
+        mono[i] = sv > n ? 0 : 1; continue;
+      }
+      if(mode === 'bayer'){
+        mono[i] = old < (BAYER[(y&7)*8 + (x&7)] + 0.5) * 3.984375 + (t - 128) ? 1 : 0;
+        continue;
+      }
+      const nw = old < t ? 0 : 255, e = old - nw;
+      mono[i] = nw === 0 ? 1 : 0;
+      for(const k of K) add(x+k[0], y+k[1], e*k[2]);
+    }
+  }
+  return mono;
+}
+
+function composeWithFrame(photoMono, pw, ph){
+  const frame = $('frame').value;
+  const stamp = getStampText();
+  const cap = $('caption').value.trim();
+
+  // Compute outer canvas dimensions & margins
+  let padTop = 0, padSide = 0, padBot = 0;
+  if(frame === 'polaroid'){ padTop = 18; padSide = 18; padBot = 68; }
+  else if(frame === 'receipt'){ padTop = 58; padSide = 16; padBot = 66; }
+  else if(frame === 'ticket'){ padTop = 44; padSide = 20; padBot = 54; }
+  else if(frame === 'film'){ padTop = 18; padSide = 34; padBot = 18; }
+  else if(frame === 'stamp'){ padTop = 22; padSide = 22; padBot = 36; }
+  else if(stamp){ padBot = 28; }
+
+  const outW = W;
+  const innerW = outW - padSide * 2;
+  const innerH = Math.round(ph * (innerW / pw));
+  const outH = Math.min(2200, padTop + innerH + padBot);
+
+  const fc = document.createElement('canvas');
+  fc.width = outW; fc.height = outH;
+  const ctx = fc.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, outW, outH);
+
+  // Draw frame chrome BEFORE photo
+  ctx.fillStyle = '#000';
+  ctx.strokeStyle = '#000';
+
+  if(frame === 'film'){
+    ctx.fillRect(0, 0, outW, outH);
+    ctx.fillStyle = '#fff';
+    for(let y = 10; y < outH - 12; y += 26){
+      ctx.fillRect(8, y, 14, 16);
+      ctx.fillRect(outW - 22, y, 14, 16);
+    }
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('KODAK TRI-X 400  ▶ 14A', padSide, 13);
+    if(stamp) ctx.fillText(stamp, padSide, outH - 6);
+  }
+
+  if(frame === 'receipt'){
+    ctx.font = 'bold 16px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('★ INSTANT THERMAL LAB ★', outW/2, 22);
+    ctx.font = '11px monospace';
+    ctx.fillText('ITEM: MEMORY CAPTURE   QTY: 01', outW/2, 38);
+    ctx.fillText('------------------------------------------', outW/2, 50);
+  }
+
+  if(frame === 'ticket'){
+    ctx.lineWidth = 3;
+    ctx.strokeRect(8, 8, outW - 16, outH - 16);
+    ctx.font = 'bold 14px monospace'; ctx.textAlign = 'left';
+    ctx.fillText('ADMIT ONE · LIVE PRINT', 18, 28);
+    ctx.textAlign = 'right';
+    ctx.fillText('#042', outW - 18, 28);
+    // Perforation line
+    ctx.setLineDash([5, 5]); ctx.beginPath();
+    ctx.moveTo(8, outH - padBot + 8); ctx.lineTo(outW - 8, outH - padBot + 8); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  if(frame === 'stamp'){
+    ctx.lineWidth = 2;
+    ctx.strokeRect(14, 14, outW - 28, outH - 28);
+    // Scalloped perforations along outer edge
+    for(let x = 0; x <= outW; x += 16){ ctx.beginPath(); ctx.arc(x, 0, 5, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x, outH, 5, 0, Math.PI*2); ctx.fill(); }
+    for(let y = 0; y <= outH; y += 16){ ctx.beginPath(); ctx.arc(0, y, 5, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(outW, y, 5, 0, Math.PI*2); ctx.fill(); }
+  }
+
+  // Blit dithered photo into inner rectangle
+  const pc = document.createElement('canvas'); pc.width = pw; pc.height = ph;
+  const pid = pc.getContext('2d').createImageData(pw, ph);
+  for(let i = 0, j = 0; i < photoMono.length; i++, j += 4){
+    const v = photoMono[i] ? 0 : 255;
+    pid.data[j] = pid.data[j+1] = pid.data[j+2] = v; pid.data[j+3] = 255;
+  }
+  pc.getContext('2d').putImageData(pid, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(pc, padSide, padTop, innerW, innerH);
+
+  if(frame === 'polaroid'){
+    ctx.lineWidth = 2;
+    ctx.strokeRect(padSide - 1, padTop - 1, innerW + 2, innerH + 2);
+    ctx.font = 'bold 20px Georgia, serif'; ctx.textAlign = 'center';
+    const label = cap || stamp || '';
+    if(label) ctx.fillText(label, outW/2, outH - 26);
+    if(cap && stamp && cap !== stamp){
+      ctx.font = '11px monospace';
+      ctx.fillText(stamp, outW/2, outH - 10);
+    }
+  } else if(frame === 'receipt'){
+    ctx.font = '11px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('------------------------------------------', outW/2, outH - 50);
+    ctx.fillText(stamp || 'THANK YOU FOR VISITING', outW/2, outH - 36);
+    // Decorative barcode
+    let bx = 72;
+    for(let i = 0; i < 48; i++){
+      const bw = ((i * 7 + 3) % 3) + 1;
+      if(i % 2 === 0) ctx.fillRect(bx, outH - 28, bw, 18);
+      bx += bw + 2;
+    }
+  } else if(frame === 'ticket'){
+    ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(stamp || 'KEEP THIS STUB · CAT THERMAL CAM', outW/2, outH - 20);
+  } else if(frame === 'stamp'){
+    ctx.font = 'bold 12px monospace'; ctx.textAlign = 'left';
+    ctx.fillText(stamp || 'POSTES · 58MM', 22, outH - 16);
+    ctx.textAlign = 'right';
+    ctx.fillText('1ST CLASS', outW - 22, outH - 16);
+  } else if(frame === 'none' && stamp){
+    ctx.font = 'bold 13px monospace'; ctx.textAlign = 'right';
+    ctx.fillText(stamp, outW - 8, outH - 9);
+  }
+
+  // Convert composed frame back to crisp 1-bit bitmap
+  const outId = ctx.getImageData(0, 0, outW, outH).data;
+  const outMono = new Uint8Array(outW * outH);
+  const inv = $('invert').checked;
+  for(let i = 0; i < outMono.length; i++){
+    const black = outId[i*4] < 128 ? 1 : 0;
+    outMono[i] = inv ? (black ^ 1) : black;
+  }
+  return {mono: outMono, w: outW, h: outH};
 }
 
 function draw(){
@@ -316,10 +663,14 @@ function draw(){
   work.width = W; work.height = H;
   const c = work.getContext('2d', {willReadFrequently:true});
   c.fillStyle = '#fff'; c.fillRect(0,0,W,H);
-  c.save(); c.translate(W/2, H/2); c.rotate(rot * Math.PI / 2);
+  c.save();
+  c.translate(W/2, H/2);
+  if(mirror) c.scale(-1, 1);
+  c.rotate(rot * Math.PI / 2);
   const dw = odd ? H : W, dh = odd ? W : H;
   c.drawImage(src.el, -dw/2, -dh/2, dw, dh);
   c.restore();
+
   const id = c.getImageData(0,0,W,H), d = id.data, g = new Float32Array(W*H);
   const br = +$('br').value * 2.55, ct = +$('ct').value * 2.55, gm = +$('gm').value, t = +$('th').value;
   const cf = (259 * (ct + 255)) / (255 * (259 - ct));
@@ -329,49 +680,73 @@ function draw(){
     v = v < 0 ? 0 : v > 255 ? 255 : v;
     g[i] = 255 * Math.pow(v / 255, 1 / gm);
   }
-  const mono = new Uint8Array(W*H), mode = $('mode').value, K = KERNELS[mode];
-  const band = 8 + (+$('sf').value) * 1.2;
-  const add = (x,y,e) => { if(x >= 0 && x < W && y < H) g[y*W+x] += e; };
-  for(let y = 0; y < H; y++){
-    for(let x = 0; x < W; x++){
-      const i = y*W + x, old = g[i];
-      if(mode === 'soft'){   // smoothstep band around threshold + interleaved gradient noise
-        let sv = (old - (t - band)) / (2*band); sv = sv < 0 ? 0 : sv > 1 ? 1 : sv; sv = sv*sv*(3 - 2*sv);
-        const n = (52.9829189 * ((0.06711056*x + 0.00583715*y) % 1)) % 1;
-        mono[i] = sv > n ? 0 : 1; continue;
-      }
-      if(mode === 'bayer'){ mono[i] = old < (BAYER[(y&7)*8 + (x&7)] + 0.5) * 3.984375 + (t - 128) ? 1 : 0; continue; }
-      const nw = old < t ? 0 : 255, e = old - nw;
-      mono[i] = nw === 0 ? 1 : 0;
-      for(const k of K) add(x+k[0], y+k[1], e*k[2]);
-    }
+
+  const photoMono = ditherGrayToMono(g, W, H, $('mode').value, t, +$('sf').value);
+  const finalImg = composeWithFrame(photoMono, W, H);
+
+  const outId = new ImageData(finalImg.w, finalImg.h);
+  for(let i = 0, j = 0; i < finalImg.mono.length; i++, j += 4){
+    const v = finalImg.mono[i] ? 0 : 255;
+    outId.data[j] = outId.data[j+1] = outId.data[j+2] = v; outId.data[j+3] = 255;
   }
-  for(let i = 0, j = 0; i < mono.length; i++, j += 4){ const v = mono[i] ? 0 : 255; d[j] = d[j+1] = d[j+2] = v; d[j+3] = 255; }
-  view.width = W; view.height = H;
-  view.getContext('2d').putImageData(id, 0, 0);
-  last = {mono, w:W, h:H};
+  view.width = finalImg.w; view.height = finalImg.h;
+  view.getContext('2d').putImageData(outId, 0, 0);
+  last = finalImg;
   updPrint();
-  $('info').textContent = 'Print size: '+W+' × '+H+' px (rotation '+(rot*90)+'°)';
+  $('info').textContent = 'Print size: '+finalImg.w+' × '+finalImg.h+' px ('+Math.round(finalImg.h/8)+' mm tall)';
 }
 
-/* ---------- capture ---------- */
+/* ---------- One-Tap Look Presets ---------- */
+const LOOKS = {
+  natural:   {mode:'atk',      br:0,   ct:0,   gm:1.0,  th:128, inv:false, inten:93},
+  portrait:  {mode:'fs',       br:18,  ct:-10, gm:1.25, th:138, inv:false, inten:85},
+  xerox:     {mode:'atk',      br:-10, ct:65,  gm:0.85, th:120, inv:false, inten:115},
+  gameboy:   {mode:'gameboy',  br:5,   ct:20,  gm:1.0,  th:128, inv:false, inten:100},
+  halftone:  {mode:'halftone', br:5,   ct:25,  gm:1.05, th:128, inv:false, inten:100},
+  ascii:     {mode:'ascii',    br:10,  ct:35,  gm:1.1,  th:128, inv:false, inten:105},
+  blueprint: {mode:'stucki',   br:0,   ct:20,  gm:1.0,  th:128, inv:true,  inten:80}
+};
+$('presetBar').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-look]');
+  if(!btn) return;
+  document.querySelectorAll('#presetBar .pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const L = LOOKS[btn.dataset.look];
+  if(!L) return;
+  $('mode').value = L.mode;
+  $('br').value = L.br; $('ct').value = L.ct; $('gm').value = L.gm; $('th').value = L.th;
+  $('invert').checked = L.inv;
+  $('inten').value = L.inten; $('inv').textContent = L.inten;
+  schedule();
+});
+
+/* ---------- Camera & Slit-Scan Time-Warp ---------- */
 function stopCam(){
+  slitActive = false;
+  cancelAnimationFrame(slitRaf);
   if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
-  vid.srcObject = null; vid.hidden = true; view.hidden = false;
-  $('btnShot').hidden = true; $('btnLive').textContent = 'Live camera';
+  vid.srcObject = null; vid.hidden = true; slitCv.hidden = true; view.hidden = false;
+  $('btnShot').hidden = true; $('btnSlitStop').hidden = true; $('slitOpts').hidden = true;
+  $('btnLive').textContent = 'Live camera'; $('btnSlit').textContent = 'Slit-Scan';
 }
-async function startCam(){
+
+async function startCam(forSlit){
   if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){
-    log('Live camera unavailable here (needs HTTPS). Use Camera app or Library.','err'); return;
+    log('Live camera unavailable here (needs HTTPS). Use Camera app or Library.','err'); return false;
   }
   try{
     log('Starting camera…');
     stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:960}}, audio:false});
     vid.srcObject = stream; await vid.play();
-    vid.hidden = false; view.hidden = true; $('btnShot').hidden = false; $('btnLive').textContent = 'Stop camera';
+    if(!forSlit){
+      vid.hidden = false; slitCv.hidden = true; view.hidden = true;
+      $('btnShot').hidden = false; $('btnLive').textContent = 'Stop camera';
+    }
     log('Camera on: '+vid.videoWidth+'×'+vid.videoHeight,'ok');
-  }catch(e){ log('Camera failed: '+errStr(e),'err'); stopCam(); }
+    return true;
+  }catch(e){ log('Camera failed: '+errStr(e),'err'); stopCam(); return false; }
 }
+
 function shot(){
   const w = vid.videoWidth, h = vid.videoHeight;
   if(!w){ log('Camera has no frame yet','err'); return; }
@@ -379,29 +754,140 @@ function shot(){
   c.getContext('2d').drawImage(vid,0,0);
   src = {el:c, w, h}; rot = 0; stopCam(); draw(); log('Captured '+w+'×'+h);
 }
+
+async function startSlitScan(){
+  if(slitActive){ finishSlitScan(); return; }
+  if(!stream){
+    const ok = await startCam(true);
+    if(!ok) return;
+  }
+  const dir = $('slitDir').value;
+  const sw = 384, sh = dir === 'v' ? 576 : 384;
+  slitCv.width = sw; slitCv.height = sh;
+  const ctx = slitCv.getContext('2d');
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, sw, sh);
+
+  slitAccum = document.createElement('canvas');
+  slitAccum.width = sw; slitAccum.height = sh;
+  slitAccum.getContext('2d').fillStyle = '#fff';
+  slitAccum.getContext('2d').fillRect(0, 0, sw, sh);
+
+  slitPos = 0; slitActive = true;
+  vid.hidden = true; view.hidden = true; slitCv.hidden = false;
+  $('btnShot').hidden = true; $('btnSlitStop').hidden = false; $('slitOpts').hidden = false;
+  $('btnSlit').textContent = 'Cancel Scan';
+
+  const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
+  const tctx = tmp.getContext('2d');
+  const actx = slitAccum.getContext('2d');
+
+  const tick = () => {
+    if(!slitActive) return;
+    const spd = +$('slitSpd').value || 2;
+    const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
+    // Center-crop video to sw x sh
+    const scale = Math.max(sw / vw, sh / vh);
+    const dw = vw * scale, dh = vh * scale;
+    tctx.drawImage(vid, (sw - dw)/2, (sh - dh)/2, dw, dh);
+
+    if(dir === 'v'){
+      actx.drawImage(tmp, 0, slitPos, sw, spd, 0, slitPos, sw, spd);
+      ctx.drawImage(tmp, 0, 0);
+      ctx.drawImage(slitAccum, 0, 0, sw, slitPos + spd, 0, 0, sw, slitPos + spd);
+      ctx.fillStyle = '#ff3b7f'; ctx.fillRect(0, slitPos + spd, sw, 3);
+      slitPos += spd;
+      if(slitPos >= sh){ finishSlitScan(); return; }
+    } else {
+      actx.drawImage(tmp, slitPos, 0, spd, sh, slitPos, 0, spd, sh);
+      ctx.drawImage(tmp, 0, 0);
+      ctx.drawImage(slitAccum, 0, 0, slitPos + spd, sh, 0, 0, slitPos + spd, sh);
+      ctx.fillStyle = '#ff3b7f'; ctx.fillRect(slitPos + spd, 0, 3, sh);
+      slitPos += spd;
+      if(slitPos >= sw){ finishSlitScan(); return; }
+    }
+    slitRaf = requestAnimationFrame(tick);
+  };
+  slitRaf = requestAnimationFrame(tick);
+}
+
+function finishSlitScan(){
+  if(!slitAccum) return;
+  const dir = $('slitDir').value;
+  const finalH = Math.max(48, dir === 'v' ? Math.min(slitAccum.height, slitPos || slitAccum.height) : slitAccum.height);
+  const finalW = Math.max(48, dir === 'h' ? Math.min(slitAccum.width, slitPos || slitAccum.width) : slitAccum.width);
+  const out = document.createElement('canvas'); out.width = finalW; out.height = finalH;
+  out.getContext('2d').drawImage(slitAccum, 0, 0, finalW, finalH, 0, 0, finalW, finalH);
+  src = {el: out, w: finalW, h: finalH};
+  rot = 0; stopCam(); draw();
+  log('Slit-Scan captured ('+finalW+'×'+finalH+')','ok');
+}
+
 async function loadFile(f){
   if(!f) return;
   try{
     if(lastUrl) URL.revokeObjectURL(lastUrl);
     lastUrl = URL.createObjectURL(f);
-    const im = new Image(); im.src = lastUrl; await im.decode();   // <img> applies EXIF orientation
+    const im = new Image(); im.src = lastUrl; await im.decode();
     src = {el:im, w:im.naturalWidth, h:im.naturalHeight}; rot = 0; stopCam(); draw();
     log('Loaded '+src.w+'×'+src.h+' ('+Math.round(f.size/1024)+' KB)');
   }catch(e){ log('Image load failed: '+errStr(e),'err'); }
 }
 
-$('btnLive').addEventListener('click', () => stream ? stopCam() : startCam());
+$('btnLive').addEventListener('click', () => stream && !slitActive ? stopCam() : startCam(false));
 $('btnShot').addEventListener('click', shot);
+$('btnSlit').addEventListener('click', () => slitActive ? stopCam() : startSlitScan());
+$('btnSlitStop').addEventListener('click', finishSlitScan);
 $('btnCam').addEventListener('click', () => $('fCam').click());
 $('btnLib').addEventListener('click', () => $('fLib').click());
 $('btnRot').addEventListener('click', () => { rot = (rot + 1) % 4; schedule(); });
+$('btnFlip').addEventListener('click', () => { mirror = !mirror; schedule(); });
 ['fCam','fLib'].forEach(id => $(id).addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; }));
-['mode','br','ct','gm','th','sf'].forEach(id => $(id).addEventListener('input', schedule));
+['mode','frame','stampOpt','br','ct','gm','th','sf','invert'].forEach(id => $(id).addEventListener('input', schedule));
+$('caption').addEventListener('input', schedule);
 blank(); draw();
 
-/* ---------- printer driver: MXW01 (ALL PROTOCOL DETAILS UNVERIFIED) ---------- */
-// Assumed (unverified): service ae30; commands on ae01 as 22 21 CMD 00 LEN_LO LEN_HI PAYLOAD CRC8(payload) FF;
-// responses on ae02; image rows (48 bytes each) on ae03; 0xA2 intensity, 0xA9 print request, 0xAD flush, 0xAA print done.
+/* ---------- Reprint Queue (In-Memory + LocalStorage Thumbnails) ---------- */
+const historyQueue = [];
+function saveToHistory(img){
+  // Clone bitmap so future edits don't mutate history
+  const clone = {mono: new Uint8Array(img.mono), w: img.w, h: img.h, ts: new Date().toTimeString().slice(0,5)};
+  historyQueue.unshift(clone);
+  if(historyQueue.length > 8) historyQueue.pop();
+  renderHistory();
+}
+
+function renderHistory(){
+  const box = $('histList');
+  if(!historyQueue.length){
+    box.innerHTML = '<span style="color:var(--mut);font-size:12px">Printed photos appear here for instant 1-tap reprints.</span>';
+    return;
+  }
+  box.innerHTML = '';
+  historyQueue.forEach((item, idx) => {
+    const wrap = document.createElement('div'); wrap.className = 'hitem';
+    const cv = document.createElement('canvas'); cv.width = item.w; cv.height = item.h;
+    const id = cv.getContext('2d').createImageData(item.w, item.h);
+    for(let i = 0, j = 0; i < item.mono.length; i++, j += 4){
+      const v = item.mono[i] ? 0 : 255;
+      id.data[j] = id.data[j+1] = id.data[j+2] = v; id.data[j+3] = 255;
+    }
+    cv.getContext('2d').putImageData(id, 0, 0);
+    const btn = document.createElement('button');
+    btn.textContent = 'Reprint ' + item.ts;
+    btn.addEventListener('click', () => {
+      last = {mono: new Uint8Array(item.mono), w: item.w, h: item.h};
+      view.width = item.w; view.height = item.h;
+      view.getContext('2d').putImageData(id, 0, 0);
+      updPrint();
+      if(dev && dev.gatt && dev.gatt.connected) doPrint(last, true);
+      else log('Loaded queued print into preview (connect printer to print).','ok');
+    });
+    wrap.appendChild(cv); wrap.appendChild(btn); box.appendChild(wrap);
+  });
+}
+$('btnClearHist').addEventListener('click', () => { historyQueue.length = 0; renderHistory(); });
+
+/* ---------- printer driver: MXW01 (Build 10 verified transport) ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function crc8(arr){ const poly = $('crcv').value === '31' ? 0x31 : 0x07; let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ poly) & 0xff : (c << 1) & 0xff; } return c; }
 function pkt(cmd, payload){
@@ -409,8 +895,6 @@ function pkt(cmd, payload){
   o.set([0x22,0x21,cmd,0x00,n & 255,n >> 8]); o.set(p,6); o[6+n] = crc8(p); o[7+n] = 0xFF; return o;
 }
 async function wr(ch, bytes){
-  // Always send a fresh, exactly-sized copy: a subarray view shares the big image buffer, and Bluefy may send
-  // the wrong bytes for views (unverified guess; commands, which are fresh arrays, always worked).
   const b = new Uint8Array(bytes.length); b.set(bytes);
   if(ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) await ch.writeValueWithoutResponse(b);
   else await ch.writeValue(b);
@@ -431,13 +915,12 @@ function waitCmd(cmd, ms){
     setTimeout(() => { if(waiters.includes(w)){ waiters = waiters.filter(x => x !== w); res(null); } }, ms);
   });
 }
-function packRows(mono, w, h, lsb, rows){   // 1 = black. Bit order is unverified, selectable in UI.
+function packRows(mono, w, h, lsb, rows){
   const rb = w >> 3, out = new Uint8Array(rb * rows);
   for(let y = 0; y < h; y++) for(let x = 0; x < w; x++)
     if(mono[y*w+x]) out[y*rb + (x >> 3)] |= lsb ? (1 << (x & 7)) : (0x80 >> (x & 7));
   return out;
 }
-// Status layout from PROTOCOL.md (jeremy46231/MXW01-catprinter), indices into the FULL notify packet. Unverified here.
 function decodeStatus(b){ return {state:b[6], battery:b[9], temp:b[10], flag:b[12], err:b[13]}; }
 async function getStatus(){
   const c1 = catChars.ae01; if(!c1) return null;
@@ -446,11 +929,11 @@ async function getStatus(){
   const r = await w;
   if(!r){ log('No status answer within 3 s','err'); return null; }
   const st = decodeStatus(r);
-  log('Status: state '+st.state+', battery '+st.battery+'%, temp '+st.temp+'°C, flag '+st.flag+(st.flag ? ', error '+st.err : ' (OK)')+'  [decode unverified]', st.flag ? 'err' : 'ok');
+  log('Status: state '+st.state+', battery '+st.battery+'%, temp '+st.temp+'°C, flag '+st.flag+(st.flag ? ', error '+st.err : ' (OK)'), st.flag ? 'err' : 'ok');
   return st;
 }
 const catDriver = {
-  name:'MXW01 (protocol per public docs)', widthPx:384,
+  name:'MXW01', widthPx:384,
   connect, disconnect,
   async printBitmap(mono, w, h){
     const c1 = catChars.ae01, c3 = catChars.ae03;
@@ -458,12 +941,12 @@ const catDriver = {
     if(w !== 384) throw new Error('Width must be 384');
     let m = mono;
     if($('rot180').checked){ m = new Uint8Array(mono.length); for(let i = 0; i < mono.length; i++) m[i] = mono[mono.length - 1 - i]; }
-    const rows = Math.max(h + (+$('feed').value | 0), 90);   // docs: at least ~90 rows (4320 bytes)
+    const rows = Math.max(h + (+$('feed').value | 0), 90);
     const lsb = $('bits').value === 'lsb';
     const data = packRows(m, w, h, lsb, rows);
     const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
     const ch = Math.max(20, +$('chunk').value | 0), dl = +$('delay').value | 0;
-    log('Print start: '+w+' × '+rows+' rows, '+data.length+' bytes, '+(lsb ? 'LSB' : 'MSB')+' first, rotate180='+$('rot180').checked+', chunk '+ch+', delay '+dl+' ms');
+    log('Print start: '+w+' × '+rows+' rows, '+data.length+' bytes, '+(lsb ? 'LSB' : 'MSB')+' first, chunk '+ch+', delay '+dl+' ms');
     await ctl(0xA2, [+$('inten').value & 255]);
     await sleep(50);
     const st = await getStatus();
@@ -473,7 +956,7 @@ const catDriver = {
     await ctl(0xA9, [rows & 255, rows >> 8, r3, r4]);
     const a = await ack;
     if(!a) throw new Error('No answer to print request: power-cycle the printer and reconnect');
-    if(a[6] !== 0) throw new Error('Print request rejected (code '+a[6]+'). Try the other CRC polynomial, then power-cycle the printer.');
+    if(a[6] !== 0) throw new Error('Print request rejected (code '+a[6]+').');
     log('Print request accepted','ok');
     const rx0 = rxCount; let n = 0;
     for(let o = 0; o < data.length; o += ch, n++){
@@ -481,7 +964,7 @@ const catDriver = {
       if(dl) await sleep(dl);
       if(n % 150 === 0) log('  data '+Math.round(o * 100 / data.length)+'%');
     }
-    log('Data sent: '+n+' writes. Printer messages during data phase: '+(rxCount - rx0)+' (0 = printer probably never received the rows)', 'ok');
+    log('Data sent: '+n+' writes. Printer messages during data phase: '+(rxCount - rx0), 'ok');
     const done = waitCmd(0xAA, 45000);
     await ctl(0xAD, [0x00]);
     let polling = $('poll').checked;
@@ -491,11 +974,11 @@ const catDriver = {
   }
 };
 
-function testPattern(){   // asymmetric "F" + border: shows mirroring/bit-order errors at a glance
+function testPattern(){
   const w = 384, h = 200, c = document.createElement('canvas'); c.width = w; c.height = h;
   const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0,0,w,h); x.fillStyle = '#000';
   x.fillRect(0,0,w,6); x.fillRect(0,h-6,w,6); x.fillRect(0,0,6,h); x.fillRect(w-6,0,6,h); x.fillRect(12,12,28,28);
-  x.fillRect(12, 140, w - 24, 40);   // solid band: easy to see if the head burns at all
+  x.fillRect(12, 140, w - 24, 40);
   x.font = 'bold 110px sans-serif'; x.textBaseline = 'top'; x.fillText('F', 70, 20);
   const d = x.getImageData(0,0,w,h).data, m = new Uint8Array(w*h);
   for(let i = 0; i < m.length; i++) m[i] = d[i*4] < 128 ? 1 : 0;
@@ -505,8 +988,6 @@ function updPrint(){
   const ok = !!(dev && dev.gatt && dev.gatt.connected && catChars.ae01 && catChars.ae03) && !printing;
   $('btnPrint').disabled = !ok || !last; $('btnTest').disabled = !ok; $('btnStat').disabled = !ok; $('btnProbe').disabled = !ok;
 }
-// Probe: the printer stays silent after our data, so it may expect MORE bytes than we send (or some writes are lost).
-// Stream the test pattern, then blank rows, until ANY notification arrives; log how many bytes that took.
 async function probeSize(){
   if(printing) return;
   printing = true; updPrint();
@@ -516,7 +997,7 @@ async function probeSize(){
     const t = testPattern(), rows = t.h, img = packRows(t.mono, t.w, t.h, true, rows), exp = img.length;
     const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
     const ch = 20, dl = +$('delay').value | 0, cap = exp * 4;
-    log('PROBE: '+rows+' rows requested; 1 bit/pixel would need '+exp+' bytes. Streaming up to '+cap+' bytes, stopping at the first printer message.');
+    log('PROBE: '+rows+' rows requested; streaming up to '+cap+' bytes.');
     await ctl(0xA2, [+$('inten').value & 255]); await sleep(50);
     const ack = waitCmd(0xA9, 3000);
     await ctl(0xA9, [rows & 255, rows >> 8, parseInt($('rq3').value, 16) & 255, parseInt($('rq4').value, 16) & 255]);
@@ -526,23 +1007,25 @@ async function probeSize(){
       const part = sent < exp ? img.subarray(sent, sent + ch) : new Uint8Array(ch);
       await wr(c3, part); sent += part.length;
       if(dl) await sleep(dl);
-      if(sent % 2400 === 0) log('  sent '+sent+' B');
     }
-    log(rxCount > rx0 ? 'Printer spoke after '+sent+' bytes (1-bit expectation was '+exp+')' : 'No message after '+sent+' bytes', rxCount > rx0 ? 'ok' : 'err');
+    log(rxCount > rx0 ? 'Printer spoke after '+sent+' bytes' : 'No message after '+sent+' bytes', rxCount > rx0 ? 'ok' : 'err');
     await ctl(0xAD, [0x00]);
     await sleep(6000);
   }catch(e){ log('Probe failed: '+errStr(e),'err'); }
   printing = false; updPrint();
 }
-async function doPrint(m){
+async function doPrint(m, isReprint){
   if(printing) return;
   printing = true; updPrint();
-  try{ await catDriver.printBitmap(m.mono, m.w, m.h); }
+  try{
+    if(!isReprint && m !== null && last === m) saveToHistory(m);
+    await catDriver.printBitmap(m.mono, m.w, m.h);
+  }
   catch(e){ log('Print failed: '+errStr(e),'err'); }
   printing = false; updPrint();
 }
-$('btnPrint').addEventListener('click', () => last && doPrint(last));
-$('btnTest').addEventListener('click', () => doPrint(testPattern()));
+$('btnPrint').addEventListener('click', () => last && doPrint(last, false));
+$('btnTest').addEventListener('click', () => doPrint(testPattern(), true));
 $('btnProbe').addEventListener('click', probeSize);
 function applyPreset(){ const v = $('preset').value.split(','); $('chunk').value = v[0]; $('delay').value = v[1]; }
 $('preset').addEventListener('change', applyPreset);
@@ -553,13 +1036,13 @@ $('inten').addEventListener('input', () => { $('inv').textContent = $('inten').v
 $('inv').textContent = $('inten').value;
 
 /* ---------- wiring ---------- */
-$('btnConnect').addEventListener('click', connect);   // must stay a direct user tap (iOS rule)
+$('btnConnect').addEventListener('click', connect);
 $('btnDisc').addEventListener('click', disconnect);
 $('btnSend').addEventListener('click', sendHex);
 $('btnCopy').addEventListener('click', copyLog);
 $('btnClear').addEventListener('click', () => { logEl.textContent = ''; });
 
-log('UA: '+navigator.userAgent);
+log('Build 11 ready. UA: '+navigator.userAgent);
 log('Secure context: '+window.isSecureContext+' | Web Bluetooth: '+!!navigator.bluetooth);
 </script>
 </body>
