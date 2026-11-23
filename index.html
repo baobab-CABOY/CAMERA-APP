@@ -42,7 +42,7 @@ input[type=range]{padding:0;border:0;background:none}
 </head>
 <body>
 <h1>Cat Photo Printer</h1>
-<p class="sub">Milestones 2–4 · print · build 9</p>
+<p class="sub">Milestones 2–4 · print · build 10</p>
 
 <div class="card">
   <p id="state">Disconnected</p>
@@ -99,6 +99,7 @@ input[type=range]{padding:0;border:0;background:none}
     <label class="sl">Bit order <select id="bits"><option value="lsb">LSB first</option><option value="msb">MSB first</option></select></label>
     <label class="sl">Pacing preset <select id="preset">
       <option value="48,25">Mac Chrome: 48 B / 25 ms (works)</option>
+      <option value="96,20">Bluefy E: 96 B / 20 ms (fast, try first)</option>
       <option value="144,60">Bluefy A: 144 B / 60 ms</option>
       <option value="96,40">Bluefy B: 96 B / 40 ms</option>
       <option value="48,60">Bluefy D: 48 B / 60 ms (diagnostic)</option>
@@ -408,8 +409,11 @@ function pkt(cmd, payload){
   o.set([0x22,0x21,cmd,0x00,n & 255,n >> 8]); o.set(p,6); o[6+n] = crc8(p); o[7+n] = 0xFF; return o;
 }
 async function wr(ch, bytes){
-  if(ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) await ch.writeValueWithoutResponse(bytes);
-  else await ch.writeValue(bytes);
+  // Always send a fresh, exactly-sized copy: a subarray view shares the big image buffer, and Bluefy may send
+  // the wrong bytes for views (unverified guess; commands, which are fresh arrays, always worked).
+  const b = new Uint8Array(bytes.length); b.set(bytes);
+  if(ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) await ch.writeValueWithoutResponse(b);
+  else await ch.writeValue(b);
 }
 let waiters = [], rxCount = 0;
 function onNotify(id, dv){
@@ -542,7 +546,7 @@ $('btnTest').addEventListener('click', () => doPrint(testPattern()));
 $('btnProbe').addEventListener('click', probeSize);
 function applyPreset(){ const v = $('preset').value.split(','); $('chunk').value = v[0]; $('delay').value = v[1]; }
 $('preset').addEventListener('change', applyPreset);
-if(/Bluefy/i.test(navigator.userAgent)) $('preset').value = '144,60';
+if(/Bluefy/i.test(navigator.userAgent)) $('preset').value = '96,20';
 applyPreset();
 $('btnStat').addEventListener('click', () => getStatus());
 $('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
