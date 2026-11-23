@@ -27,26 +27,25 @@ body{
   padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px));
 }
 
-/* Minimalist Top Status & BLE Camera Bar */
+/* Minimalist Top Bar: Fused BLE / 35mm Camera Connect Button + Heat Stop + Battery + Disconnect */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
   margin-bottom:10px;padding:6px 10px;background:var(--card);
   border:1.5px solid var(--line);border-radius:8px;box-shadow:2px 2px 0 var(--line);
 }
-.cam-sign{display:inline-flex;align-items:center;gap:7px;min-width:0}
-.cam-badge{
-  display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:6px;
-  border:1.5px solid var(--line);background:var(--bg);color:var(--mut);
+button.conn-fuse{
+  flex:0 0 auto;min-height:32px;padding:4px 10px;border-radius:6px;
+  border:1.5px solid var(--line);background:var(--bg);color:var(--fg);
+  font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px;
+  cursor:pointer;box-shadow:1.5px 1.5px 0 var(--line);
 }
-.cam-badge.ready{
-  border-color:var(--ok);color:var(--ok);background:color-mix(in srgb, var(--ok) 12%, var(--bg));
+button.conn-fuse.ready{
+  border-color:var(--ok);color:#fff;background:var(--ok);
 }
-.cam-badge.busy{
-  border-color:var(--accent2);color:var(--accent2);background:color-mix(in srgb, var(--accent2) 12%, var(--bg));
+button.conn-fuse.busy{
+  border-color:var(--accent2);color:#fff;background:var(--accent2);
 }
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--mut);flex-shrink:0}
-.cam-badge.ready .status-dot{background:var(--ok)}
-.cam-badge.busy .status-dot{background:var(--accent2)}
+button.conn-fuse:active:not(:disabled){transform:translate(1px,1px);box-shadow:0.5px 0.5px 0 var(--line)}
 
 .telem-group{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .telem-chip{
@@ -61,7 +60,6 @@ body{
 .telem-chip.heat-ok{opacity:.65;color:var(--mut)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
-.ble-btns{display:flex;gap:5px;flex-shrink:0}
 button.micro{
   min-height:28px;width:30px;padding:0;flex:0 0 30px;border-radius:6px;
   border:1.5px solid var(--line);background:var(--bg);color:var(--fg);
@@ -75,7 +73,7 @@ button.micro:disabled{opacity:.35;box-shadow:none;cursor:not-allowed}
   background:var(--card);border:1.5px solid var(--line);border-radius:8px;
   padding:12px;margin-bottom:12px;box-shadow:3px 3px 0 var(--line);
 }
-.row{display:flex;gap:8px;flex-wrap:wrap}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
 button{
   font:inherit;font-weight:700;padding:10px 12px;border-radius:6px;
   border:1.5px solid var(--line);background:var(--card);color:var(--fg);
@@ -88,12 +86,12 @@ button.pill.active{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 button.pill.cool-pill{border-color:var(--accent2);color:var(--accent2)}
 button.pill.cool-pill.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
 button:disabled{opacity:.4;cursor:not-allowed}
-button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
   outline:2.5px solid var(--accent);outline-offset:2px;
 }
 
-/* Primary Action Row: Zinester Print + Prominent Save */
-.cta-row{display:flex;gap:8px;margin-top:10px;align-items:stretch}
+/* Primary Action Row above controls: Zinester Print + Prominent Save */
+.cta-row{display:flex;gap:8px;margin-bottom:10px;align-items:stretch}
 button.zinester-print{
   flex:1 1 auto;min-height:52px;padding:12px 14px;
   background:var(--accent);color:#fff;border:2px solid var(--line);border-radius:4px;
@@ -110,7 +108,7 @@ button.zinester-print:active:not(:disabled){
 }
 
 button.save-cta{
-  flex:0 0 auto;min-width:110px;min-height:52px;padding:12px 14px;
+  flex:0 0 auto;min-width:108px;min-height:52px;padding:12px 14px;
   background:var(--accent2);color:#fff;border:2px solid var(--line);border-radius:4px;
   box-shadow:4px 4px 0 var(--line);
   font-size:13px;letter-spacing:.05em;text-transform:uppercase;
@@ -118,6 +116,26 @@ button.save-cta{
 }
 button.save-cta:active:not(:disabled){
   transform:translate(3px,3px);box-shadow:1px 1px 0 var(--line);
+}
+
+/* High-visibility Shutter / Snap CTA when live camera is active */
+button.shutter-cta{
+  flex:1.6 1 auto;min-height:46px;
+  background:#ff2e63;color:#fff;border:2px solid var(--line);
+  box-shadow:3px 3px 0 var(--line);
+  font-size:14px;letter-spacing:.04em;text-transform:uppercase;
+}
+button.shutter-cta:active:not(:disabled){
+  transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line);
+}
+
+/* Secondary / Utility Slit-Scan button (visually subordinate to primary capture/actions) */
+button.slit-sub{
+  flex:0 0 auto;min-height:36px;padding:6px 10px;font-size:11.5px;font-weight:600;
+  color:var(--mut);background:var(--bg);border:1px dashed var(--line);border-radius:6px;
+}
+button.slit-sub.active-toggle{
+  background:var(--accent2);color:#fff;border-style:solid;
 }
 
 input,select,textarea{
@@ -137,17 +155,18 @@ input,select,textarea{
 [hidden]{display:none!important}
 .stage{position:relative;width:100%}
 #view{width:100%;display:block;background:#fff;border:1.5px solid var(--line);border-radius:4px;image-rendering:pixelated}
-#vidWrap{position:relative;width:100%;overflow:hidden;border-radius:4px}
-#vid,#slitCv{width:100%;display:block;border-radius:4px;background:#000;border:1.5px solid var(--line)}
+#vidWrap{position:relative;width:100%;aspect-ratio:4 / 3;overflow:hidden;border-radius:4px;background:#000;border:1.5px solid var(--line)}
+#vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#slitCv{width:100%;display:block;border-radius:4px;background:#000;border:1.5px solid var(--line)}
 #ghostOverlay{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  pointer-events:none;opacity:.45;mix-blend-mode:normal;border-radius:4px;
+  pointer-events:none;opacity:.45;mix-blend-mode:normal;border-radius:4px;z-index:2;
 }
 #cropGuide{
-  position:absolute;inset:0;pointer-events:none;border-radius:4px;
+  position:absolute;inset:0;pointer-events:none;border-radius:4px;z-index:3;
   display:flex;flex-direction:column;justify-content:space-between;
 }
-.crop-shade{background:rgba(0,0,0,.52);width:100%;flex:1 1 auto}
+.crop-shade{background:rgba(0,0,0,.48);width:100%;flex:1 1 auto}
 .crop-window{
   width:100%;aspect-ratio:4 / 3;border-top:2px dashed #ff5c7c;border-bottom:2px dashed #ff5c7c;
   position:relative;flex:0 0 auto;
@@ -156,6 +175,17 @@ input,select,textarea{
   content:"LANDSCAPE CROP";position:absolute;right:6px;top:4px;
   font-size:9.5px;font-weight:700;letter-spacing:.06em;
   background:rgba(0,0,0,.72);color:#fff;padding:1px 5px;border-radius:3px;
+}
+#liveCountdownOverlay{
+  position:absolute;inset:0;z-index:8;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.22);
+}
+.cd-badge{
+  padding:10px 22px;border-radius:10px;
+  background:rgba(24,21,18,.84);color:#fff;border:2px solid var(--accent);
+  box-shadow:4px 4px 0 #000;font-size:24px;font-weight:700;letter-spacing:.05em;
+  text-align:center;
 }
 #flashOverlay{
   position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;
@@ -175,19 +205,18 @@ input[type=range]{padding:0;border:0;background:none}
 .hitem canvas{width:100%;height:76px;object-fit:contain;background:#fff;border-radius:3px;display:block;image-rendering:pixelated}
 .hitem button{width:100%;margin-top:4px;padding:4px 2px;min-height:28px;font-size:11px;border-radius:4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 summary.adv-sum{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;list-style:none}
 summary.adv-sum::-webkit-details-marker{display:none}
 summary.adv-sum::before{content:"▸ ";color:var(--accent)}
 details[open] > summary.adv-sum::before{content:"▾ "}
 .sub-box{margin-top:10px;padding-top:10px;border-top:1.5px dashed var(--line)}
-.booth-banner{
-  margin-top:8px;padding:8px 10px;border-radius:6px;border:1.5px solid var(--accent);
-  background:color-mix(in srgb, var(--accent) 12%, var(--bg));font-size:12px;font-weight:700;
-  text-align:center;
+
+.tool-footer-row{
+  margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
 
-/* Integrated Roll Bar below Rotate & Mirror: Compact Photomaton Booth + Separated Banner */
+/* Integrated Roll Bar: Compact Photomaton Booth + Separated Banner */
 .roll-bar{
   margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--line);
   display:flex;gap:6px;align-items:stretch;flex-wrap:nowrap;
@@ -211,7 +240,7 @@ details[open] > summary.adv-sum::before{content:"▾ "}
 }
 button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--line)}
 
-/* Collapsible Drawer Cards (Look & Frame, Stereoscopic, Poster Strip, Zine Maker) */
+/* Collapsible Drawer Cards */
 .tab-card{padding:0}
 .tab-toggle{
   width:100%;min-height:46px;padding:11px 12px;border:0;border-radius:8px;
@@ -224,16 +253,25 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
 .tab-card.open .tab-toggle{border-bottom:1.5px dashed var(--line);border-bottom-left-radius:0;border-bottom-right-radius:0}
 .tab-body{padding:12px}
 
-/* Stereoscopic 3D Card (65mm IPD Cha-Cha + Auto-Align + Live View per Eye) */
+/* Dual-Eye Slots (Stereoscopic 3D + Double Exposure) */
 .stereo-card{
   background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--card)), var(--card));
+}
+.dexp-card{
+  background:linear-gradient(135deg, color-mix(in srgb, var(--warn) 8%, var(--card)), var(--card));
 }
 .stereo-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .stereo-slot{
   border:1.5px dashed var(--line);border-radius:6px;padding:6px;background:var(--bg);
-  text-align:center;display:flex;flex-direction:column;gap:5px;
+  text-align:center;display:flex;flex-direction:column;gap:5px;position:relative;
 }
 .stereo-slot.loaded{border-style:solid;border-color:var(--ok)}
+.slot-head{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.slot-head strong{font-size:10.5px}
+button.slot-x{
+  flex:0 0 auto;min-height:22px;width:22px;padding:0;border-radius:4px;
+  font-size:11px;line-height:1;background:var(--card);border:1px solid var(--line);
+}
 .stereo-media{
   position:relative;width:100%;aspect-ratio:4 / 3;background:#111;border-radius:4px;overflow:hidden;
 }
@@ -268,7 +306,7 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
   align-items:center;flex-wrap:wrap;
 }
 
-/* Phase 3: Zine Text / QR / Optical Stamp Studio + Live Preview */
+/* Zine Maker Studio + Live Preview */
 .phase3-tabs{display:flex;gap:6px;margin-bottom:8px}
 .phase3-tabs button{min-height:34px;padding:6px 8px;font-size:12px}
 .phase3-tabs button.active{background:var(--fg);color:var(--bg)}
@@ -284,19 +322,14 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
 </head>
 <body>
 
-<!-- Minimalist Top Bar: 35mm Cocked/Open Camera Sign + Heat Stop + Battery % + BLE Micro Buttons -->
+<!-- Top Bar: Fused BLE / 35mm Camera Connect Button + Heat Stop + Battery + Disconnect -->
 <div class="topbar">
-  <div class="cam-sign">
-    <div id="camBadge" class="cam-badge" title="Disconnected — 35mm camera open">
-      <span class="status-dot"></span>
-      <svg id="camSvg" width="24" height="18" viewBox="0 0 28 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path id="windLever" d="M20 4 L25 2" />
-        <path d="M4 6 H9 L11 3 H17 L19 6 H24 A2 2 0 0 1 26 8 V16 A2 2 0 0 1 24 18 H4 A2 2 0 0 1 2 16 V8 A2 2 0 0 1 4 6 Z" />
-        <circle cx="14" cy="12" r="4.2" />
-        <circle id="filmDot" cx="6" cy="9.5" r="1.3" fill="currentColor" stroke="none" />
-      </svg>
-    </div>
-  </div>
+  <button id="btnConnect" type="button" class="conn-fuse" title="Connect BLE Printer">
+    <svg id="fuseSvg" width="16" height="16" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="8 5 15 11 11.5 14.5 11.5 5.5 15 9 8 15"/>
+    </svg>
+    <span id="connLabel">BLE</span>
+  </button>
 
   <div class="telem-group">
     <span id="heatChip" class="telem-chip heat-ok" title="Printhead thermal state">
@@ -305,15 +338,18 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
     <span id="batChip" class="telem-chip" title="Printer battery">
       <span>🔋</span><span id="batTxt">--%</span>
     </span>
-    <div class="ble-btns">
-      <button id="btnConnect" class="micro" title="Connect BLE" aria-label="Connect BLE">⏻</button>
-      <button id="btnDisc" class="micro" title="Disconnect BLE" aria-label="Disconnect BLE" disabled>✕</button>
-    </div>
+    <button id="btnDisc" class="micro" title="Disconnect BLE" aria-label="Disconnect BLE" disabled>✕</button>
   </div>
 </div>
 
 <!-- Section 1: Capture, Preview, Print & Save, and Integrated Roll Controls -->
 <div class="card" id="mainStageCard">
+  <!-- Print & Save Row ABOVE capture & preview -->
+  <div class="cta-row">
+    <button id="btnPrint" class="zinester-print" disabled>Print</button>
+    <button id="btnSave" class="save-cta" disabled title="Save PNG image to phone">⬇ Save</button>
+  </div>
+
   <div class="stage">
     <div id="vidWrap" hidden>
       <video id="vid" playsinline muted autoplay></video>
@@ -323,27 +359,21 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
         <div class="crop-window"></div>
         <div class="crop-shade"></div>
       </div>
+      <div id="liveCountdownOverlay" hidden>
+        <div id="liveCountdownBadge" class="cd-badge">3</div>
+      </div>
     </div>
     <canvas id="slitCv" width="384" height="512" hidden></canvas>
     <canvas id="view" width="384" height="240"></canvas>
     <div id="flashOverlay"></div>
   </div>
   <p id="info">No photo yet.</p>
-  <div id="boothStatus" class="booth-banner" hidden></div>
 
-  <!-- Prominent Print + Save Buttons -->
-  <div class="cta-row">
-    <button id="btnPrint" class="zinester-print" disabled>Print</button>
-    <button id="btnSave" class="save-cta" disabled title="Save PNG image to phone">⬇ Save</button>
-  </div>
-
-  <!-- Live / Selfie / Snap / Slit-Scan -->
+  <!-- Live / Selfie / High-Visibility Take Photo -->
   <div class="row" style="margin-top:10px">
     <button id="btnLive">Live</button>
     <button id="btnSelfie" title="Switch Front / Back Camera" aria-label="Switch Front / Back Camera">🤳</button>
-    <button id="btnShot" hidden>Snap</button>
-    <button id="btnSlit">Slit-Scan</button>
-    <button id="btnSlitStop" hidden>Finish</button>
+    <button id="btnShot" class="shutter-cta" hidden>● TAKE PHOTO</button>
   </div>
 
   <!-- Camera app & Library -->
@@ -361,7 +391,7 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
   <!-- Integrated Roll Layouts: Photomaton Booth + Separated Banner -->
   <div class="roll-bar">
     <div class="booth-group">
-      <button id="btnBooth" type="button" title="Multi-shot Photomaton Booth">
+      <button id="btnBooth" type="button" title="Multi-shot Photomaton Booth (starts in Selfie)">
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <rect x="2" y="2" width="16" height="16" rx="2"/>
           <line x1="9" y1="2" x2="9" y2="18"/>
@@ -371,9 +401,10 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
         </svg>
         <span>Booth</span>
       </button>
-      <select id="boothCount" aria-label="Booth shots">
+      <select id="boothCount" aria-label="Booth mode">
         <option value="3">3 Shots</option>
         <option value="4">4 Shots (2×2)</option>
+        <option value="crazy">🌀 Crazy (4-Mix)</option>
       </select>
       <select id="boothDelay" aria-label="Booth timer">
         <option value="2">⏱ 2s</option>
@@ -383,6 +414,15 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
     </div>
     <div class="banner-sep">
       <button id="btnBanner" type="button" title="Rotate 90° for extra-wide sideways roll banner">↔ Banner</button>
+    </div>
+  </div>
+
+  <!-- Subordinate Slit-Scan Utility Row -->
+  <div class="tool-footer-row">
+    <span style="font-size:11px;color:var(--mut)">Time-stretch:</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button id="btnSlit" type="button" class="slit-sub">Slit-Scan</button>
+      <button id="btnSlitStop" type="button" class="slit-sub active-toggle" hidden>Finish</button>
     </div>
   </div>
 
@@ -407,6 +447,8 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
   <input id="fLib" type="file" accept="image/*" hidden>
   <input id="fStereoL" type="file" accept="image/*" hidden>
   <input id="fStereoR" type="file" accept="image/*" hidden>
+  <input id="fDexpA" type="file" accept="image/*" hidden>
+  <input id="fDexpB" type="file" accept="image/*" hidden>
 </div>
 
 <!-- Tab 1: Look & Frame (Collapsible) -->
@@ -475,7 +517,7 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
   </div>
 </div>
 
-<!-- Tab 2: Stereoscopic 3D Card Builder (Collapsible + Per-Eye Live View + Full 58mm Roll) -->
+<!-- Tab 2: Stereoscopic 3D Card Builder (Collapsible + Clear X + Per-Eye Live View + Full 58mm Roll) -->
 <div class="card tab-card stereo-card" id="tabStereoCard">
   <button type="button" class="tab-toggle" data-target="tabStereoBody">
     <span class="chev">👓 Stereoscopic 3D Card</span>
@@ -484,7 +526,10 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
   <div class="tab-body" id="tabStereoBody" hidden>
     <div class="stereo-slots">
       <div class="stereo-slot" id="slotL">
-        <strong style="font-size:11px">LEFT EYE (L)</strong>
+        <div class="slot-head">
+          <strong>LEFT EYE (L)</strong>
+          <button type="button" id="btnClearL" class="slot-x" title="Clear Left Eye & restart live">✕</button>
+        </div>
         <div class="stereo-media">
           <video id="vidStereoL" playsinline muted autoplay hidden></video>
           <canvas id="cvStereoL" width="200" height="150"></canvas>
@@ -496,7 +541,10 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
         </div>
       </div>
       <div class="stereo-slot" id="slotR">
-        <strong style="font-size:11px">RIGHT EYE (R)</strong>
+        <div class="slot-head">
+          <strong>RIGHT EYE (R)</strong>
+          <button type="button" id="btnClearR" class="slot-x" title="Clear Right Eye & restart live">✕</button>
+        </div>
         <div class="stereo-media">
           <video id="vidStereoR" playsinline muted autoplay hidden></video>
           <canvas id="cvStereoR" width="200" height="150"></canvas>
@@ -512,6 +560,7 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
       <button type="button" id="btnStereoChaCha">⚡ AUTO</button>
       <button type="button" id="btnStereoAlign">🎯 Auto-Align &amp; Build</button>
       <button type="button" id="btnStereoSwap" style="flex:0 0 46px" title="Swap Left & Right (Parallel vs Cross-eye)">⇄</button>
+      <button type="button" id="btnStereoClearAll" style="flex:0 0 46px" title="Clear Both Eyes & restart live">✕</button>
     </div>
     <div class="grid2" style="margin-top:6px">
       <label class="sl" style="margin-top:4px">Viewer Layout
@@ -528,7 +577,71 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
   </div>
 </div>
 
-<!-- Tab 3: Poster Strip (Collapsible) -->
+<!-- Tab 3: Double Exposure Tab (Collapsible + Dual Slots + Blend Modes + Hi-to-Lo Threshold) -->
+<div class="card tab-card dexp-card" id="tabDexpCard">
+  <button type="button" class="tab-toggle" data-target="tabDexpBody">
+    <span class="chev">🎞 Double Exposure</span>
+    <span id="dexpBadge" class="poster-badge">Hi → Lo Shadows</span>
+  </button>
+  <div class="tab-body" id="tabDexpBody" hidden>
+    <div class="stereo-slots">
+      <div class="stereo-slot" id="slotDexpA">
+        <div class="slot-head">
+          <strong>EXPOSURE A (HI / BASE)</strong>
+          <button type="button" id="btnClearDexpA" class="slot-x" title="Clear A & restart live">✕</button>
+        </div>
+        <div class="stereo-media">
+          <video id="vidDexpA" playsinline muted autoplay hidden></video>
+          <canvas id="cvDexpA" width="200" height="150"></canvas>
+        </div>
+        <div class="stereo-slot-btns">
+          <button type="button" id="btnSnapDexpA">📷 Snap A</button>
+          <button type="button" id="btnLoadDexpA">🖼 File</button>
+        </div>
+      </div>
+      <div class="stereo-slot" id="slotDexpB">
+        <div class="slot-head">
+          <strong>EXPOSURE B (LO / OVERLAY)</strong>
+          <button type="button" id="btnClearDexpB" class="slot-x" title="Clear B & restart live">✕</button>
+        </div>
+        <div class="stereo-media">
+          <video id="vidDexpB" playsinline muted autoplay hidden></video>
+          <canvas id="cvDexpB" width="200" height="150"></canvas>
+        </div>
+        <div class="stereo-slot-btns">
+          <button type="button" id="btnSnapDexpB">📷 Snap B</button>
+          <button type="button" id="btnLoadDexpB">🖼 File</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <label class="sl" style="margin-top:0">Blend Mode
+        <select id="dexpMode">
+          <option value="hilo" selected>Highlights of A → Shadows of B</option>
+          <option value="screen">Additive Screen (Lighten)</option>
+          <option value="multiply">Darkroom Multiply (Shadows)</option>
+          <option value="silhouette">Silhouette Mask (A cuts B)</option>
+          <option value="xor">Phase Interference (XOR)</option>
+        </select>
+      </label>
+      <label class="sl" style="margin-top:0">Blend Mix <b id="dxmv">65%</b>
+        <input id="dexpMix" type="range" min="0" max="100" value="65">
+      </label>
+    </div>
+
+    <label class="sl">Hi/Lo Threshold <b id="dxtv">135</b>
+      <input id="dexpThresh" type="range" min="10" max="245" value="135">
+    </label>
+
+    <div class="row" style="margin-top:8px">
+      <button type="button" id="btnDexpSwap">⇄ Swap A / B</button>
+      <button type="button" id="btnDexpBuild">✦ Combine &amp; Preview</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tab 4: Poster Strip (Collapsible) -->
 <div class="card tab-card poster-card" id="tabPosterCard">
   <button type="button" class="tab-toggle" data-target="tabPosterBody">
     <span class="chev">🧱 Poster Strip</span>
@@ -545,7 +658,7 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
   </div>
 </div>
 
-<!-- Tab 4: Zine Maker (Collapsible + Live Preview + 6 Moiré Parameters) -->
+<!-- Tab 5: Zine Maker (Collapsible + Live Preview + QR First + Optical 10 Sliders + Text Modifier) -->
 <div class="card tab-card" id="tabZineCard">
   <button type="button" class="tab-toggle" data-target="tabZineBody">
     <span class="chev">✦ Zine Maker</span>
@@ -558,11 +671,11 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
 
     <div class="phase3-tabs" id="p3Tabs">
       <button type="button" class="active" data-tab="p3Type">✍ Zine Note</button>
-      <button type="button" class="toggle-btn" data-tab="p3Cipher">🔐 Secret / Barcode</button>
-      <button type="button" data-tab="p3Optic">🌀 Optical Moiré</button>
+      <button type="button" class="toggle-btn" data-tab="p3Cipher">◼ QR / Code</button>
+      <button type="button" class="toggle-btn" data-tab="p3Optic">🌀 Optical</button>
     </div>
 
-    <!-- Tab 1: Zine Type / Manifesto Card -->
+    <!-- Sub-tab 1: Zine Type / Manifesto Card -->
     <div id="p3Type">
       <input id="zineTitle" placeholder="Headline (e.g. NORMAL AIN'T REAL)" maxlength="32">
       <textarea id="zineBody" rows="3" placeholder="Type a poem, manifesto, prompt, or intention slip to render onto 58mm thermal paper…"></textarea>
@@ -575,12 +688,12 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
       </div>
     </div>
 
-    <!-- Tab 2: Secret Cipher / Barcode Slip -->
+    <!-- Sub-tab 2: QR Code First + Barcode / ROT13 -->
     <div id="p3Cipher" hidden>
       <input id="cipherInput" placeholder="URL, secret note, or clue…" maxlength="80">
       <div class="grid2" style="margin-top:6px">
         <select id="cipherStyle">
-          <option value="matrix">2D Data Matrix + Text</option>
+          <option value="qr" selected>QR Code (25×25 Matrix)</option>
           <option value="barcode">1D Zine Barcode</option>
           <option value="rot13">ROT13 Secret Dispatch</option>
         </select>
@@ -588,17 +701,28 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
       </div>
     </div>
 
-    <!-- Tab 3: Procedural Optical Art / Op-Art Generator (6 Parameters) -->
+    <!-- Sub-tab 3: Optical Generator (6 Types + 10 Wild Sliders + Optional Text Warp) -->
     <div id="p3Optic" hidden>
       <div class="grid2">
         <select id="opticPattern">
-          <option value="moire">Interference Moiré Rings</option>
-          <option value="spiral">Hypnotic Op-Art Spiral</option>
-          <option value="sunburst">Cyanotype Sunburst</option>
-          <option value="waves">Caustic Water Waves</option>
+          <option value="moire">1. Interference Moiré Rings</option>
+          <option value="spiral">2. Hypnotic Op-Art Spiral</option>
+          <option value="sunburst">3. Cyanotype Sunburst</option>
+          <option value="waves">4. Caustic Water Waves</option>
+          <option value="voronoi">5. Kaleido Prism Lattice</option>
+          <option value="glitch">6. Scanline CRT Harmonics</option>
         </select>
         <button id="btnRenderOptic" type="button">Generate Art</button>
       </div>
+
+      <div class="grid2" style="margin-top:6px">
+        <input id="opticOverlayText" placeholder="Optional stamped / warped text…" maxlength="28">
+        <select id="opticTextMode">
+          <option value="warp">Text: Warped by Sliders</option>
+          <option value="clean">Text: Crisp Unwarped Stamp</option>
+        </select>
+      </div>
+
       <div class="grid2" style="margin-top:4px">
         <label class="sl">1. Frequency <b id="opv1">18</b><input id="opticFreq" type="range" min="4" max="48" value="18"></label>
         <label class="sl">2. Second Layer <b id="opv2">19</b><input id="opticFreq2" type="range" min="4" max="48" value="19"></label>
@@ -606,6 +730,10 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
         <label class="sl">4. Offset Y <b id="opv4">-18</b><input id="opticOffY" type="range" min="-120" max="120" value="-18"></label>
         <label class="sl">5. Twist / Angle <b id="opv5">0°</b><input id="opticTwist" type="range" min="-180" max="180" value="0"></label>
         <label class="sl">6. Contrast / Warp <b id="opv6">1.0</b><input id="opticWarp" type="range" min="0.4" max="3.0" step="0.1" value="1.0"></label>
+        <label class="sl">7. Radial Pinch <b id="opv7">0.0</b><input id="opticPinch" type="range" min="-2.5" max="2.5" step="0.1" value="0.0"></label>
+        <label class="sl">8. Kaleidoscope Folds <b id="opv8">1</b><input id="opticFolds" type="range" min="1" max="12" step="1" value="1"></label>
+        <label class="sl">9. Phase Drift <b id="opv9">0.0</b><input id="opticPhase" type="range" min="0" max="6.28" step="0.1" value="0.0"></label>
+        <label class="sl">10. Posterize Bands <b id="opv10">0</b><input id="opticPoster" type="range" min="0" max="12" step="1" value="0"></label>
       </div>
     </div>
   </div>
@@ -709,8 +837,19 @@ function triggerFlash(){
   });
 }
 
+function setLiveCountdown(text){
+  const ov = $('liveCountdownOverlay');
+  const bd = $('liveCountdownBadge');
+  if(text === null || text === undefined){
+    ov.hidden = true;
+    return;
+  }
+  bd.textContent = text;
+  ov.hidden = false;
+}
+
 /* ---------- Collapsible Section Tabs ---------- */
-let stereoTabOpen = false;
+let stereoTabOpen = false, dexpTabOpen = false;
 document.querySelectorAll('.tab-toggle').forEach(btn => {
   btn.addEventListener('click', () => {
     const target = $(btn.dataset.target);
@@ -719,21 +858,19 @@ document.querySelectorAll('.tab-toggle').forEach(btn => {
     target.hidden = !willOpen;
     card.classList.toggle('open', willOpen);
 
-    if(btn.dataset.target === 'tabStereoBody'){
-      stereoTabOpen = willOpen;
-      if(willOpen){
-        startStereoSlotLive();
-      } else {
-        stopStereoSlotLive();
-      }
-    }
+    stereoTabOpen = !$('tabStereoBody').hidden;
+    dexpTabOpen = !$('tabDexpBody').hidden;
+
+    if(stereoTabOpen || dexpTabOpen) startDualSlotLive();
+    else stopDualSlotLive();
+
     if(btn.dataset.target === 'tabZineBody' && willOpen){
       updateZineLivePreview();
     }
   });
 });
 
-/* ---------- BLE & 35mm Camera Status Bar ---------- */
+/* ---------- Fused BLE / 35mm Camera Top Button ---------- */
 const SERVICES = ['ae30','ae00','af30','ff00','ffe0','fff0','18f0','fee7','180a','180f']
   .map(s => '0000'+s+'-0000-1000-8000-00805f9b34fb');
 const PRINTER_FILTERS = [
@@ -747,25 +884,35 @@ const PROPS = ['read','write','writeWithoutResponse','notify','indicate'];
 let dev = null, server = null, writable = [], catChars = {}, printing = false;
 let overheated = false, lastBattery = null;
 
-function updateCamSign(connected){
-  const badge = $('camBadge');
-  const lever = $('windLever');
-  const filmDot = $('filmDot');
-  badge.classList.remove('ready', 'busy');
-  if(printing){
-    badge.classList.add('busy');
-    badge.title = 'Printing — 35mm shutter active';
-    lever.setAttribute('d', 'M20 4 L26 6');
-    filmDot.setAttribute('opacity', '1');
-  } else if(connected){
-    badge.classList.add('ready');
-    badge.title = 'Connected — 35mm camera cocked & loaded';
-    lever.setAttribute('d', 'M20 4 L25 1');
-    filmDot.setAttribute('opacity', '1');
+function renderFuseIcon(state){
+  const svg = $('fuseSvg');
+  const lbl = $('connLabel');
+  if(state === 'busy'){
+    lbl.textContent = 'REC';
+    svg.innerHTML = '<rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="10" cy="10" r="3"/><circle cx="20.5" cy="6.5" r="2" fill="currentColor" stroke="none"/>';
+  } else if(state === 'ready'){
+    lbl.textContent = 'CAM';
+    svg.innerHTML = '<path d="M3 6 H8 L10 3 H15 L17 6 H21 A2 2 0 0 1 23 8 V16 A2 2 0 0 1 21 18 H3 A2 2 0 0 1 1 16 V8 A2 2 0 0 1 3 6 Z"/><circle cx="12" cy="12" r="3.6"/><circle cx="20" cy="4.5" r="2.2" fill="currentColor" stroke="none"/>';
   } else {
-    badge.title = 'Disconnected — 35mm camera open / uncocked';
-    lever.setAttribute('d', 'M20 6 L26 6');
-    filmDot.setAttribute('opacity', '0.25');
+    lbl.textContent = 'BLE';
+    svg.innerHTML = '<polyline points="7 4 16 11 11.5 15.5 11.5 4.5 16 9 7 16"/>';
+  }
+}
+
+function updateCamSign(connected){
+  const btn = $('btnConnect');
+  btn.classList.remove('ready', 'busy');
+  if(printing){
+    btn.classList.add('busy');
+    btn.title = 'Printing — camera active';
+    renderFuseIcon('busy');
+  } else if(connected){
+    btn.classList.add('ready');
+    btn.title = 'Connected — camera turned on & ready';
+    renderFuseIcon('ready');
+  } else {
+    btn.title = 'Connect via Bluetooth';
+    renderFuseIcon('ble');
   }
 }
 
@@ -792,7 +939,6 @@ function setBatteryPct(pct){
 }
 
 function setState(connected){
-  $('btnConnect').disabled = connected;
   $('btnDisc').disabled = !connected;
   $('btnSend').disabled = !connected || !writable.length;
   updateCamSign(connected);
@@ -830,6 +976,10 @@ async function autoReconnectKnown(){
 }
 
 async function connect(){
+  if(dev && dev.gatt && dev.gatt.connected){
+    log('Already connected to '+(dev.name||'printer'),'ok');
+    return;
+  }
   if(!navigator.bluetooth){ log('Web Bluetooth unavailable in this browser.','err'); return; }
   try{
     if(navigator.bluetooth.getDevices){
@@ -940,7 +1090,7 @@ async function copyLog(){
   log('Clipboard blocked: log selected, use Copy from the iOS menu.','err');
 }
 
-/* ---------- Creative Pipeline: Shaders, Refined Thermal Preview, Frames & Layouts ---------- */
+/* ---------- Creative Pipeline: Shaders, Thermal Preview, Frames & Layouts ---------- */
 const W = 384;
 const KERNELS = {
   fs:[[1,0,7/16],[-1,1,3/16],[0,1,5/16],[1,1,1/16]],
@@ -973,7 +1123,7 @@ function blank(){
   const c = view.getContext('2d');
   c.fillStyle = '#fff'; c.fillRect(0,0,W,240);
   c.fillStyle = '#666'; c.font = '14px monospace'; c.textAlign = 'center';
-  c.fillText('Live / Booth / Stereo 3D / Library', W/2, 124);
+  c.fillText('Live / Booth / Stereo / Double Exp / Library', W/2, 124);
 }
 
 function getStampText(){
@@ -1394,17 +1544,19 @@ $('presetBar').addEventListener('click', e => {
   if(btn) applyLook(btn.dataset.look);
 });
 
-/* ---------- Camera, Selfie Switch, Slit-Scan & Clean Photo Booth ---------- */
+/* ---------- Camera, Selfie Switch, Slit-Scan & Booth (Selfie Start + Crazy 4-Mix) ---------- */
 function stopCam(){
   slitActive = false;
   cancelAnimationFrame(slitRaf);
+  setLiveCountdown(null);
   if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
   vid.srcObject = null; vidWrap.hidden = true; slitCv.hidden = true; view.hidden = false;
   $('ghostOverlay').hidden = true;
   $('cropGuide').hidden = true;
   $('btnShot').hidden = true; $('btnSlitStop').hidden = true; $('slitOpts').hidden = true;
-  $('btnLive').textContent = 'Live'; $('btnSlit').textContent = 'Slit-Scan';
-  if(stereoTabOpen) startStereoSlotLive();
+  $('btnLive').textContent = 'Live';
+  $('btnSlit').classList.remove('active-toggle');
+  if(stereoTabOpen || dexpTabOpen) startDualSlotLive();
 }
 
 function updateVideoPreviewTransform(){
@@ -1417,7 +1569,7 @@ async function startCam(forSlit, showLandscapeGuide){
   if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){
     log('Live camera unavailable here (needs HTTPS). Use Camera or Library.','err'); return false;
   }
-  stopStereoSlotLive();
+  stopDualSlotLive();
   try{
     if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
     log('Starting '+facing+' camera…');
@@ -1437,20 +1589,25 @@ async function startCam(forSlit, showLandscapeGuide){
   }catch(e){ log('Camera failed: '+errStr(e),'err'); stopCam(); return false; }
 }
 
-async function toggleSelfie(){
-  facing = facing === 'environment' ? 'user' : 'environment';
+async function setCameraFacing(targetFacing){
+  facing = targetFacing;
   mirror = false;
   $('fCam').setAttribute('capture', facing);
-  log('Camera switched to '+(facing === 'user' ? 'selfie (front)' : 'rear'));
   if(stream){
     const keepGuide = !$('cropGuide').hidden;
     await startCam(slitActive, keepGuide);
     if(slitActive) startSlitScan();
-  } else if(stereoTabOpen){
-    await startStereoSlotLive();
+  } else if(stereoTabOpen || dexpTabOpen){
+    await startDualSlotLive();
   } else if(src){
     schedule();
   }
+}
+
+async function toggleSelfie(){
+  const next = facing === 'environment' ? 'user' : 'environment';
+  log('Camera switched to '+(next === 'user' ? 'selfie (front)' : 'rear'));
+  await setCameraFacing(next);
 }
 
 function grabFrameCanvas(forceLandscape){
@@ -1458,7 +1615,6 @@ function grabFrameCanvas(forceLandscape){
   if(!w) return null;
   let sx = 0, sy = 0, sw = w, sh = h;
   if(forceLandscape && h > w){
-    // Extract centered 4:3 landscape region from portrait camera feed
     sh = Math.round(w * 0.75);
     sy = Math.max(0, Math.round((h - sh) / 2));
   }
@@ -1482,29 +1638,116 @@ function shot(){
   log('Captured '+c.width+'×'+c.height);
 }
 
+async function runFastSlitForBooth(durationMs){
+  const ok = await startCam(true, false);
+  if(!ok) return null;
+  const sw = 384, sh = 288;
+  slitCv.width = sw; slitCv.height = sh;
+  vidWrap.hidden = true; view.hidden = true; slitCv.hidden = false;
+  $('btnShot').hidden = true;
+
+  const accum = document.createElement('canvas'); accum.width = sw; accum.height = sh;
+  const actx = accum.getContext('2d');
+  actx.fillStyle = '#fff'; actx.fillRect(0, 0, sw, sh);
+
+  const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
+  const tctx = tmp.getContext('2d');
+  const sctx = slitCv.getContext('2d');
+
+  const start = performance.now();
+  await new Promise(resolve => {
+    const step = now => {
+      const elapsed = now - start;
+      const prog = Math.min(1, elapsed / durationMs);
+      const pos = Math.min(sh - 4, Math.floor(prog * sh));
+      const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
+      const scale = Math.max(sw / vw, sh / vh);
+      const dw = vw * scale, dh = vh * scale;
+      tctx.save();
+      if(facing === 'user'){ tctx.translate(sw, 0); tctx.scale(-1, 1); }
+      tctx.drawImage(vid, (sw - dw)/2, (sh - dh)/2, dw, dh);
+      tctx.restore();
+
+      actx.drawImage(tmp, 0, pos, sw, 6, 0, pos, sw, 6);
+      sctx.drawImage(tmp, 0, 0);
+      sctx.drawImage(accum, 0, 0, sw, pos + 6, 0, 0, sw, pos + 6);
+      sctx.fillStyle = '#ff2e63'; sctx.fillRect(0, pos + 6, sw, 3);
+
+      if(prog < 1) requestAnimationFrame(step);
+      else resolve();
+    };
+    requestAnimationFrame(step);
+  });
+
+  triggerFlash();
+  return accum;
+}
+
 async function runPhotoBooth(){
-  const count = +$('boothCount').value || 3;
+  const modeVal = $('boothCount').value;
   const sec = +$('boothDelay').value || 2;
-  const banner = $('boothStatus');
   scrollToStage();
+
+  // Booth always starts in selfie mode
+  await setCameraFacing('user');
   if(!stream){
     const ok = await startCam(false, false);
     if(!ok) return;
   }
-  banner.hidden = false;
+
   const frames = [];
-  for(let k = 1; k <= count; k++){
-    for(let s = sec; s > 0; s--){
-      banner.textContent = `Shot ${k}/${count} in ${s}…`;
-      await new Promise(r => setTimeout(r, 1000));
+  const labels = [];
+
+  if(modeVal === 'crazy'){
+    // 1. Selfie shot, 2. Front shot, 3. Fast slit cam selfie, 4. Fast slit cam front
+    const plan = [
+      {facing:'user',   kind:'photo', tag:'1/4 SELFIE'},
+      {facing:'environment', kind:'photo', tag:'2/4 FRONT'},
+      {facing:'user',   kind:'slit',  tag:'3/4 SLIT SELFIE'},
+      {facing:'environment', kind:'slit',  tag:'4/4 SLIT FRONT'}
+    ];
+    for(let i = 0; i < plan.length; i++){
+      const item = plan[i];
+      if(facing !== item.facing){
+        await setCameraFacing(item.facing);
+      }
+      if(item.kind === 'photo'){
+        vidWrap.hidden = false; slitCv.hidden = true; view.hidden = true;
+        for(let s = sec; s > 0; s--){
+          setLiveCountdown(`${item.tag} · ${s}`);
+          await new Promise(r => setTimeout(r, 1000));
+        }
+        setLiveCountdown(item.tag);
+        triggerFlash();
+        const snap = grabFrameCanvas(false);
+        if(snap){ frames.push(snap); labels.push(item.tag); }
+        await new Promise(r => setTimeout(r, 300));
+      } else {
+        for(let s = sec; s > 0; s--){
+          setLiveCountdown(`${item.tag} · ${s}`);
+          await new Promise(r => setTimeout(r, 1000));
+        }
+        setLiveCountdown(null);
+        const sl = await runFastSlitForBooth(1100);
+        if(sl){ frames.push(sl); labels.push(item.tag); }
+      }
     }
-    triggerFlash();
-    banner.textContent = `Snap ${k}/${count}!`;
-    const snap = grabFrameCanvas(false);
-    if(snap) frames.push(snap);
-    await new Promise(r => setTimeout(r, 350));
+  } else {
+    const count = +modeVal || 3;
+    for(let k = 1; k <= count; k++){
+      for(let s = sec; s > 0; s--){
+        setLiveCountdown(`${k}/${count} · ${s}`);
+        await new Promise(r => setTimeout(r, 1000));
+      }
+      setLiveCountdown(`${k}/${count}!`);
+      triggerFlash();
+      const snap = grabFrameCanvas(false);
+      if(snap){ frames.push(snap); labels.push(`#${k}`); }
+      await new Promise(r => setTimeout(r, 350));
+    }
   }
-  banner.hidden = true;
+
+  setLiveCountdown(null);
   stopCam();
   if(!frames.length){ log('Photo booth captured no frames','err'); return; }
 
@@ -1512,7 +1755,6 @@ async function runPhotoBooth(){
   let bcv, totalH;
 
   if(frames.length === 4){
-    // 2x2 Photomaton grid for 4 shots
     const cols = 2, rows = 2;
     const cellW = Math.floor((W - pad * (cols + 1)) / cols);
     const cellH = Math.round(cellW * 1.15);
@@ -1520,27 +1762,29 @@ async function runPhotoBooth(){
     bcv = document.createElement('canvas'); bcv.width = W; bcv.height = totalH;
     const bctx = bcv.getContext('2d');
     bctx.fillStyle = '#fff'; bctx.fillRect(0, 0, W, totalH);
-    bctx.fillStyle = '#000';
     frames.forEach((f, idx) => {
       const r = Math.floor(idx / cols), c = idx % cols;
       const x = pad + c * (cellW + pad);
       const y = pad + r * (cellH + pad);
-      bctx.strokeRect(x - 1, y - 1, cellW + 2, cellH + 2);
+      bctx.strokeStyle = '#000'; bctx.strokeRect(x - 1, y - 1, cellW + 2, cellH + 2);
       bctx.save();
       bctx.beginPath(); bctx.rect(x, y, cellW, cellH); bctx.clip();
       const scale = Math.max(cellW / f.width, cellH / f.height);
       const dw = f.width * scale, dh = f.height * scale;
       bctx.drawImage(f, x + (cellW - dw)/2, y + (cellH - dh)/2, dw, dh);
       bctx.restore();
+      if(modeVal === 'crazy' && labels[idx]){
+        bctx.fillStyle = 'rgba(0,0,0,0.72)'; bctx.fillRect(x + 4, y + 4, 88, 16);
+        bctx.fillStyle = '#fff'; bctx.font = 'bold 9.5px monospace'; bctx.fillText(labels[idx], x + 8, y + 15);
+      }
     });
   } else {
-    // Vertical strip for 3 shots
     const cellW = W - pad * 2, cellH = Math.round(cellW * 0.75);
     totalH = pad + frames.length * (cellH + pad);
     bcv = document.createElement('canvas'); bcv.width = W; bcv.height = totalH;
     const bctx = bcv.getContext('2d');
     bctx.fillStyle = '#fff'; bctx.fillRect(0, 0, W, totalH);
-    bctx.fillStyle = '#000';
+    bctx.strokeStyle = '#000';
     frames.forEach((f, idx) => {
       const y = pad + idx * (cellH + pad);
       bctx.strokeRect(pad - 1, y - 1, cellW + 2, cellH + 2);
@@ -1557,7 +1801,7 @@ async function runPhotoBooth(){
   $('btnBanner').classList.remove('active-toggle');
   src = {el: bcv, w: W, h: totalH}; rot = 0;
   draw();
-  log('Photo booth ready ('+frames.length+' shots)','ok');
+  log('Booth complete ('+modeVal+': '+frames.length+' frames)','ok');
 }
 
 async function startSlitScan(){
@@ -1580,7 +1824,7 @@ async function startSlitScan(){
   slitPos = 0; slitActive = true;
   vidWrap.hidden = true; view.hidden = true; slitCv.hidden = false;
   $('btnShot').hidden = true; $('btnSlitStop').hidden = false; $('slitOpts').hidden = false;
-  $('btnSlit').textContent = 'Cancel';
+  $('btnSlit').classList.add('active-toggle');
 
   const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
   const tctx = tmp.getContext('2d');
@@ -1644,41 +1888,58 @@ async function loadFile(f){
   }catch(e){ log('Image load failed: '+errStr(e),'err'); }
 }
 
-/* ---------- Stereoscopic 3D Engine (Per-Eye Live View, Landscape Crop, Full 58mm Roll) ---------- */
+/* ---------- Shared Dual-Slot Live Stream (Stereoscopic + Double Exposure) ---------- */
 let stereoL = null, stereoR = null;
-let stereoSlotStream = null;
+let dexpA = null, dexpB = null;
+let dualSlotStream = null;
 let lastAlign = {dx: 0, dy: 0, rotDeg: 0, dispPct: 0};
 let wiggleTimer = null;
 
-async function startStereoSlotLive(){
-  if(!stereoTabOpen) return;
-  if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return;
-  if(stream) return; // main camera active
-  try{
-    if(stereoSlotStream){ stereoSlotStream.getTracks().forEach(t => t.stop()); stereoSlotStream = null; }
-    stereoSlotStream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:facing}, width:{ideal:960}, height:{ideal:720}},
-      audio:false
-    });
-    const vL = $('vidStereoL'), vR = $('vidStereoR');
-    const tx = (facing === 'user') ? 'scaleX(-1)' : 'none';
-    vL.style.transform = tx;
-    vR.style.transform = tx;
-    if(!stereoL){ vL.srcObject = stereoSlotStream; vL.hidden = false; await vL.play().catch(()=>{}); }
-    else { vL.hidden = true; }
-    if(!stereoR){ vR.srcObject = stereoSlotStream; vR.hidden = false; await vR.play().catch(()=>{}); }
-    else { vR.hidden = true; }
-  }catch(e){
-    log('Stereo live preview note: '+errStr(e));
+function syncDualSlotLiveVideos(){
+  const tx = (facing === 'user') ? 'scaleX(-1)' : 'none';
+  const pairs = [
+    ['vidStereoL', !stereoL && stereoTabOpen],
+    ['vidStereoR', !stereoR && stereoTabOpen],
+    ['vidDexpA',   !dexpA   && dexpTabOpen],
+    ['vidDexpB',   !dexpB   && dexpTabOpen]
+  ];
+  for(const [id, active] of pairs){
+    const v = $(id);
+    if(!v) continue;
+    v.style.transform = tx;
+    if(active && dualSlotStream){
+      v.srcObject = dualSlotStream;
+      v.hidden = false;
+      v.play().catch(()=>{});
+    } else {
+      v.hidden = true;
+    }
   }
 }
 
-function stopStereoSlotLive(){
-  if(stereoSlotStream){
-    stereoSlotStream.getTracks().forEach(t => t.stop());
-    stereoSlotStream = null;
+async function startDualSlotLive(){
+  if(!stereoTabOpen && !dexpTabOpen) return;
+  if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return;
+  if(stream) return;
+  try{
+    if(!dualSlotStream){
+      dualSlotStream = await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:{ideal:facing}, width:{ideal:960}, height:{ideal:720}},
+        audio:false
+      });
+    }
+    syncDualSlotLiveVideos();
+  }catch(e){
+    log('Slot live preview note: '+errStr(e));
   }
-  ['vidStereoL','vidStereoR'].forEach(id => {
+}
+
+function stopDualSlotLive(){
+  if(dualSlotStream){
+    dualSlotStream.getTracks().forEach(t => t.stop());
+    dualSlotStream = null;
+  }
+  ['vidStereoL','vidStereoR','vidDexpA','vidDexpB'].forEach(id => {
     const v = $(id);
     if(v){ v.srcObject = null; v.hidden = true; }
   });
@@ -1709,8 +1970,7 @@ function drawThumb(canvasId, imgCanvas){
   ctx.drawImage(imgCanvas, (cv.width - dw)/2, (cv.height - dh)/2, dw, dh);
 }
 
-function setStereoSide(side, el, w, h){
-  // Crop portrait uploads/captures into 4:3 landscape so stereo frames maximize the 58mm paper!
+function normalizeLandscapeCanvas(el, w, h){
   let sx = 0, sy = 0, sw = w, sh = h;
   if(h > w){
     sh = Math.round(w * 0.75);
@@ -1720,29 +1980,52 @@ function setStereoSide(side, el, w, h){
   norm.width = 480;
   norm.height = Math.max(240, Math.round(480 * (sh / sw)));
   norm.getContext('2d').drawImage(el, sx, sy, sw, sh, 0, 0, norm.width, norm.height);
+  return norm;
+}
 
+/* ---------- Stereoscopic 3D Engine + Clear X Buttons ---------- */
+function setStereoSide(side, el, w, h){
+  const norm = normalizeLandscapeCanvas(el, w, h);
   if(side === 'L'){
     stereoL = norm;
     $('slotL').classList.add('loaded');
-    $('vidStereoL').hidden = true;
     drawThumb('cvStereoL', norm);
-    log('Stereo Left eye set ('+sw+'×'+sh+' landscape)');
+    log('Stereo Left eye set');
   } else {
     stereoR = norm;
     $('slotR').classList.add('loaded');
-    $('vidStereoR').hidden = true;
     drawThumb('cvStereoR', norm);
-    log('Stereo Right eye set ('+sw+'×'+sh+' landscape)');
+    log('Stereo Right eye set');
   }
+  syncDualSlotLiveVideos();
   if(stereoL && stereoR){
-    stopStereoSlotLive();
     autoAlignAndComposeStereo(true);
   }
 }
 
+function clearStereoSlot(side){
+  if(side === 'L' || side === 'ALL'){
+    stereoL = null;
+    $('slotL').classList.remove('loaded');
+    drawThumb('cvStereoL', null);
+  }
+  if(side === 'R' || side === 'ALL'){
+    stereoR = null;
+    $('slotR').classList.remove('loaded');
+    drawThumb('cvStereoR', null);
+  }
+  $('stereoMetrics').textContent = 'Ready · L + R';
+  if(!stereoL || !stereoR){
+    clearInterval(wiggleTimer); wiggleTimer = null;
+    $('ghostOverlay').hidden = true;
+  }
+  syncDualSlotLiveVideos();
+  if(stereoTabOpen) startDualSlotLive();
+}
+
 async function captureStereoSlot(side){
   const slotVid = side === 'L' ? $('vidStereoL') : $('vidStereoR');
-  if(stereoSlotStream && slotVid && slotVid.videoWidth > 0){
+  if(dualSlotStream && slotVid && slotVid.videoWidth > 0){
     const snap = grabFromSlotVideo(slotVid);
     if(snap){
       setStereoSide(side, snap, snap.width, snap.height);
@@ -1771,38 +2054,37 @@ async function captureStereoSlot(side){
 }
 
 async function runAutoStereo(){
-  const banner = $('boothStatus');
-  stopStereoSlotLive();
+  stopDualSlotLive();
   scrollToStage();
   if(!stream){
     const ok = await startCam(false, true);
     if(!ok) return;
   }
   $('ghostOverlay').hidden = true;
-  banner.hidden = false;
 
   for(let s = 3; s > 0; s--){
-    banner.textContent = `AUTO 1/2 (LEFT): Hold steady… ${s}s`;
+    setLiveCountdown(`L · ${s}`);
     await new Promise(r => setTimeout(r, 1000));
   }
+  setLiveCountdown('L!');
   triggerFlash();
   const snapL = grabFrameCanvas(true);
-  if(!snapL){ banner.hidden = true; stopCam(); return; }
+  if(!snapL){ setLiveCountdown(null); stopCam(); return; }
   setStereoSide('L', snapL, snapL.width, snapL.height);
 
-  // Ghost overlay for horizontal shift alignment
   const ghost = $('ghostOverlay');
   ghost.src = snapL.toDataURL('image/jpeg', 0.7);
   ghost.hidden = false;
 
   for(let s = 3; s > 0; s--){
-    banner.textContent = `AUTO 2/2 (RIGHT): Shift 6.5 cm RIGHT… ${s}s`;
+    setLiveCountdown(`R · ${s}`);
     await new Promise(r => setTimeout(r, 1000));
   }
+  setLiveCountdown('R!');
   triggerFlash();
   const snapR = grabFrameCanvas(true);
   ghost.hidden = true;
-  banner.hidden = true;
+  setLiveCountdown(null);
   stopCam();
   if(snapR){
     setStereoSide('R', snapR, snapR.width, snapR.height);
@@ -1951,14 +2233,13 @@ function autoAlignAndComposeStereo(recompute = true){
     return;
   }
 
-  // Full-bleed Sideways 65mm IPD Stereocard utilizing the entire 58mm roll (384px full height)!
-  const eyePrintH = 376; // full 384px printable width minus 4px top/bottom hairline margin
-  const eyePrintW = Math.min(504, Math.round(eyePrintH * (cw / ch))); // ~501px (62.6mm wide) for 4:3 landscape!
-  const centerDistPx = 520; // exact 65.0 mm center-to-center IPD at 8 dots/mm
-  const sepPx = Math.max(16, centerDistPx - eyePrintW); // keeps center-to-center = 65.0mm with crisp septum
+  const eyePrintH = 376;
+  const eyePrintW = Math.min(504, Math.round(eyePrintH * (cw / ch)));
+  const centerDistPx = 520;
+  const sepPx = Math.max(16, centerDistPx - eyePrintW);
   const padSide = 8;
   const cardW = padSide * 2 + eyePrintW * 2 + sepPx;
-  const cardH = W; // full 384px across the 58mm roll
+  const cardH = W;
 
   const card = document.createElement('canvas');
   card.width = cardW; card.height = cardH;
@@ -1999,6 +2280,9 @@ function autoAlignAndComposeStereo(recompute = true){
 
 $('btnSnapL').addEventListener('click', () => captureStereoSlot('L'));
 $('btnSnapR').addEventListener('click', () => captureStereoSlot('R'));
+$('btnClearL').addEventListener('click', () => clearStereoSlot('L'));
+$('btnClearR').addEventListener('click', () => clearStereoSlot('R'));
+$('btnStereoClearAll').addEventListener('click', () => clearStereoSlot('ALL'));
 $('btnLoadL').addEventListener('click', () => $('fStereoL').click());
 $('btnLoadR').addEventListener('click', () => $('fStereoR').click());
 $('fStereoL').addEventListener('change', async e => {
@@ -2025,7 +2309,155 @@ $('btnStereoSwap').addEventListener('click', () => {
 $('stereoMode').addEventListener('change', () => autoAlignAndComposeStereo(false));
 $('stereoWindow').addEventListener('input', () => autoAlignAndComposeStereo(false));
 
-/* ---------- Phase 3: Zine Note, Secret Cipher & Optical Moire Generators + Live Preview ---------- */
+/* ---------- Double Exposure Engine ---------- */
+function setDexpSide(slot, el, w, h){
+  const norm = normalizeLandscapeCanvas(el, w, h);
+  if(slot === 'A'){
+    dexpA = norm;
+    $('slotDexpA').classList.add('loaded');
+    drawThumb('cvDexpA', norm);
+    log('Double Exposure A set');
+  } else {
+    dexpB = norm;
+    $('slotDexpB').classList.add('loaded');
+    drawThumb('cvDexpB', norm);
+    log('Double Exposure B set');
+  }
+  syncDualSlotLiveVideos();
+  if(dexpA && dexpB) combineDoubleExposure(false);
+}
+
+function clearDexpSlot(slot){
+  if(slot === 'A'){
+    dexpA = null;
+    $('slotDexpA').classList.remove('loaded');
+    drawThumb('cvDexpA', null);
+  } else {
+    dexpB = null;
+    $('slotDexpB').classList.remove('loaded');
+    drawThumb('cvDexpB', null);
+  }
+  syncDualSlotLiveVideos();
+  if(dexpTabOpen) startDualSlotLive();
+}
+
+async function captureDexpSlot(slot){
+  const slotVid = slot === 'A' ? $('vidDexpA') : $('vidDexpB');
+  if(dualSlotStream && slotVid && slotVid.videoWidth > 0){
+    const snap = grabFromSlotVideo(slotVid);
+    if(snap){
+      setDexpSide(slot, snap, snap.width, snap.height);
+      return;
+    }
+  }
+  if(!stream){
+    const ok = await startCam(false, false);
+    if(!ok) return;
+  }
+  triggerFlash();
+  const snap = grabFrameCanvas(false);
+  if(snap){
+    setDexpSide(slot, snap, snap.width, snap.height);
+    stopCam();
+  }
+}
+
+function combineDoubleExposure(andScroll){
+  if(!dexpA || !dexpB){
+    if(andScroll) log('Capture or load both Exposure A and Exposure B first.','err');
+    return;
+  }
+  const mode = $('dexpMode').value;
+  const mix = (+$('dexpMix').value || 65) / 100;
+  const thresh = +$('dexpThresh').value || 135;
+
+  $('dxmv').textContent = Math.round(mix * 100) + '%';
+  $('dxtv').textContent = String(thresh);
+  $('dexpBadge').textContent = mode === 'hilo' ? `Hi→Lo @${thresh}` : mode.toUpperCase();
+
+  const cw = 480, ch = 360;
+  const cA = document.createElement('canvas'); cA.width = cw; cA.height = ch;
+  cA.getContext('2d').drawImage(dexpA, 0, 0, cw, ch);
+  const cB = document.createElement('canvas'); cB.width = cw; cB.height = ch;
+  cB.getContext('2d').drawImage(dexpB, 0, 0, cw, ch);
+
+  const dA = cA.getContext('2d').getImageData(0, 0, cw, ch).data;
+  const dB = cB.getContext('2d').getImageData(0, 0, cw, ch).data;
+
+  const out = document.createElement('canvas'); out.width = cw; out.height = ch;
+  const octx = out.getContext('2d');
+  const outId = octx.createImageData(cw, ch);
+
+  for(let i = 0; i < dA.length; i += 4){
+    const lumA = 0.299*dA[i] + 0.587*dA[i+1] + 0.114*dA[i+2];
+    const lumB = 0.299*dB[i] + 0.587*dB[i+1] + 0.114*dB[i+2];
+    let val = lumA;
+
+    if(mode === 'hilo'){
+      // Highlights of A (>= threshold) placed onto shadows of B (< threshold)
+      const isHiA = lumA >= thresh;
+      const isLoB = lumB < thresh;
+      if(isHiA && isLoB){
+        val = lumA * (0.5 + 0.5 * mix) + lumB * (0.5 * (1 - mix));
+      } else if(isLoB){
+        val = lumB * (1 - mix * 0.65) + lumA * (mix * 0.65);
+      } else {
+        val = lumA * (1 - mix * 0.35) + lumB * (mix * 0.35);
+      }
+    } else if(mode === 'screen'){
+      const s = 255 - ((255 - lumA) * (255 - lumB)) / 255;
+      val = lumA * (1 - mix) + s * mix;
+    } else if(mode === 'multiply'){
+      const m = (lumA * lumB) / 255;
+      val = lumA * (1 - mix) + m * mix;
+    } else if(mode === 'silhouette'){
+      val = lumA < thresh ? lumA : lumB;
+    } else if(mode === 'xor'){
+      const x = Math.abs(lumA - lumB);
+      val = lumA * (1 - mix) + x * mix;
+    }
+
+    const v = Math.max(0, Math.min(255, Math.round(val)));
+    outId.data[i] = outId.data[i+1] = outId.data[i+2] = v;
+    outId.data[i+3] = 255;
+  }
+
+  octx.putImageData(outId, 0, 0);
+  clearInterval(wiggleTimer); wiggleTimer = null;
+  sidewaysBanner = false; $('btnBanner').classList.remove('active-toggle');
+  src = {el: out, w: cw, h: ch}; rot = 0; stopCam(); draw();
+  if(andScroll) scrollToStage();
+  log('Double Exposure rendered ('+mode+', thresh='+thresh+')','ok');
+}
+
+$('btnSnapDexpA').addEventListener('click', () => captureDexpSlot('A'));
+$('btnSnapDexpB').addEventListener('click', () => captureDexpSlot('B'));
+$('btnClearDexpA').addEventListener('click', () => clearDexpSlot('A'));
+$('btnClearDexpB').addEventListener('click', () => clearDexpSlot('B'));
+$('btnLoadDexpA').addEventListener('click', () => $('fDexpA').click());
+$('btnLoadDexpB').addEventListener('click', () => $('fDexpB').click());
+$('fDexpA').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+  const im = new Image(); im.src = URL.createObjectURL(f); await im.decode();
+  setDexpSide('A', im, im.naturalWidth, im.naturalHeight);
+});
+$('fDexpB').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+  const im = new Image(); im.src = URL.createObjectURL(f); await im.decode();
+  setDexpSide('B', im, im.naturalWidth, im.naturalHeight);
+});
+$('btnDexpSwap').addEventListener('click', () => {
+  if(!dexpA && !dexpB) return;
+  const tmp = dexpA; dexpA = dexpB; dexpB = tmp;
+  $('slotDexpA').classList.toggle('loaded', !!dexpA);
+  $('slotDexpB').classList.toggle('loaded', !!dexpB);
+  drawThumb('cvDexpA', dexpA); drawThumb('cvDexpB', dexpB);
+  if(dexpA && dexpB) combineDoubleExposure(false);
+});
+$('btnDexpBuild').addEventListener('click', () => combineDoubleExposure(true));
+['dexpMode','dexpMix','dexpThresh'].forEach(id => $(id).addEventListener('input', () => combineDoubleExposure(false)));
+
+/* ---------- Zine Note, QR-First Cipher & 10-Slider Optical Engine + Live Preview ---------- */
 let activeZineSubTab = 'p3Type';
 $('p3Tabs').addEventListener('click', e => {
   const btn = e.target.closest('button[data-tab]');
@@ -2081,8 +2513,20 @@ function buildZineSlipCanvas(){
   return c;
 }
 
+function drawQrFinder(ctx, ox, oy, cell){
+  for(let r = 0; r < 7; r++){
+    for(let c = 0; c < 7; c++){
+      const edge = r === 0 || r === 6 || c === 0 || c === 6;
+      const core = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+      if(edge || core){
+        ctx.fillRect(ox + c * cell, oy + r * cell, cell, cell);
+      }
+    }
+  }
+}
+
 function buildCipherSlipCanvas(){
-  const raw = $('cipherInput').value.trim() || 'ZINESTER-LAB';
+  const raw = $('cipherInput').value.trim() || 'https://zinester.lab/58mm';
   const style = $('cipherStyle').value;
   const c = document.createElement('canvas'); c.width = W;
   const ctx = c.getContext('2d');
@@ -2123,21 +2567,45 @@ function buildCipherSlipCanvas(){
     return c;
   }
 
-  const grid = 21, cell = 10, pad = (W - grid * cell) / 2;
-  const h = grid * cell + 64; c.height = h;
+  // QR Code (25x25 version-2 style matrix with 3 finder patterns + timing lines + payload hash)
+  const grid = 25, cell = 11;
+  const padX = Math.floor((W - grid * cell) / 2);
+  const padY = 22;
+  const h = padY + grid * cell + 52;
+  c.height = h;
   ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, h);
   ctx.fillStyle = '#000';
-  let seed = 2166136261;
-  for(let i = 0; i < raw.length; i++){ seed ^= raw.charCodeAt(i); seed = Math.imul(seed, 16777619); }
-  for(let gy = 0; gy < grid; gy++){
-    for(let gx = 0; gx < grid; gx++){
-      const border = gx === 0 || gy === grid - 1 || (gy === 0 && gx % 2 === 0) || (gx === grid - 1 && gy % 2 === 1);
-      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-      if(border || (seed & 1)) ctx.fillRect(pad + gx * cell, 18 + gy * cell, cell, cell);
+
+  const isFinderArea = (r, col) =>
+    (r < 8 && col < 8) || (r < 8 && col >= grid - 8) || (r >= grid - 8 && col < 8);
+
+  let state = 0x811c9dc5;
+  for(let i = 0; i < raw.length; i++){
+    state ^= raw.charCodeAt(i);
+    state = Math.imul(state, 0x01000193) >>> 0;
+  }
+
+  for(let r = 0; r < grid; r++){
+    for(let col = 0; col < grid; col++){
+      if(isFinderArea(r, col)) continue;
+      if(r === 6 || col === 6){
+        if((r + col) % 2 === 0) ctx.fillRect(padX + col * cell, padY + r * cell, cell, cell);
+        continue;
+      }
+      const byteCh = raw.charCodeAt((r * grid + col) % raw.length);
+      state = (Math.imul(state ^ byteCh, 1664525) + 1013904223) >>> 0;
+      if(((state >>> 3) ^ (r * 7 + col * 13)) & 1){
+        ctx.fillRect(padX + col * cell, padY + r * cell, cell, cell);
+      }
     }
   }
+
+  drawQrFinder(ctx, padX, padY, cell);
+  drawQrFinder(ctx, padX + (grid - 7) * cell, padY, cell);
+  drawQrFinder(ctx, padX, padY + (grid - 7) * cell, cell);
+
   ctx.font = 'bold 12px monospace'; ctx.textAlign = 'center';
-  ctx.fillText(raw.slice(0, 34), W/2, h - 18);
+  ctx.fillText(raw.slice(0, 36), W/2, h - 18);
   return c;
 }
 
@@ -2149,6 +2617,12 @@ function buildOpticArtCanvas(){
   const oy = +$('opticOffY').value || 0;
   const twistDeg = +$('opticTwist').value || 0;
   const warp = +$('opticWarp').value || 1.0;
+  const pinch = +$('opticPinch').value || 0.0;
+  const folds = +$('opticFolds').value || 1;
+  const phase = +$('opticPhase').value || 0.0;
+  const poster = +$('opticPoster').value || 0;
+  const txt = $('opticOverlayText').value.trim();
+  const txtMode = $('opticTextMode').value;
 
   $('opv1').textContent = f1;
   $('opv2').textContent = f2;
@@ -2156,51 +2630,134 @@ function buildOpticArtCanvas(){
   $('opv4').textContent = oy;
   $('opv5').textContent = twistDeg + '°';
   $('opv6').textContent = warp.toFixed(1);
+  $('opv7').textContent = pinch.toFixed(1);
+  $('opv8').textContent = String(folds);
+  $('opv9').textContent = phase.toFixed(1);
+  $('opv10').textContent = String(poster);
 
   const twist = twistDeg * Math.PI / 180;
   const cosT = Math.cos(twist), sinT = Math.sin(twist);
+  const foldSector = (Math.PI * 2) / Math.max(1, folds);
 
   const h = 384;
   const c = document.createElement('canvas'); c.width = W; c.height = h;
   const ctx = c.getContext('2d');
   const id = ctx.createImageData(W, h);
   const cx = W / 2, cy = h / 2;
+  const maxR = Math.hypot(cx, cy);
 
   for(let y = 0; y < h; y++){
     for(let x = 0; x < W; x++){
       const dx0 = x - cx, dy0 = y - cy;
-      const dx = dx0 * cosT - dy0 * sinT;
-      const dy = dx0 * sinT + dy0 * cosT;
-      const r = Math.hypot(dx, dy);
-      const a = Math.atan2(dy, dx);
-      let v = 0;
+      let dx = dx0 * cosT - dy0 * sinT;
+      let dy = dx0 * sinT + dy0 * cosT;
 
+      let r = Math.hypot(dx, dy);
+      let a = Math.atan2(dy, dx);
+
+      // Radial pinch modifier
+      if(Math.abs(pinch) > 0.01){
+        const normR = Math.min(1.5, r / maxR);
+        const factor = Math.max(0.2, 1 + pinch * (1 - normR));
+        r *= factor;
+        dx *= factor; dy *= factor;
+      }
+
+      // Kaleidoscope symmetry folding
+      if(folds > 1){
+        let kAngle = ((a % foldSector) + foldSector) % foldSector;
+        const half = foldSector * 0.5;
+        if(kAngle > half) kAngle = foldSector - kAngle;
+        a = kAngle;
+        dx = Math.cos(a) * r;
+        dy = Math.sin(a) * r;
+      }
+
+      let v = 0;
       if(pat === 'moire'){
         const r2 = Math.hypot(dx - ox, dy - oy);
-        const w1 = Math.sin(r * (f1 * 0.045) + Math.sin(a * warp) * 1.5);
-        const w2 = Math.sin(r2 * (f2 * 0.045));
+        const w1 = Math.sin(r * (f1 * 0.045) + phase + Math.sin(a * warp) * 1.5);
+        const w2 = Math.sin(r2 * (f2 * 0.045) - phase * 0.5);
         v = w1 * w2;
       } else if(pat === 'spiral'){
         const r2 = Math.hypot(dx - ox * 0.5, dy - oy * 0.5);
         const a2 = Math.atan2(dy - oy * 0.5, dx - ox * 0.5);
-        v = Math.sin(a * Math.round(f1 / 2) + r * 0.14 * warp) * Math.cos(a2 * Math.round(f2 / 3) - r2 * 0.08);
+        v = Math.sin(a * Math.max(1, Math.round(f1 / 2)) + r * 0.14 * warp + phase)
+          * Math.cos(a2 * Math.max(1, Math.round(f2 / 3)) - r2 * 0.08 - phase);
       } else if(pat === 'sunburst'){
         const r2 = Math.hypot(dx - ox, dy - oy);
         const a2 = Math.atan2(dy - oy, dx - ox);
-        v = Math.sin(a * f1 + Math.sin(r * 0.03) * warp * 2) * Math.cos(a2 * f2 + r2 * 0.02);
-      } else {
-        const wave1 = Math.sin((dx + ox) * f1 * 0.016 + Math.sin((dy + oy) * 0.045) * 3 * warp);
-        const wave2 = Math.cos((dy - oy) * f2 * 0.016 + Math.cos((dx - ox) * 0.045) * 3 * warp);
+        v = Math.sin(a * f1 + phase + Math.sin(r * 0.03) * warp * 2)
+          * Math.cos(a2 * f2 + r2 * 0.02 - phase);
+      } else if(pat === 'waves'){
+        const wave1 = Math.sin((dx + ox) * f1 * 0.016 + phase + Math.sin((dy + oy) * 0.045) * 3 * warp);
+        const wave2 = Math.cos((dy - oy) * f2 * 0.016 - phase + Math.cos((dx - ox) * 0.045) * 3 * warp);
         v = (wave1 + wave2) * 0.5;
+      } else if(pat === 'voronoi'){
+        const cellSz = Math.max(14, 140 / Math.max(4, f1));
+        const gx = Math.abs(((dx + ox) % cellSz + cellSz) % cellSz - cellSz * 0.5);
+        const gy = Math.abs(((dy + oy) % cellSz + cellSz) % cellSz - cellSz * 0.5);
+        const edge = Math.min(gx, gy) / (cellSz * 0.5);
+        v = Math.cos(edge * Math.PI * (1 + warp) + phase);
+      } else {
+        // CRT scanline harmonics
+        const scan = Math.sin(y * (0.25 + f2 * 0.02) + phase);
+        const beat = Math.sin((x + ox) * f1 * 0.03 + scan * 4 * warp);
+        v = scan * 0.45 + beat * 0.55;
       }
 
-      const boosted = Math.max(-1, Math.min(1, v * (0.7 + warp * 0.45)));
-      const lum = Math.max(0, Math.min(255, Math.round((boosted * 0.5 + 0.5) * 255)));
+      let normLum = (Math.max(-1, Math.min(1, v * (0.7 + warp * 0.45))) * 0.5 + 0.5) * 255;
+      if(poster > 1){
+        const step = 255 / poster;
+        normLum = Math.round(normLum / step) * step;
+      }
+      const lum = Math.max(0, Math.min(255, Math.round(normLum)));
       const j = (y * W + x) * 4;
       id.data[j] = id.data[j+1] = id.data[j+2] = lum; id.data[j+3] = 255;
     }
   }
   ctx.putImageData(id, 0, 0);
+
+  if(txt){
+    if(txtMode === 'warp'){
+      // Warp text onto an offscreen canvas and displace pixels with the optical field
+      const tCv = document.createElement('canvas'); tCv.width = W; tCv.height = h;
+      const tCtx = tCv.getContext('2d');
+      tCtx.font = 'bold 28px monospace'; tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle';
+      tCtx.fillStyle = '#fff';
+      tCtx.fillText(txt, W / 2, cy);
+      const tData = tCtx.getImageData(0, 0, W, h).data;
+      const baseData = ctx.getImageData(0, 0, W, h).data;
+      const outData = new ImageData(W, h);
+      outData.data.set(baseData);
+
+      for(let y = 0; y < h; y++){
+        for(let x = 0; x < W; x++){
+          const dispX = Math.round(Math.sin(y * (0.04 + f1 * 0.002) + phase) * 8 * warp);
+          const dispY = Math.round(Math.cos(x * (0.04 + f2 * 0.002) - phase) * 6 * warp);
+          const sx = x - dispX, sy = y - dispY;
+          if(sx >= 0 && sx < W && sy >= 0 && sy < h){
+            const alpha = tData[(sy * W + sx) * 4] / 255;
+            if(alpha > 0.15){
+              const j = (y * W + x) * 4;
+              const ink = alpha > 0.55 ? 0 : 255;
+              outData.data[j] = outData.data[j+1] = outData.data[j+2] = ink;
+            }
+          }
+        }
+      }
+      ctx.putImageData(outData, 0, 0);
+    } else {
+      ctx.save();
+      ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 5; ctx.strokeStyle = '#fff';
+      ctx.strokeText(txt, W / 2, cy);
+      ctx.fillStyle = '#000';
+      ctx.fillText(txt, W / 2, cy);
+      ctx.restore();
+    }
+  }
+
   return c;
 }
 
@@ -2231,7 +2788,7 @@ function renderCipherSlip(){
   sidewaysBanner = false; $('btnBanner').classList.remove('active-toggle');
   src = {el: c, w: c.width, h: c.height}; rot = 0; stopCam(); draw();
   scrollToStage();
-  log('Rendered cipher slip ('+c.width+'×'+c.height+')','ok');
+  log('Rendered cipher/QR slip ('+c.width+'×'+c.height+')','ok');
 }
 
 function renderOpticArt(){
@@ -2240,15 +2797,20 @@ function renderOpticArt(){
   sidewaysBanner = false; $('btnBanner').classList.remove('active-toggle');
   src = {el: c, w: c.width, h: c.height}; rot = 0; stopCam(); draw();
   scrollToStage();
-  log('Generated '+$('opticPattern').value+' op-art ('+c.width+'×'+c.height+')','ok');
+  log('Generated '+$('opticPattern').value+' optical art ('+c.width+'×'+c.height+')','ok');
 }
 
 $('btnRenderZine').addEventListener('click', renderZineSlip);
 $('btnRenderCipher').addEventListener('click', renderCipherSlip);
 $('btnRenderOptic').addEventListener('click', renderOpticArt);
 
-['zineTitle','zineBody','zineAlign','cipherInput','cipherStyle','opticPattern','opticFreq','opticFreq2','opticOffX','opticOffY','opticTwist','opticWarp']
-  .forEach(id => $(id).addEventListener('input', updateZineLivePreview));
+[
+  'zineTitle','zineBody','zineAlign',
+  'cipherInput','cipherStyle',
+  'opticPattern','opticOverlayText','opticTextMode',
+  'opticFreq','opticFreq2','opticOffX','opticOffY','opticTwist','opticWarp',
+  'opticPinch','opticFolds','opticPhase','opticPoster'
+].forEach(id => $(id).addEventListener('input', updateZineLivePreview));
 
 /* ---------- Event Wiring ---------- */
 $('btnLive').addEventListener('click', () => stream && !slitActive ? stopCam() : startCam(false, false));
