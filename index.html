@@ -42,7 +42,7 @@ input[type=range]{padding:0;border:0;background:none}
 </head>
 <body>
 <h1>Cat Photo Printer</h1>
-<p class="sub">Milestones 2–4 · print (unverified) · build 5</p>
+<p class="sub">Milestones 2–4 · print · build 7</p>
 
 <div class="card">
   <p id="state">Disconnected</p>
@@ -90,13 +90,16 @@ input[type=range]{padding:0;border:0;background:none}
     <button id="btnTest" disabled>Test pattern</button>
     <button id="btnStat" disabled>Status</button>
   </div>
-  <label class="sl">Intensity <b id="inv"></b><input id="inten" type="range" min="0" max="100" value="60"></label>
+  <label class="sl">Intensity <b id="inv"></b><input id="inten" type="range" min="0" max="255" value="93"></label>
   <details style="margin-top:10px"><summary>Print settings (unverified defaults)</summary>
+    <label class="sl">CRC8 polynomial <select id="crcv"><option value="07">0x07 (PROTOCOL.md; accepted in earlier logs)</option><option value="31">0x31 (table from another web driver)</option></select></label>
     <label class="sl">Request byte 3, hex (default 30) <input id="rq3" value="30" autocomplete="off"></label>
     <label class="sl">Request byte 4 / mode, hex (default 00) <input id="rq4" value="00" autocomplete="off"></label>
     <label class="sl">Bit order <select id="bits"><option value="lsb">LSB first</option><option value="msb">MSB first</option></select></label>
-    <label class="sl">Chunk bytes <input id="chunk" type="number" value="48" min="20" max="240"></label>
-    <label class="sl">Delay ms <input id="delay" type="number" value="15" min="0" max="100"></label>
+    <label class="sl">Chunk bytes <input id="chunk" type="number" value="20" min="20" max="240"></label>
+    <label class="sl">Delay ms <input id="delay" type="number" value="25" min="0" max="100"></label>
+    <label class="sl"><input id="rot180" type="checkbox" checked style="width:auto"> Rotate 180° when printing</label>
+    <label class="sl"><input id="poll" type="checkbox" checked style="width:auto"> Poll status while printing</label>
     <label class="sl">Feed rows after image <input id="feed" type="number" value="40" min="0" max="200"></label>
   </details>
 </div>
@@ -391,7 +394,7 @@ blank(); draw();
 // Assumed (unverified): service ae30; commands on ae01 as 22 21 CMD 00 LEN_LO LEN_HI PAYLOAD CRC8(payload) FF;
 // responses on ae02; image rows (48 bytes each) on ae03; 0xA2 intensity, 0xA9 print request, 0xAD flush, 0xAA print done.
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-function crc8(arr){ let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ 0x07) & 0xff : (c << 1) & 0xff; } return c; }  // poly 0x07: unverified
+function crc8(arr){ const poly = $('crcv').value === '31' ? 0x31 : 0x07; let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ poly) & 0xff : (c << 1) & 0xff; } return c; }
 function pkt(cmd, payload){
   const p = Uint8Array.from(payload), n = p.length, o = new Uint8Array(8 + n);
   o.set([0x22,0x21,cmd,0x00,n & 255,n >> 8]); o.set(p,6); o[6+n] = crc8(p); o[7+n] = 0xFF; return o;
@@ -421,40 +424,65 @@ function packRows(mono, w, h, lsb, rows){   // 1 = black. Bit order is unverifie
     if(mono[y*w+x]) out[y*rb + (x >> 3)] |= lsb ? (1 << (x & 7)) : (0x80 >> (x & 7));
   return out;
 }
+// Status layout from PROTOCOL.md (jeremy46231/MXW01-catprinter), indices into the FULL notify packet. Unverified here.
+function decodeStatus(b){ return {state:b[6], battery:b[9], temp:b[10], flag:b[12], err:b[13]}; }
+async function getStatus(){
+  const c1 = catChars.ae01; if(!c1) return null;
+  const w = waitCmd(0xA1, 3000), p = pkt(0xA1, [0x00]);
+  log('TX ae01: '+hex(p),'tx'); await wr(c1, p);
+  const r = await w;
+  if(!r){ log('No status answer within 3 s','err'); return null; }
+  const st = decodeStatus(r);
+  log('Status: state '+st.state+', battery '+st.battery+'%, temp '+st.temp+'°C, flag '+st.flag+(st.flag ? ', error '+st.err : ' (OK)')+'  [decode unverified]', st.flag ? 'err' : 'ok');
+  return st;
+}
 const catDriver = {
-  name:'MXW01 (unverified protocol)', widthPx:384,
+  name:'MXW01 (protocol per public docs)', widthPx:384,
   connect, disconnect,
   async printBitmap(mono, w, h){
     const c1 = catChars.ae01, c3 = catChars.ae03;
     if(!(dev && dev.gatt.connected && c1 && c3)) throw new Error('Not connected (need ae01 + ae03)');
     if(w !== 384) throw new Error('Width must be 384');
-    const rows = h + (+$('feed').value | 0), lsb = $('bits').value === 'lsb';
-    const data = packRows(mono, w, h, lsb, rows);
+    let m = mono;
+    if($('rot180').checked){ m = new Uint8Array(mono.length); for(let i = 0; i < mono.length; i++) m[i] = mono[mono.length - 1 - i]; }
+    const rows = Math.max(h + (+$('feed').value | 0), 90);   // docs: at least ~90 rows (4320 bytes)
+    const lsb = $('bits').value === 'lsb';
+    const data = packRows(m, w, h, lsb, rows);
     const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
-    log('Print start: '+w+' × '+rows+' rows, '+data.length+' bytes, bit order '+(lsb ? 'LSB' : 'MSB')+' (unverified)');
-    await ctl(0xA2, [+$('inten').value]);
-    await sleep(50);
-    const ack = waitCmd(0xA9, 3000);
-    const r3 = parseInt($('rq3').value, 16) & 255, r4 = parseInt($('rq4').value, 16) & 255;
-    await ctl(0xA9, [rows & 255, rows >> 8, r3, r4]);   // payload layout unverified
-    log((await ack) ? 'Print request answered' : 'No answer to 0xA9 within 3 s, continuing anyway', (await ack) ? 'ok' : 'err');
     const ch = Math.max(20, +$('chunk').value | 0), dl = +$('delay').value | 0;
-    for(let o = 0, n = 0; o < data.length; o += ch, n++){
+    log('Print start: '+w+' × '+rows+' rows, '+data.length+' bytes, '+(lsb ? 'LSB' : 'MSB')+' first, rotate180='+$('rot180').checked+', chunk '+ch+', delay '+dl+' ms');
+    await ctl(0xA2, [+$('inten').value & 255]);
+    await sleep(50);
+    const st = await getStatus();
+    if(st && st.flag) throw new Error('Printer reports an error (code '+st.err+'): stop and check paper/battery/heat');
+    const r3 = parseInt($('rq3').value, 16) & 255, r4 = parseInt($('rq4').value, 16) & 255;
+    const ack = waitCmd(0xA9, 3000);
+    await ctl(0xA9, [rows & 255, rows >> 8, r3, r4]);
+    const a = await ack;
+    if(!a) throw new Error('No answer to print request: power-cycle the printer and reconnect');
+    if(a[6] !== 0) throw new Error('Print request rejected (code '+a[6]+'). Try the other CRC polynomial, then power-cycle the printer.');
+    log('Print request accepted','ok');
+    let n = 0;
+    for(let o = 0; o < data.length; o += ch, n++){
       await wr(c3, data.subarray(o, o + ch));
       if(dl) await sleep(dl);
       if(n % 150 === 0) log('  data '+Math.round(o * 100 / data.length)+'%');
     }
-    log('Data sent','ok');
-    const done = waitCmd(0xAA, 30000);
+    log('Data sent: '+n+' writes','ok');
+    const done = waitCmd(0xAA, 45000);
     await ctl(0xAD, [0x00]);
-    log((await done) ? 'Print-complete notice received' : 'No complete notice within 30 s (check paper/printer)', (await done) ? 'ok' : 'err');
+    let polling = $('poll').checked;
+    (async () => { while(polling){ await sleep(3000); if(polling) await getStatus(); } })();
+    const d = await done; polling = false;
+    log(d ? 'Print complete (0xAA received)' : 'No complete notice within 45 s', d ? 'ok' : 'err');
   }
 };
 
 function testPattern(){   // asymmetric "F" + border: shows mirroring/bit-order errors at a glance
-  const w = 384, h = 160, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const w = 384, h = 200, c = document.createElement('canvas'); c.width = w; c.height = h;
   const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0,0,w,h); x.fillStyle = '#000';
   x.fillRect(0,0,w,6); x.fillRect(0,h-6,w,6); x.fillRect(0,0,6,h); x.fillRect(w-6,0,6,h); x.fillRect(12,12,28,28);
+  x.fillRect(12, 140, w - 24, 40);   // solid band: easy to see if the head burns at all
   x.font = 'bold 110px sans-serif'; x.textBaseline = 'top'; x.fillText('F', 70, 20);
   const d = x.getImageData(0,0,w,h).data, m = new Uint8Array(w*h);
   for(let i = 0; i < m.length; i++) m[i] = d[i*4] < 128 ? 1 : 0;
@@ -473,12 +501,7 @@ async function doPrint(m){
 }
 $('btnPrint').addEventListener('click', () => last && doPrint(last));
 $('btnTest').addEventListener('click', () => doPrint(testPattern()));
-$('btnStat').addEventListener('click', async () => {
-  const c1 = catChars.ae01; if(!c1) return;
-  const w = waitCmd(0xA1, 3000), p = pkt(0xA1, [0x00]);   // status query payload unverified
-  log('TX ae01: '+hex(p),'tx'); await wr(c1, p);
-  log((await w) ? 'Status answered' : 'No status answer within 3 s', (await w) ? 'ok' : 'err');
-});
+$('btnStat').addEventListener('click', () => getStatus());
 $('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
 $('inv').textContent = $('inten').value;
 
