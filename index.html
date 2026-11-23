@@ -7,14 +7,14 @@
 <style>
 :root{
   --bg:#f4efe6;--fg:#181512;--mut:#685f56;--card:#fffdf9;--line:#181512;
-  --ink:#181512;--paper:#fffdf9;--accent:#d9385a;--accent2:#1e5bd8;
+  --accent:#d9385a;--accent2:#1e5bd8;--ok:#15803d;--warn:#d97706;--danger:#dc2626;
   --logbg:#141210;--logfg:#d8f3dc;--err:#ff7b8a;--rx:#8fd3ff;--tx:#ffd98f;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
   :root{
     --bg:#161412;--fg:#f2ece1;--mut:#a69c90;--card:#1f1c19;--line:#e5dec9;
-    --ink:#f2ece1;--paper:#1f1c19;--accent:#ff5c7c;--accent2:#6ba4ff;
+    --accent:#ff5c7c;--accent2:#6ba4ff;--ok:#4ade80;--warn:#fbbf24;--danger:#f87171;
     --logbg:#0f0e0d;--logfg:#c9f2cf;--err:#ff7b8a;--rx:#8fd3ff;--tx:#ffd98f;
     color-scheme:dark;
   }
@@ -26,23 +26,53 @@ body{
   font:15px/1.4 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
   padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px));
 }
+
+/* Minimalist Top Status & BLE Camera Bar */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
   margin-bottom:10px;padding:6px 10px;background:var(--card);
-  border:1.5px solid var(--line);border-radius:8px;
+  border:1.5px solid var(--line);border-radius:8px;box-shadow:2px 2px 0 var(--line);
 }
-.ble-status{display:flex;flex-direction:column;min-width:0}
-#state{font-size:12px;font-weight:700;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#hint{font-size:11px;color:var(--mut);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ble-btns{display:flex;gap:6px;flex-shrink:0}
+.cam-sign{
+  display:inline-flex;align-items:center;gap:7px;min-width:0;
+}
+.cam-badge{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:6px;
+  border:1.5px solid var(--line);background:var(--bg);color:var(--mut);
+}
+.cam-badge.ready{
+  border-color:var(--ok);color:var(--ok);background:color-mix(in srgb, var(--ok) 12%, var(--bg));
+}
+.cam-badge.busy{
+  border-color:var(--accent2);color:var(--accent2);background:color-mix(in srgb, var(--accent2) 12%, var(--bg));
+}
+.status-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--mut);flex-shrink:0;
+}
+.cam-badge.ready .status-dot{background:var(--ok)}
+.cam-badge.busy .status-dot{background:var(--accent2)}
+
+.telem-group{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.telem-chip{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:6px;
+  border:1.5px solid var(--line);background:var(--bg);font-size:11px;font-weight:700;
+  color:var(--fg);min-height:28px;
+}
+.telem-chip.heat-stop{
+  border-color:var(--danger);background:color-mix(in srgb, var(--danger) 18%, var(--bg));
+  color:var(--danger);animation:pulse 1.1s infinite;
+}
+.telem-chip.heat-ok{opacity:.65;color:var(--mut)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+.ble-btns{display:flex;gap:5px;flex-shrink:0}
 button.micro{
-  min-height:32px;width:36px;padding:0;flex:0 0 36px;border-radius:6px;
+  min-height:28px;width:30px;padding:0;flex:0 0 30px;border-radius:6px;
   border:1.5px solid var(--line);background:var(--bg);color:var(--fg);
-  font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center;
-  cursor:pointer;box-shadow:2px 2px 0 var(--line);
+  font-size:13px;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:1.5px 1.5px 0 var(--line);
 }
-button.micro.on{background:var(--accent2);color:#fff;border-color:var(--line)}
-button.micro:active:not(:disabled){transform:translate(1px,1px);box-shadow:1px 1px 0 var(--line)}
+button.micro:active:not(:disabled){transform:translate(1px,1px);box-shadow:0.5px 0.5px 0 var(--line)}
 button.micro:disabled{opacity:.35;box-shadow:none;cursor:not-allowed}
 
 .card{
@@ -57,8 +87,10 @@ button{
 }
 button:active:not(:disabled){transform:translate(1px,1px)}
 button.icon-only{font-size:18px;padding:8px;min-height:40px;line-height:1}
-button.pill{flex:0 0 auto;font-size:12px;padding:6px 11px;min-height:32px;border-radius:999px}
+button.pill{flex:0 0 auto;font-size:11.5px;padding:6px 10px;min-height:30px;border-radius:999px}
 button.pill.active{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+button.pill.cool-pill{border-color:var(--accent2);color:var(--accent2)}
+button.pill.cool-pill.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
 button:disabled{opacity:.4;cursor:not-allowed}
 button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{
   outline:2.5px solid var(--accent);outline-offset:2px;
@@ -71,11 +103,8 @@ button.zinester-print{
   box-shadow:4px 4px 0 var(--line);
   font-size:15px;letter-spacing:.08em;text-transform:uppercase;
   display:flex;align-items:center;justify-content:center;gap:8px;
-  position:relative;
 }
-button.zinester-print::before{
-  content:"★";font-size:13px;
-}
+button.zinester-print::before{content:"★";font-size:13px}
 button.zinester-print::after{
   content:"58MM";font-size:10px;padding:2px 5px;border:1px solid #fff;border-radius:2px;letter-spacing:.04em;
 }
@@ -100,8 +129,7 @@ input,select{
 [hidden]{display:none!important}
 .stage{position:relative;width:100%}
 #view{width:100%;display:block;background:#fff;border:1.5px solid var(--line);border-radius:4px;image-rendering:pixelated}
-#vid{width:100%;display:block;border-radius:4px;background:#000;border:1.5px solid var(--line)}
-#slitCv{width:100%;display:block;border-radius:4px;background:#000;border:1.5px solid var(--line)}
+#vid,#slitCv{width:100%;display:block;border-radius:4px;background:#000;border:1.5px solid var(--line)}
 input[type=range]{padding:0;border:0;background:none}
 .sl{display:block;margin-top:10px;font-size:13px}.sl b{float:right;font-weight:700}
 #info{color:var(--mut);font-size:11.5px;margin:6px 0 0}
@@ -114,24 +142,51 @@ input[type=range]{padding:0;border:0;background:none}
 .hitem canvas{width:100%;height:76px;object-fit:contain;background:#fff;border-radius:3px;display:block;image-rendering:pixelated}
 .hitem button{width:100%;margin-top:4px;padding:4px 2px;min-height:28px;font-size:11px;border-radius:4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 summary.adv-sum{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;list-style:none}
 summary.adv-sum::-webkit-details-marker{display:none}
 summary.adv-sum::before{content:"▸ ";color:var(--accent)}
 details[open] > summary.adv-sum::before{content:"▾ "}
 .sub-box{margin-top:10px;padding-top:10px;border-top:1.5px dashed var(--line)}
+.booth-banner{
+  margin-top:8px;padding:8px 10px;border-radius:6px;border:1.5px solid var(--accent);
+  background:color-mix(in srgb, var(--accent) 12%, var(--bg));font-size:12px;font-weight:700;
+  text-align:center;
+}
 </style>
 </head>
 <body>
 
-<!-- Minimalist BLE Icon Bar (No Title Banner) -->
+<!-- Minimalist Top Bar: 35mm Cocked/Open Camera Sign + Heat Stop + Battery % + BLE Micro Buttons -->
 <div class="topbar">
-  <div class="ble-status">
-    <p id="state">Disconnected</p>
-    <p id="hint">Tap BT icon to pair</p>
+  <div class="cam-sign">
+    <div id="camBadge" class="cam-badge" title="Disconnected — 35mm camera open">
+      <span class="status-dot"></span>
+      <!-- 35mm SLR/Rangefinder SVG: swaps between cocked/loaded & open/uncocked -->
+      <svg id="camSvg" width="24" height="18" viewBox="0 0 28 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <!-- Wind lever (cocked = angled out, uncocked = flat) -->
+        <path id="windLever" d="M20 4 L25 2" />
+        <!-- Top plate & prism -->
+        <path d="M4 6 H9 L11 3 H17 L19 6 H24 A2 2 0 0 1 26 8 V16 A2 2 0 0 1 24 18 H4 A2 2 0 0 1 2 16 V8 A2 2 0 0 1 4 6 Z" />
+        <!-- Lens barrel -->
+        <circle cx="14" cy="12" r="4.2" />
+        <!-- Film advance / loaded indicator inside -->
+        <circle id="filmDot" cx="6" cy="9.5" r="1.3" fill="currentColor" stroke="none" />
+      </svg>
+    </div>
   </div>
-  <div class="ble-btns">
-    <button id="btnConnect" class="micro" title="Connect BLE" aria-label="Connect BLE">⏻</button>
-    <button id="btnDisc" class="micro" title="Disconnect BLE" aria-label="Disconnect BLE" disabled>✕</button>
+
+  <div class="telem-group">
+    <span id="heatChip" class="telem-chip heat-ok" title="Printhead thermal state">
+      <span id="heatIcon">♨</span><span id="heatTxt">OK</span>
+    </span>
+    <span id="batChip" class="telem-chip" title="Printer battery">
+      <span>🔋</span><span id="batTxt">--%</span>
+    </span>
+    <div class="ble-btns">
+      <button id="btnConnect" class="micro" title="Connect BLE" aria-label="Connect BLE">⏻</button>
+      <button id="btnDisc" class="micro" title="Disconnect BLE" aria-label="Disconnect BLE" disabled>✕</button>
+    </div>
   </div>
 </div>
 
@@ -143,6 +198,7 @@ details[open] > summary.adv-sum::before{content:"▾ "}
     <canvas id="view" width="384" height="240"></canvas>
   </div>
   <p id="info">No photo yet.</p>
+  <div id="boothStatus" class="booth-banner" hidden></div>
 
   <button id="btnPrint" class="zinester-print" disabled>Print photo</button>
 
@@ -154,13 +210,13 @@ details[open] > summary.adv-sum::before{content:"▾ "}
     <button id="btnSlitStop" hidden>Finish</button>
   </div>
 
-  <!-- Row: Camera app & Library on same line with simple icon -->
+  <!-- Camera app & Library on same line with simple icon -->
   <div class="row" style="margin-top:8px">
     <button id="btnCam">📷 Camera</button>
     <button id="btnLib">🖼 Library</button>
   </div>
 
-  <!-- Row: Rotate & Mirror on another line, just the icons -->
+  <!-- Rotate & Mirror on another line, just the icons -->
   <div class="row" style="margin-top:8px">
     <button id="btnRot" class="icon-only" title="Rotate 90°" aria-label="Rotate 90°">↻</button>
     <button id="btnFlip" class="icon-only" title="Mirror horizontal" aria-label="Mirror horizontal">⇄</button>
@@ -194,11 +250,12 @@ details[open] > summary.adv-sum::before{content:"▾ "}
   <div class="presets" id="presetBar">
     <button type="button" class="pill active" data-look="natural">Natural</button>
     <button type="button" class="pill" data-look="portrait">High-Key Portrait</button>
-    <button type="button" class="pill" data-look="xerox">Xerox Zine</button>
+    <button type="button" class="pill" data-look="xerox">Xerox</button>
+    <button type="button" class="pill cool-pill" data-look="cool">❄ Cool (Giveaway)</button>
     <button type="button" class="pill" data-look="gameboy">Game Boy</button>
-    <button type="button" class="pill" data-look="halftone">Halftone Dots</button>
-    <button type="button" class="pill" data-look="ascii">ASCII Art</button>
-    <button type="button" class="pill" data-look="blueprint">Blueprint Invert</button>
+    <button type="button" class="pill" data-look="halftone">Halftone</button>
+    <button type="button" class="pill" data-look="ascii">ASCII</button>
+    <button type="button" class="pill" data-look="blueprint">Blueprint</button>
   </div>
 
   <div class="grid2" style="margin-top:6px">
@@ -238,14 +295,47 @@ details[open] > summary.adv-sum::before{content:"▾ "}
   </div>
 
   <label class="sl" style="margin-top:8px"><input id="invert" type="checkbox" style="width:auto"> Invert black &amp; white</label>
+  <label class="sl" style="margin-top:6px"><input id="printSim" type="checkbox" checked style="width:auto"> Thermal print preview (simulates dark ink spread)</label>
 
   <details style="margin-top:8px"><summary style="font-size:12.5px;font-weight:700;cursor:pointer">Tone &amp; Dither Sliders</summary>
-    <label class="sl">Brightness <b id="brv"></b><input id="br" type="range" min="-100" max="100" value="0"></label>
-    <label class="sl">Contrast <b id="ctv"></b><input id="ct" type="range" min="-100" max="100" value="0"></label>
+    <label class="sl">Brightness <b id="brv"></b><input id="br" type="range" min="-100" max="100" value="20"></label>
+    <label class="sl">Contrast <b id="ctv"></b><input id="ct" type="range" min="-100" max="100" value="-20"></label>
     <label class="sl">Gamma <b id="gmv"></b><input id="gm" type="range" min="0.5" max="2.5" step="0.05" value="1"></label>
     <label class="sl">Threshold <b id="thv"></b><input id="th" type="range" min="0" max="255" value="128"></label>
     <label class="sl">Softness (soft threshold) <b id="sfv"></b><input id="sf" type="range" min="0" max="100" value="60"></label>
   </details>
+</div>
+
+<!-- Phase 2: Multi-Shot Photo Booth, Sideways Banner & Multi-Strip Poster Slicer -->
+<div class="card">
+  <p class="label">Roll Layouts · Booth &amp; Strips</p>
+
+  <!-- Photo Booth Sequence -->
+  <div class="grid3">
+    <select id="boothCount" aria-label="Booth shots">
+      <option value="3">3-Shot Booth</option>
+      <option value="4">4-Shot Booth</option>
+    </select>
+    <select id="boothDelay" aria-label="Booth countdown">
+      <option value="2">2s Timer</option>
+      <option value="3">3s Timer</option>
+      <option value="1">1s Rapid</option>
+    </select>
+    <button id="btnBooth" type="button">📸 Booth</button>
+  </div>
+
+  <!-- Sideways Long Banner & Poster Strip Splitter -->
+  <div class="grid2" style="margin-top:8px">
+    <button id="btnBanner" type="button">↔ Sideways Banner</button>
+    <select id="stripCount" aria-label="Poster strips">
+      <option value="1">Poster: 1 Strip (384px)</option>
+      <option value="2">Poster: 2 Strips (768px)</option>
+      <option value="3">Poster: 3 Strips (1152px)</option>
+      <option value="4">Poster: 4 Strips (1536px)</option>
+    </select>
+  </div>
+
+  <div id="stripBar" class="row" style="margin-top:8px" hidden></div>
 </div>
 
 <!-- Reprint Queue -->
@@ -257,7 +347,7 @@ details[open] > summary.adv-sum::before{content:"▾ "}
   <div class="hist" id="histList"><span style="color:var(--mut);font-size:12px">Printed bitmaps appear here for 1-tap reprints.</span></div>
 </div>
 
-<!-- Advanced Console (Hides Print Settings, Test/Status/Probe, Debug Console & Raw Hex) -->
+<!-- Advanced Console -->
 <div class="card">
   <details>
     <summary class="adv-sum">advanced console</summary>
@@ -270,6 +360,7 @@ details[open] > summary.adv-sum::before{content:"▾ "}
         <button id="btnProbe" disabled>Probe size</button>
       </div>
       <label class="sl">Intensity (0xA2 burn pulse) <b id="inv"></b><input id="inten" type="range" min="0" max="255" value="93"></label>
+      <label class="sl">Cool pause between giveaway prints (sec) <b id="cpv"></b><input id="coolPause" type="range" min="0" max="15" step="1" value="0"></label>
       <label class="sl">CRC8 polynomial <select id="crcv"><option value="07">0x07 (PROTOCOL.md)</option><option value="31">0x31 (alt table)</option></select></label>
       <label class="sl">Request byte 3, hex <input id="rq3" value="30" autocomplete="off"></label>
       <label class="sl">Request byte 4 / mode, hex <input id="rq4" value="00" autocomplete="off"></label>
@@ -329,54 +420,135 @@ function errStr(e){
   return 'non-Error '+typeof e+' -> '+String(e)+' '+j;
 }
 
-/* ---------- BLE layer (Build 10 verified) ---------- */
+/* ---------- BLE & 35mm Camera Status Bar ---------- */
 const SERVICES = ['ae30','ae00','af30','ff00','ffe0','fff0','18f0','fee7','180a','180f']
   .map(s => '0000'+s+'-0000-1000-8000-00805f9b34fb');
+const PRINTER_FILTERS = [
+  {namePrefix: 'MXW01'},
+  {namePrefix: 'GB0'},
+  {namePrefix: 'GT01'},
+  {namePrefix: 'CAT'},
+  {namePrefix: 'PeriPage'}
+];
 const PROPS = ['read','write','writeWithoutResponse','notify','indicate'];
 let dev = null, server = null, writable = [], catChars = {}, printing = false;
+let overheated = false, lastBattery = null;
 
-function setState(connected, text){
-  $('state').textContent = text || (connected ? 'Connected' : 'Disconnected');
-  $('btnConnect').disabled = connected;
-  $('btnConnect').classList.toggle('on', !!connected);
-  $('btnDisc').disabled = !connected;
-  $('btnSend').disabled = !connected || !writable.length;
+function updateCamSign(connected){
+  const badge = $('camBadge');
+  const lever = $('windLever');
+  const filmDot = $('filmDot');
+  badge.classList.remove('ready', 'busy');
+  if(printing){
+    badge.classList.add('busy');
+    badge.title = 'Printing — 35mm shutter active';
+    lever.setAttribute('d', 'M20 4 L26 6');
+    filmDot.setAttribute('opacity', '1');
+  } else if(connected){
+    badge.classList.add('ready');
+    badge.title = 'Connected — 35mm camera cocked & loaded';
+    lever.setAttribute('d', 'M20 4 L25 1');
+    filmDot.setAttribute('opacity', '1');
+  } else {
+    badge.title = 'Disconnected — 35mm camera open / uncocked';
+    lever.setAttribute('d', 'M20 6 L26 6');
+    filmDot.setAttribute('opacity', '0.25');
+  }
+}
+
+function setHeatAlert(isHot, labelText){
+  overheated = !!isHot;
+  const chip = $('heatChip');
+  const txt = $('heatTxt');
+  if(overheated){
+    chip.className = 'telem-chip heat-stop';
+    txt.textContent = labelText || 'STOP/HOT';
+    log('PRINTER OVERHEAT / STOP: '+txt.textContent,'err');
+  } else {
+    chip.className = 'telem-chip heat-ok';
+    txt.textContent = 'OK';
+  }
   updPrint();
 }
 
-function protocolHint(name){
-  if(/^MXW01/i.test(name||'')) return 'MXW01 ready';
-  if(/^(GB0[123]|GT01)/i.test(name||'')) return 'GB-family (unverified)';
-  return name || 'BLE ready';
+function setBatteryPct(pct){
+  if(typeof pct === 'number' && !Number.isNaN(pct) && pct >= 0 && pct <= 100){
+    lastBattery = pct;
+    $('batTxt').textContent = pct + '%';
+  }
+}
+
+function setState(connected){
+  $('btnConnect').disabled = connected;
+  $('btnDisc').disabled = !connected;
+  $('btnSend').disabled = !connected || !writable.length;
+  updateCamSign(connected);
+  updPrint();
+}
+
+async function attachDevice(targetDev){
+  dev = targetDev;
+  dev.addEventListener('gattserverdisconnected', () => {
+    log('GATT disconnected','err');
+    writable = []; fillWritable();
+    setState(false);
+  });
+  updateCamSign(false);
+  server = await dev.gatt.connect();
+  log('GATT connected: '+(dev.name||'unnamed'),'ok');
+  setState(true);
+  await discover();
+  setState(true);
+  if(catChars.ae01) getStatus().catch(()=>{});
+}
+
+async function autoReconnectKnown(){
+  if(!navigator.bluetooth || !navigator.bluetooth.getDevices) return;
+  try{
+    const devices = await navigator.bluetooth.getDevices();
+    if(!devices || !devices.length) return;
+    devices.sort((a,b) => (/^MXW01/i.test(b.name||'') ? 1 : 0) - (/^MXW01/i.test(a.name||'') ? 1 : 0));
+    const preferred = devices[0];
+    if(preferred && (!dev || !dev.gatt || !dev.gatt.connected)){
+      log('Auto-connecting to known device: '+(preferred.name||preferred.id));
+      await attachDevice(preferred);
+    }
+  }catch(_){}
 }
 
 async function connect(){
   if(!navigator.bluetooth){ log('Web Bluetooth unavailable in this browser.','err'); return; }
   try{
-    log('Requesting device…');
-    dev = null;
-    const attempts = [
-      ['all + optionalServices', {acceptAllDevices:true, optionalServices:SERVICES}],
-      ['all, no services',       {acceptAllDevices:true}]
-    ];
-    for(const [label, opts] of attempts){
-      try{ log('Trying: '+label); dev = await navigator.bluetooth.requestDevice(opts); break; }
-      catch(e){ log('Failed ('+label+'): '+errStr(e),'err'); if(e && e.name==='NotFoundError') throw e; }
+    if(navigator.bluetooth.getDevices){
+      const known = await navigator.bluetooth.getDevices().catch(()=>[]);
+      const mx = known.find(d => /^MXW01/i.test(d.name||''));
+      if(mx && (!dev || !dev.gatt || !dev.gatt.connected)){
+        try{ await attachDevice(mx); return; }catch(_){}
+      }
     }
-    if(!dev) throw new Error('requestDevice failed on all attempts');
-    log('Selected: name="'+dev.name+'" id='+dev.id);
-    $('hint').textContent = protocolHint(dev.name);
-    log($('hint').textContent);
-    dev.addEventListener('gattserverdisconnected', () => {
-      log('GATT disconnected','err'); writable = []; fillWritable(); $('hint').textContent = 'Tap BT icon to pair'; setState(false);
-    });
-    setState(false,'Connecting…');
-    log('GATT connecting…');
-    server = await dev.gatt.connect();
-    log('GATT connected','ok');
-    setState(true,'Connected: '+(dev.name||'unnamed'));
-    await discover();
-    setState(true,'Connected: '+(dev.name||'unnamed'));
+    log('Requesting device (prioritizing MXW01 / cat printers)…');
+    let picked = null;
+    try{
+      picked = await navigator.bluetooth.requestDevice({
+        filters: PRINTER_FILTERS,
+        optionalServices: SERVICES
+      });
+    }catch(e){
+      if(e && e.name === 'NotFoundError'){
+        log('Filtered scan cancelled/empty — opening full device list…');
+      } else {
+        log('Filter scan note: '+errStr(e));
+      }
+    }
+    if(!picked){
+      picked = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: SERVICES
+      });
+    }
+    if(!picked) throw new Error('No device selected');
+    log('Selected: "'+(picked.name||'unnamed')+'"');
+    await attachDevice(picked);
   }catch(e){
     log(errStr(e),'err');
     setState(false);
@@ -401,7 +573,10 @@ async function discover(){
       if(short(s.uuid) === 'ae30') catChars[short(c.uuid)] = c;
       if((c.properties.notify || c.properties.indicate) && short(s.uuid) === 'ae30'){
         try{
-          c.addEventListener('characteristicvaluechanged', ev => { log('RX '+short(c.uuid)+': '+hex(ev.target.value),'rx'); onNotify(short(c.uuid), ev.target.value); });
+          c.addEventListener('characteristicvaluechanged', ev => {
+            log('RX '+short(c.uuid)+': '+hex(ev.target.value),'rx');
+            onNotify(short(c.uuid), ev.target.value);
+          });
           await c.startNotifications();
           log('  notifications on for '+short(c.uuid));
         }catch(e){ log('  startNotifications '+short(c.uuid)+' failed: '+e.message,'err'); }
@@ -440,7 +615,8 @@ async function sendHex(){
 }
 
 function disconnect(){
-  if(dev && dev.gatt.connected){ log('Disconnecting…'); dev.gatt.disconnect(); }
+  if(dev && dev.gatt && dev.gatt.connected){ log('Disconnecting…'); dev.gatt.disconnect(); }
+  setState(false);
 }
 
 async function copyLog(){
@@ -451,7 +627,7 @@ async function copyLog(){
   log('Clipboard blocked: log selected, use Copy from the iOS menu.','err');
 }
 
-/* ---------- Creative Pipeline: Shaders, Frames, Stamps & Slit-Scan ---------- */
+/* ---------- Creative Pipeline: Shaders, Thermal Preview Gain, Frames & Phase 2 Layouts ---------- */
 const W = 384;
 const KERNELS = {
   fs:[[1,0,7/16],[-1,1,3/16],[0,1,5/16],[1,1,1/16]],
@@ -475,6 +651,7 @@ const ASCII_RAMP = ' .:-=+*#%@';
 const view = $('view'), vid = $('vid'), slitCv = $('slitCv'), work = document.createElement('canvas');
 let src = null, rot = 0, mirror = false, facing = 'environment', stream = null, last = null, raf = 0, lastUrl = null;
 let slitActive = false, slitRaf = 0, slitPos = 0, slitAccum = null;
+let posterStrips = [], activeStripIdx = 0, sidewaysBanner = false;
 
 function schedule(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
 
@@ -482,8 +659,8 @@ function blank(){
   view.width = W; view.height = 240;
   const c = view.getContext('2d');
   c.fillStyle = '#fff'; c.fillRect(0,0,W,240);
-  c.fillStyle = '#666'; c.font = '15px monospace'; c.textAlign = 'center';
-  c.fillText('Live / Slit-Scan / Camera / Library', W/2, 124);
+  c.fillStyle = '#666'; c.font = '14px monospace'; c.textAlign = 'center';
+  c.fillText('Live / Booth / Slit / Camera / Library', W/2, 124);
 }
 
 function getStampText(){
@@ -617,7 +794,7 @@ function composeWithFrame(photoMono, pw, ph){
   const outW = W;
   const innerW = outW - padSide * 2;
   const innerH = Math.round(ph * (innerW / pw));
-  const outH = Math.min(2200, padTop + innerH + padBot);
+  const outH = Math.min(2400, padTop + innerH + padBot);
 
   const fc = document.createElement('canvas');
   fc.width = outW; fc.height = outH;
@@ -720,19 +897,110 @@ function composeWithFrame(photoMono, pw, ph){
   return {mono: outMono, w: outW, h: outH};
 }
 
+function applyThermalPreviewGain(mono, w, h){
+  const sim = new Uint8Array(mono);
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      if(mono[y*w + x]){
+        if(x + 1 < w) sim[y*w + (x + 1)] = 1;
+        if(y + 1 < h && ((x + y) & 1) === 0) sim[(y + 1)*w + x] = 1;
+      }
+    }
+  }
+  return sim;
+}
+
+function buildPosterStrips(finalImg, numStrips){
+  posterStrips = [];
+  activeStripIdx = 0;
+  const bar = $('stripBar');
+  if(numStrips <= 1){
+    bar.hidden = true;
+    return finalImg;
+  }
+  const fullW = W * numStrips;
+  const fullH = Math.min(2200, Math.round(finalImg.h * numStrips));
+  const fullCv = document.createElement('canvas'); fullCv.width = fullW; fullCv.height = fullH;
+  const fctx = fullCv.getContext('2d');
+  fctx.fillStyle = '#fff'; fctx.fillRect(0, 0, fullW, fullH);
+
+  const srcCv = document.createElement('canvas'); srcCv.width = finalImg.w; srcCv.height = finalImg.h;
+  const sid = srcCv.getContext('2d').createImageData(finalImg.w, finalImg.h);
+  for(let i = 0, j = 0; i < finalImg.mono.length; i++, j += 4){
+    const v = finalImg.mono[i] ? 0 : 255;
+    sid.data[j] = sid.data[j+1] = sid.data[j+2] = v; sid.data[j+3] = 255;
+  }
+  srcCv.getContext('2d').putImageData(sid, 0, 0);
+  fctx.imageSmoothingEnabled = false;
+  fctx.drawImage(srcCv, 0, 0, fullW, fullH);
+
+  for(let s = 0; s < numStrips; s++){
+    const scv = document.createElement('canvas'); scv.width = W; scv.height = fullH;
+    const sctx = scv.getContext('2d');
+    sctx.fillStyle = '#fff'; sctx.fillRect(0, 0, W, fullH);
+    sctx.drawImage(fullCv, s * W, 0, W, fullH, 0, 0, W, fullH);
+    sctx.fillStyle = '#000';
+    sctx.font = 'bold 10px monospace';
+    sctx.fillText(`STRIP ${s+1}/${numStrips}  [TAPE HERE]`, 8, 12);
+    sctx.fillRect(0, 0, 12, 2); sctx.fillRect(W - 12, 0, 12, 2);
+    sctx.fillRect(0, fullH - 2, 12, 2); sctx.fillRect(W - 12, fullH - 2, 12, 2);
+
+    const sd = sctx.getImageData(0, 0, W, fullH).data;
+    const sm = new Uint8Array(W * fullH);
+    for(let i = 0; i < sm.length; i++) sm[i] = sd[i*4] < 128 ? 1 : 0;
+    posterStrips.push({mono: sm, w: W, h: fullH});
+  }
+
+  bar.hidden = false;
+  bar.innerHTML = '';
+  posterStrips.forEach((_, idx) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pill' + (idx === 0 ? ' active' : '');
+    b.textContent = `Strip ${idx+1}`;
+    b.addEventListener('click', () => {
+      activeStripIdx = idx;
+      bar.querySelectorAll('button').forEach((el, k) => el.classList.toggle('active', k === idx));
+      renderBitmapToView(posterStrips[idx], `Poster Strip ${idx+1}/${numStrips}`);
+    });
+    bar.appendChild(b);
+  });
+  return posterStrips[0];
+}
+
+function renderBitmapToView(imgObj, tagNote){
+  const useSim = $('printSim').checked;
+  const dispMono = useSim ? applyThermalPreviewGain(imgObj.mono, imgObj.w, imgObj.h) : imgObj.mono;
+  const outId = new ImageData(imgObj.w, imgObj.h);
+  for(let i = 0, j = 0; i < dispMono.length; i++, j += 4){
+    const isBlack = dispMono[i] === 1;
+    outId.data[j]   = isBlack ? 24  : 250;
+    outId.data[j+1] = isBlack ? 20  : 246;
+    outId.data[j+2] = isBlack ? 18  : 238;
+    outId.data[j+3] = 255;
+  }
+  view.width = imgObj.w; view.height = imgObj.h;
+  view.getContext('2d').putImageData(outId, 0, 0);
+  last = imgObj;
+  updPrint();
+  $('info').textContent = imgObj.w+' × '+imgObj.h+' px · '+Math.round(imgObj.h/8)+' mm'+(tagNote ? ' · '+tagNote : '');
+}
+
 function draw(){
   ['br','ct','gm','th','sf'].forEach(k => { $(k+'v').textContent = $(k).value; });
   if(!src) return;
-  const odd = rot % 2 === 1;
+  const extraRot = sidewaysBanner ? 1 : 0;
+  const totalRot = (rot + extraRot) % 4;
+  const odd = totalRot % 2 === 1;
   const sw = odd ? src.h : src.w, sh = odd ? src.w : src.h;
-  const H = Math.min(2000, Math.max(8, Math.round(W * sh / sw)));
+  const H = Math.min(2200, Math.max(8, Math.round(W * sh / sw)));
   work.width = W; work.height = H;
   const c = work.getContext('2d', {willReadFrequently:true});
   c.fillStyle = '#fff'; c.fillRect(0,0,W,H);
   c.save();
   c.translate(W/2, H/2);
   if(mirror) c.scale(-1, 1);
-  c.rotate(rot * Math.PI / 2);
+  c.rotate(totalRot * Math.PI / 2);
   const dw = odd ? H : W, dh = odd ? W : H;
   c.drawImage(src.el, -dw/2, -dh/2, dw, dh);
   c.restore();
@@ -749,44 +1017,41 @@ function draw(){
 
   const photoMono = ditherGrayToMono(g, W, H, $('mode').value, t, +$('sf').value);
   const finalImg = composeWithFrame(photoMono, W, H);
-
-  const outId = new ImageData(finalImg.w, finalImg.h);
-  for(let i = 0, j = 0; i < finalImg.mono.length; i++, j += 4){
-    const v = finalImg.mono[i] ? 0 : 255;
-    outId.data[j] = outId.data[j+1] = outId.data[j+2] = v; outId.data[j+3] = 255;
-  }
-  view.width = finalImg.w; view.height = finalImg.h;
-  view.getContext('2d').putImageData(outId, 0, 0);
-  last = finalImg;
-  updPrint();
-  $('info').textContent = finalImg.w+' × '+finalImg.h+' px · '+Math.round(finalImg.h/8)+' mm';
+  const strips = +$('stripCount').value || 1;
+  const chosen = buildPosterStrips(finalImg, strips);
+  renderBitmapToView(chosen, sidewaysBanner ? 'Sideways Banner' : '');
 }
 
-/* ---------- One-Tap Look Presets ---------- */
+/* ---------- Presets (including requested defaults & Cool Giveaway mode) ---------- */
 const LOOKS = {
-  natural:   {mode:'atk',      br:0,   ct:0,   gm:1.0,  th:128, inv:false, inten:93},
-  portrait:  {mode:'fs',       br:18,  ct:-10, gm:1.25, th:138, inv:false, inten:85},
-  xerox:     {mode:'atk',      br:-10, ct:65,  gm:0.85, th:120, inv:false, inten:115},
-  gameboy:   {mode:'gameboy',  br:5,   ct:20,  gm:1.0,  th:128, inv:false, inten:100},
-  halftone:  {mode:'halftone', br:5,   ct:25,  gm:1.05, th:128, inv:false, inten:100},
-  ascii:     {mode:'ascii',    br:10,  ct:35,  gm:1.1,  th:128, inv:false, inten:105},
-  blueprint: {mode:'stucki',   br:0,   ct:20,  gm:1.0,  th:128, inv:true,  inten:80}
+  natural:   {mode:'atk',      br:20,  ct:-20, gm:1.05, th:132, inv:false, inten:90, coolPause:0},
+  portrait:  {mode:'fs',       br:0,   ct:0,   gm:1.22, th:136, inv:false, inten:82, coolPause:0},
+  xerox:     {mode:'atk',      br:20,  ct:5,   gm:0.9,  th:126, inv:false, inten:105, coolPause:0},
+  cool:      {mode:'bayer',    br:32,  ct:18,  gm:1.18, th:146, inv:false, inten:64, coolPause:2},
+  gameboy:   {mode:'gameboy',  br:12,  ct:10,  gm:1.0,  th:128, inv:false, inten:88, coolPause:0},
+  halftone:  {mode:'halftone', br:14,  ct:12,  gm:1.05, th:130, inv:false, inten:88, coolPause:0},
+  ascii:     {mode:'ascii',    br:15,  ct:20,  gm:1.1,  th:128, inv:false, inten:92, coolPause:0},
+  blueprint: {mode:'stucki',   br:10,  ct:10,  gm:1.0,  th:128, inv:true,  inten:72, coolPause:1}
 };
-$('presetBar').addEventListener('click', e => {
-  const btn = e.target.closest('button[data-look]');
-  if(!btn) return;
-  document.querySelectorAll('#presetBar .pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const L = LOOKS[btn.dataset.look];
+
+function applyLook(key){
+  document.querySelectorAll('#presetBar .pill').forEach(b => b.classList.toggle('active', b.dataset.look === key));
+  const L = LOOKS[key];
   if(!L) return;
   $('mode').value = L.mode;
   $('br').value = L.br; $('ct').value = L.ct; $('gm').value = L.gm; $('th').value = L.th;
   $('invert').checked = L.inv;
   $('inten').value = L.inten; $('inv').textContent = L.inten;
+  $('coolPause').value = L.coolPause; $('cpv').textContent = L.coolPause + 's';
   schedule();
+}
+
+$('presetBar').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-look]');
+  if(btn) applyLook(btn.dataset.look);
 });
 
-/* ---------- Camera, Selfie Switch & Slit-Scan ---------- */
+/* ---------- Camera, Selfie Switch, Slit-Scan & Photo Booth ---------- */
 function stopCam(){
   slitActive = false;
   cancelAnimationFrame(slitRaf);
@@ -830,12 +1095,71 @@ async function toggleSelfie(){
   }
 }
 
-function shot(){
+function grabFrameCanvas(){
   const w = vid.videoWidth, h = vid.videoHeight;
-  if(!w){ log('Camera has no frame yet','err'); return; }
+  if(!w) return null;
   const c = document.createElement('canvas'); c.width = w; c.height = h;
-  c.getContext('2d').drawImage(vid,0,0);
-  src = {el:c, w, h}; rot = 0; stopCam(); draw(); log('Captured '+w+'×'+h);
+  c.getContext('2d').drawImage(vid, 0, 0);
+  return c;
+}
+
+function shot(){
+  const c = grabFrameCanvas();
+  if(!c){ log('Camera has no frame yet','err'); return; }
+  sidewaysBanner = false;
+  src = {el:c, w:c.width, h:c.height}; rot = 0; stopCam(); draw();
+  log('Captured '+c.width+'×'+c.height);
+}
+
+async function runPhotoBooth(){
+  const count = +$('boothCount').value || 3;
+  const sec = +$('boothDelay').value || 2;
+  const banner = $('boothStatus');
+  if(!stream){
+    const ok = await startCam(false);
+    if(!ok) return;
+  }
+  banner.hidden = false;
+  const frames = [];
+  for(let k = 1; k <= count; k++){
+    for(let s = sec; s > 0; s--){
+      banner.textContent = `Pose ${k}/${count} in ${s}…`;
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    banner.textContent = `Snap ${k}/${count}!`;
+    const snap = grabFrameCanvas();
+    if(snap) frames.push(snap);
+    await new Promise(r => setTimeout(r, 350));
+  }
+  banner.hidden = true;
+  stopCam();
+  if(!frames.length){ log('Photo booth captured no frames','err'); return; }
+
+  const pad = 14, cellW = W - pad * 2, cellH = Math.round(cellW * 0.75);
+  const stripH = pad + frames.length * (cellH + pad) + 28;
+  const bcv = document.createElement('canvas'); bcv.width = W; bcv.height = stripH;
+  const bctx = bcv.getContext('2d');
+  bctx.fillStyle = '#fff'; bctx.fillRect(0, 0, W, stripH);
+  bctx.fillStyle = '#000';
+  frames.forEach((f, idx) => {
+    const y = pad + idx * (cellH + pad);
+    bctx.strokeRect(pad - 1, y - 1, cellW + 2, cellH + 2);
+    bctx.save();
+    bctx.beginPath(); bctx.rect(pad, y, cellW, cellH); bctx.clip();
+    if(mirror){ bctx.translate(W, 0); bctx.scale(-1, 1); }
+    const scale = Math.max(cellW / f.width, cellH / f.height);
+    const dw = f.width * scale, dh = f.height * scale;
+    const dx = mirror ? (W - pad - cellW + (cellW - dw)/2) : (pad + (cellW - dw)/2);
+    bctx.drawImage(f, dx, y + (cellH - dh)/2, dw, dh);
+    bctx.restore();
+  });
+  bctx.font = 'bold 12px monospace'; bctx.textAlign = 'center';
+  bctx.fillText(`PHOTO BOOTH ×${frames.length} · ${new Date().toLocaleDateString()}`, W/2, stripH - 10);
+
+  sidewaysBanner = false;
+  src = {el: bcv, w: W, h: stripH}; rot = 0;
+  draw();
+  log('Photo booth strip ready ('+frames.length+' frames)','ok');
 }
 
 async function startSlitScan(){
@@ -902,6 +1226,7 @@ function finishSlitScan(){
   const finalW = Math.max(48, dir === 'h' ? Math.min(slitAccum.width, slitPos || slitAccum.width) : slitAccum.width);
   const out = document.createElement('canvas'); out.width = finalW; out.height = finalH;
   out.getContext('2d').drawImage(slitAccum, 0, 0, finalW, finalH, 0, 0, finalW, finalH);
+  sidewaysBanner = false;
   src = {el: out, w: finalW, h: finalH};
   rot = 0; stopCam(); draw();
   log('Slit-Scan captured ('+finalW+'×'+finalH+')','ok');
@@ -913,6 +1238,7 @@ async function loadFile(f){
     if(lastUrl) URL.revokeObjectURL(lastUrl);
     lastUrl = URL.createObjectURL(f);
     const im = new Image(); im.src = lastUrl; await im.decode();
+    sidewaysBanner = false;
     src = {el:im, w:im.naturalWidth, h:im.naturalHeight}; rot = 0; stopCam(); draw();
     log('Loaded '+src.w+'×'+src.h+' ('+Math.round(f.size/1024)+' KB)');
   }catch(e){ log('Image load failed: '+errStr(e),'err'); }
@@ -921,6 +1247,15 @@ async function loadFile(f){
 $('btnLive').addEventListener('click', () => stream && !slitActive ? stopCam() : startCam(false));
 $('btnSelfie').addEventListener('click', toggleSelfie);
 $('btnShot').addEventListener('click', shot);
+$('btnBooth').addEventListener('click', runPhotoBooth);
+$('btnBanner').addEventListener('click', () => {
+  sidewaysBanner = !sidewaysBanner;
+  $('btnBanner').classList.toggle('pill', false);
+  $('btnBanner').style.background = sidewaysBanner ? 'var(--accent2)' : '';
+  $('btnBanner').style.color = sidewaysBanner ? '#fff' : '';
+  schedule();
+});
+$('stripCount').addEventListener('change', schedule);
 $('btnSlit').addEventListener('click', () => slitActive ? stopCam() : startSlitScan());
 $('btnSlitStop').addEventListener('click', finishSlitScan);
 $('btnCam').addEventListener('click', () => $('fCam').click());
@@ -928,7 +1263,7 @@ $('btnLib').addEventListener('click', () => $('fLib').click());
 $('btnRot').addEventListener('click', () => { rot = (rot + 1) % 4; schedule(); });
 $('btnFlip').addEventListener('click', () => { mirror = !mirror; schedule(); });
 ['fCam','fLib'].forEach(id => $(id).addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; }));
-['mode','frame','stampOpt','br','ct','gm','th','sf','invert'].forEach(id => $(id).addEventListener('input', schedule));
+['mode','frame','stampOpt','br','ct','gm','th','sf','invert','printSim'].forEach(id => $(id).addEventListener('input', schedule));
 $('caption').addEventListener('input', schedule);
 blank(); draw();
 
@@ -961,9 +1296,7 @@ function renderHistory(){
     btn.textContent = 'Reprint ' + item.ts;
     btn.addEventListener('click', () => {
       last = {mono: new Uint8Array(item.mono), w: item.w, h: item.h};
-      view.width = item.w; view.height = item.h;
-      view.getContext('2d').putImageData(id, 0, 0);
-      updPrint();
+      renderBitmapToView(last, 'Queued Reprint');
       if(dev && dev.gatt && dev.gatt.connected) doPrint(last, true);
       else log('Loaded queued print into preview (connect printer to print).','ok');
     });
@@ -972,7 +1305,7 @@ function renderHistory(){
 }
 $('btnClearHist').addEventListener('click', () => { historyQueue.length = 0; renderHistory(); });
 
-/* ---------- printer driver: MXW01 (Build 10 verified transport) ---------- */
+/* ---------- printer driver: MXW01 ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function crc8(arr){ const poly = $('crcv').value === '31' ? 0x31 : 0x07; let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ poly) & 0xff : (c << 1) & 0xff; } return c; }
 function pkt(cmd, payload){
@@ -990,9 +1323,21 @@ function onNotify(id, dv){
   if(id !== 'ae02') return;
   const b = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
   if(b.length < 8 || b[0] !== 0x22 || b[1] !== 0x21){ log('  (unparsed notify)'); return; }
-  const n = b[4] | (b[5] << 8);
-  log('  RX cmd 0x'+b[2].toString(16)+' payload: '+hex(b.subarray(6, 6+n)));
-  waiters = waiters.filter(w => { if(w.cmd === b[2]){ w.res(b); return false; } return true; });
+  const cmd = b[2], n = b[4] | (b[5] << 8);
+  const pl = b.subarray(6, 6+n);
+  log('  RX cmd 0x'+cmd.toString(16)+' payload: '+hex(pl));
+  if(cmd === 0xA1 && b.length >= 14){
+    const st = decodeStatus(b);
+    setBatteryPct(st.battery);
+    if(st.flag || st.temp >= 60) setHeatAlert(true, st.temp >= 60 ? st.temp+'°C' : 'ERR '+st.err);
+    else setHeatAlert(false);
+  }
+  if(cmd === 0xAA && pl.length >= 1){
+    if(pl[0] === 0xfc || (pl[0] !== 0x00 && pl[0] !== 0x01)){
+      setHeatAlert(true, 'STOP');
+    }
+  }
+  waiters = waiters.filter(w => { if(w.cmd === cmd){ w.res(b); return false; } return true; });
 }
 function waitCmd(cmd, ms){
   return new Promise(res => {
@@ -1014,6 +1359,9 @@ async function getStatus(){
   const r = await w;
   if(!r){ log('No status answer within 3 s','err'); return null; }
   const st = decodeStatus(r);
+  setBatteryPct(st.battery);
+  if(st.flag || st.temp >= 60) setHeatAlert(true, st.temp >= 60 ? st.temp+'°C' : 'ERR '+st.err);
+  else setHeatAlert(false);
   log('Status: state '+st.state+', battery '+st.battery+'%, temp '+st.temp+'°C, flag '+st.flag+(st.flag ? ', error '+st.err : ' (OK)'), st.flag ? 'err' : 'ok');
   return st;
 }
@@ -1035,13 +1383,19 @@ const catDriver = {
     await ctl(0xA2, [+$('inten').value & 255]);
     await sleep(50);
     const st = await getStatus();
-    if(st && st.flag) throw new Error('Printer reports an error (code '+st.err+'): stop and check paper/battery/heat');
+    if(st && (st.flag || st.temp >= 60)){
+      setHeatAlert(true, st.temp >= 60 ? st.temp+'°C' : 'ERR '+st.err);
+      throw new Error('Printer overheated / stopped (code '+st.err+', temp '+st.temp+'°C): wait for cooldown');
+    }
     const r3 = parseInt($('rq3').value, 16) & 255, r4 = parseInt($('rq4').value, 16) & 255;
     const ack = waitCmd(0xA9, 3000);
     await ctl(0xA9, [rows & 255, rows >> 8, r3, r4]);
     const a = await ack;
     if(!a) throw new Error('No answer to print request: power-cycle the printer and reconnect');
-    if(a[6] !== 0) throw new Error('Print request rejected (code '+a[6]+').');
+    if(a[6] !== 0){
+      setHeatAlert(true, 'BUSY/HOT');
+      throw new Error('Print request rejected (code '+a[6]+').');
+    }
     log('Print request accepted','ok');
     const rx0 = rxCount; let n = 0;
     for(let o = 0; o < data.length; o += ch, n++){
@@ -1056,6 +1410,11 @@ const catDriver = {
     (async () => { while(polling){ await sleep(3000); if(polling) await getStatus(); } })();
     const d = await done; polling = false;
     log(d ? 'Print complete (0xAA received)' : 'No complete notice within 45 s', d ? 'ok' : 'err');
+    const cp = +$('coolPause').value || 0;
+    if(cp > 0){
+      log('Cool mode cooldown pause: '+cp+'s…','ok');
+      await sleep(cp * 1000);
+    }
   }
 };
 
@@ -1070,8 +1429,10 @@ function testPattern(){
   return {mono:m, w, h};
 }
 function updPrint(){
-  const ok = !!(dev && dev.gatt && dev.gatt.connected && catChars.ae01 && catChars.ae03) && !printing;
-  $('btnPrint').disabled = !ok || !last; $('btnTest').disabled = !ok; $('btnStat').disabled = !ok; $('btnProbe').disabled = !ok;
+  const ok = !!(dev && dev.gatt && dev.gatt.connected && catChars.ae01 && catChars.ae03) && !printing && !overheated;
+  $('btnPrint').disabled = !ok || !last;
+  $('btnTest').disabled = !ok; $('btnStat').disabled = !ok; $('btnProbe').disabled = !ok;
+  updateCamSign(!!(dev && dev.gatt && dev.gatt.connected));
 }
 async function probeSize(){
   if(printing) return;
@@ -1100,7 +1461,7 @@ async function probeSize(){
   printing = false; updPrint();
 }
 async function doPrint(m, isReprint){
-  if(printing) return;
+  if(printing || overheated) return;
   printing = true; updPrint();
   try{
     if(!isReprint && m !== null && last === m) saveToHistory(m);
@@ -1119,16 +1480,20 @@ applyPreset();
 $('btnStat').addEventListener('click', () => getStatus());
 $('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
 $('inv').textContent = $('inten').value;
+$('coolPause').addEventListener('input', () => { $('cpv').textContent = $('coolPause').value + 's'; });
+$('cpv').textContent = $('coolPause').value + 's';
 
-/* ---------- wiring ---------- */
+/* ---------- wiring & startup ---------- */
 $('btnConnect').addEventListener('click', connect);
 $('btnDisc').addEventListener('click', disconnect);
 $('btnSend').addEventListener('click', sendHex);
 $('btnCopy').addEventListener('click', copyLog);
 $('btnClear').addEventListener('click', () => { logEl.textContent = ''; });
 
+updateCamSign(false);
 log('Ready. UA: '+navigator.userAgent);
 log('Secure context: '+window.isSecureContext+' | Web Bluetooth: '+!!navigator.bluetooth);
+autoReconnectKnown();
 </script>
 </body>
 </html>
