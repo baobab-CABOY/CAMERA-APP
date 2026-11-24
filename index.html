@@ -29,7 +29,7 @@ body{
 
 /* Minimalist Top Bar: Printer selector, BLE status, heat/battery indicators */
 .topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  display:flex;align-items:center;justify-space-between;gap:6px;
   margin-bottom:8px;padding:6px 8px;background:var(--card);
   border:1.5px solid var(--line);border-radius:8px;box-shadow:2px 2px 0 var(--line);
 }
@@ -339,17 +339,10 @@ button.slot-x{
 .phase3-tabs button.active{background:var(--fg);color:var(--bg)}
 
 .zine-helper-bar{
-  display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-top:6px;
+  display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-top:4px;
 }
 .zine-helper-bar button{
-  flex:0 0 auto;min-height:28px;padding:2px 10px;font-size:11px;border-radius:4px;
-}
-
-.optic-roll-box{
-  margin-top:8px;padding:8px;border:1.5px dashed var(--line);border-radius:6px;background:var(--bg);
-}
-.optic-roll-box label.chk{
-  display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-top:0;
+  flex:0 0 auto;min-height:28px;padding:2px 8px;font-size:11px;border-radius:4px;
 }
 
 /* Warning Banner for High Consumption Features */
@@ -368,6 +361,9 @@ button.slot-x{
   display:flex;align-items:center;justify-content:space-between;
   box-shadow:2px 2px 0 var(--line);margin-bottom:4px;
 }
+.micro-chk{font-size:10px;display:flex;align-items:center;gap:2px;color:var(--mut);white-space:nowrap}
+.micro-chk input{width:auto;margin:0}
+.optic-len{margin-top:8px;padding:8px;border:2px dashed var(--line);border-radius:8px}
 </style>
 </head>
 <body>
@@ -385,6 +381,7 @@ button.slot-x{
       </svg>
       <span id="connLabel">BLE</span>
     </button>
+    <label class="micro-chk" title="Show every Bluetooth device in the picker (otherwise only your printer model is listed)"><input type="checkbox" id="bleAll"> all</label>
   </div>
 
   <div class="telem-group">
@@ -394,6 +391,7 @@ button.slot-x{
     <span id="batChip" class="telem-chip" title="Printer battery">
       <span>🔋</span><span id="batTxt">--%</span>
     </span>
+    <button id="btnPanic" class="micro" title="Emergency stop: reset printer + disconnect" aria-label="Emergency stop">⏹</button>
     <button id="btnDisc" class="micro" title="Disconnect BLE" aria-label="Disconnect BLE" disabled>✕</button>
   </div>
 </div>
@@ -484,7 +482,7 @@ button.slot-x{
   <input id="fDexpB" type="file" accept="image/*" hidden>
 </div>
 
-<!-- Tab 1: Look & Frame (Borderless & No Date Default + Burn Intensity) -->
+<!-- Tab 1: Look & Frame (Borderless & No Date Default) -->
 <div class="card tab-card" id="tabLookCard">
   <button type="button" class="tab-toggle" data-target="tabLookBody">
     <span class="chev">Look &amp; Frame</span>
@@ -536,10 +534,6 @@ button.slot-x{
         <option value="sign">Caption only</option>
       </select>
     </div>
-
-    <label class="sl">Burn Intensity (paper density) <b id="burnv">82</b>
-      <input id="burnIntensity" type="range" min="0" max="255" value="82">
-    </label>
 
     <label class="sl" style="margin-top:8px"><input id="invert" type="checkbox" style="width:auto"> Invert black &amp; white</label>
 
@@ -613,17 +607,17 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Tab 3: Double Exposure Tab (A sets frame, B crops within & positions) -->
+<!-- Tab 3: Double Exposure Tab -->
 <div class="card tab-card dexp-card" id="tabDexpCard">
   <button type="button" class="tab-toggle" data-target="tabDexpBody">
     <span class="chev">🎞 Double Exposure</span>
-    <span id="dexpBadge" class="poster-badge">A Frames · B Crops</span>
+    <span id="dexpBadge" class="poster-badge">Hi → Lo Shadows</span>
   </button>
   <div class="tab-body" id="tabDexpBody" hidden>
     <div class="stereo-slots">
       <div class="stereo-slot" id="slotDexpA">
         <div class="slot-head">
-          <strong>EXPOSURE A (FRAME)</strong>
+          <strong>EXPOSURE A (BASE)</strong>
           <button type="button" id="btnClearDexpA" class="slot-x" title="Clear A">✕</button>
         </div>
         <div class="stereo-media">
@@ -637,7 +631,7 @@ button.slot-x{
       </div>
       <div class="stereo-slot" id="slotDexpB">
         <div class="slot-head">
-          <strong>EXPOSURE B (CROP IN A)</strong>
+          <strong>EXPOSURE B (OVERLAY)</strong>
           <button type="button" id="btnClearDexpB" class="slot-x" title="Clear B">✕</button>
         </div>
         <div class="stereo-media">
@@ -666,19 +660,18 @@ button.slot-x{
       </label>
     </div>
 
-    <div class="grid2">
-      <label class="sl">Image B Pos X <b id="dxbxv">0%</b>
-        <input id="dexpPosX" type="range" min="-100" max="100" value="0">
-      </label>
-      <label class="sl">Image B Pos Y <b id="dxbyv">0%</b>
-        <input id="dexpPosY" type="range" min="-100" max="100" value="0">
-      </label>
-    </div>
-
     <label class="sl">Hi/Lo Threshold <b id="dxtv">135</b>
       <input id="dexpThresh" type="range" min="10" max="245" value="135">
     </label>
 
+    <div class="grid2">
+      <label class="sl">B position X <b id="dxpxv">0</b><input id="dexpBX" type="range" min="-100" max="100" value="0"></label>
+      <label class="sl">B position Y <b id="dxpyv">0</b><input id="dexpBY" type="range" min="-100" max="100" value="0"></label>
+    </div>
+    <label class="sl">B zoom <b id="dxpzv">100%</b><input id="dexpBZ" type="range" min="100" max="300" value="100"></label>
+    <div class="row" style="margin-top:8px">
+      <button type="button" id="btnDexpBReset">↺ Reset B position</button>
+    </div>
     <div class="row" style="margin-top:8px">
       <button type="button" id="btnDexpSwap">⇄ Swap A / B</button>
       <button type="button" id="btnDexpBuild">✦ Combine &amp; Preview</button>
@@ -721,7 +714,7 @@ button.slot-x{
       <input id="zineTitle" placeholder="Headline (e.g. NORMAL AIN'T REAL)" maxlength="32">
       <textarea id="zineBody" rows="4" placeholder="Type a poem, manifesto, prompt, or intention slip to render onto 58mm thermal paper…"></textarea>
 
-      <!-- Quick helper toolbar for Zine Note editing (zine01 & bullet removed) -->
+      <!-- Quick helper toolbar for Zine Note editing -->
       <div class="zine-helper-bar">
         <button type="button" id="btnZineDate">+ Date/Time</button>
         <button type="button" id="btnZineClear" style="background:color-mix(in srgb, var(--danger) 15%, var(--bg));color:var(--danger)">Clear</button>
@@ -757,9 +750,25 @@ button.slot-x{
       </div>
     </div>
 
-    <!-- Sub-tab 3: Optical Generator + Continuous Roll Length (cm) -->
+    <!-- Sub-tab 3: Optical Generator -->
     <div id="p3Optic" hidden>
-      <div class="grid2">
+      <div class="optic-len">
+        <div class="grid2">
+          <label class="sl" style="margin-top:0">Total paper length (cm) <input id="opticLenCm" type="number" min="0" max="500" step="1" value="0" inputmode="decimal"></label>
+          <label class="sl" style="margin-top:0">Fit
+            <select id="opticFit">
+              <option value="repeat" selected>Repeat design (mirror tiles)</option>
+              <option value="stretch">Stretch design to length</option>
+            </select>
+          </label>
+        </div>
+        <p id="opticLenInfo" style="font-size:11.5px;color:var(--mut);margin:6px 0 0">0 = single square (4.8 cm). Enter e.g. 300 for a continuous 3 m strip.</p>
+        <div class="row" style="margin-top:6px">
+          <button id="btnOpticPrint" type="button" style="background:var(--accent2);color:#fff">▶ Print continuous</button>
+          <button id="btnOpticStop" type="button" style="flex:0 0 90px" disabled>■ Stop</button>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:8px">
         <select id="opticPattern">
           <option value="moire">1. Interference Moiré Rings</option>
           <option value="spiral">2. Hypnotic Op-Art Spiral</option>
@@ -775,16 +784,6 @@ button.slot-x{
       </div>
 
       <input id="opticOverlayText" placeholder="Optional stamped / warped text…" maxlength="28" style="margin-top:6px">
-
-      <div class="optic-roll-box">
-        <label class="chk"><input id="opticContinuous" type="checkbox" style="width:auto"> Continuous Roll Length Mode (cm)</label>
-        <div class="grid2" style="margin-top:6px;align-items:center">
-          <label class="sl" style="margin-top:0">Paper Length (cm)
-            <input id="opticLengthCm" type="number" min="5" max="1500" step="5" value="300">
-          </label>
-          <div style="font-size:11px;color:var(--mut);padding-top:14px" id="opticCmInfo">300 cm ≈ 2400 px (capped/scaled)</div>
-        </div>
-      </div>
 
       <div class="grid2" style="margin-top:4px">
         <label class="sl">1. Frequency <b id="opv1">18</b><input id="opticFreq" type="range" min="4" max="48" value="18"></label>
@@ -802,22 +801,23 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Tab 6: Weird Scanner (Live Streamed Slice Scanner + Clean Pacing) -->
+<!-- Tab 6: Weird Scanner (Continuous 10-Line Oscillating Scanner + Paper Warning) -->
 <div class="card tab-card weird-card" id="tabWeirdCard">
   <button type="button" class="tab-toggle" data-target="tabWeirdBody">
     <span class="chev">〰 Weird Scanner</span>
-    <span id="weirdBadge" class="poster-badge">Live Slice Stream</span>
+    <span id="weirdBadge" class="poster-badge">10-Line Continuous Sweep</span>
   </button>
   <div class="tab-body" id="tabWeirdBody" hidden>
+    
     <div class="warning-banner">
       <span>⚠️</span>
       <div>
-        <strong>LIVE THERMAL STREAM:</strong> When connected, slices stream to the printer at a controlled cadence to prevent head chatter and paper jams.
+        <strong>HIGH PAPER CONSUMPTION WARNING:</strong> Continuous live 10-line scanning sends non-stop slice output to thermal paper when connected.
       </div>
     </div>
 
     <p style="font-size:11.5px;color:var(--mut);margin:0 0 8px">
-      Sweeps across the live camera feed in controlled bands, builds the slice strip on screen, and sends paced raster bands to the printer when connected.
+      Sweeps continuously up and down across the live camera feed 10 lines at a time, rendering an infinite slice deformation strip on screen and sending data continuously to the printer.
     </p>
 
     <div class="grid2">
@@ -836,11 +836,9 @@ button.slot-x{
       </label>
     </div>
 
-    <label class="sl"><input id="weirdLivePrint" type="checkbox" checked style="width:auto"> Stream slices live to connected BLE printer</label>
-
     <div class="row" style="margin-top:10px">
-      <button id="btnStartWeirdScan" type="button" style="background:var(--accent2);color:#fff">▶ Start Scanner</button>
-      <button id="btnFinishWeirdScan" type="button" style="flex:0 0 90px" disabled>■ Finish</button>
+      <button id="btnStartWeirdScan" type="button" style="background:var(--accent2);color:#fff">▶ Start Continuous Scanner</button>
+      <button id="btnFinishWeirdScan" type="button" style="flex:0 0 90px" disabled>■ Stop</button>
     </div>
   </div>
 </div>
@@ -934,6 +932,7 @@ button.slot-x{
       <label class="sl">Chunk bytes <input id="chunk" type="number" value="20" min="20" max="240"></label>
       <label class="sl">Delay ms <input id="delay" type="number" value="25" min="0" max="100"></label>
       <label class="sl"><input id="rot180" type="checkbox" style="width:auto"> Rotate 180° when printing</label>
+      <label class="sl"><input id="autoDisc" type="checkbox" style="width:auto" checked> M02X: reset + disconnect after each print (stops endless reprint)</label>
       <label class="sl"><input id="poll" type="checkbox" style="width:auto"> Poll status while printing</label>
       <label class="sl">Feed rows after image <input id="feed" type="number" value="40" min="0" max="200"></label>
     </div>
@@ -1027,6 +1026,7 @@ document.querySelectorAll('.tab-toggle').forEach(btn => {
   });
 });
 
+/* Collapsible Console Toggle */
 $('btnToggleConsole').addEventListener('click', () => {
   const body = $('advConsoleBody');
   const chev = $('consoleChev');
@@ -1035,7 +1035,7 @@ $('btnToggleConsole').addEventListener('click', () => {
   chev.textContent = open ? '▾' : '▸';
 });
 
-/* ---------- BLE Driver & Single-Shot Print Session Lock ---------- */
+/* ---------- BLE Driver & Print Loop Fix ---------- */
 const M02X_ALT_SVC = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 const M02X_ALT_CHAR = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
 const M02X_FF00_SVC = '0000ff00-0000-1000-8000-00805f9b34fb';
@@ -1049,25 +1049,25 @@ const SERVICES = [
     .map(s => '0000'+s+'-0000-1000-8000-00805f9b34fb')
 ];
 
-const M02X_FILTERS = [
-  {namePrefix: 'M02X'},
-  {namePrefix: 'M02'},
-  {namePrefix: 'Phomemo'}
+const PRINTER_FILTERS = [
+  {namePrefix: 'M02X'}, {namePrefix: 'MXW01'}, {namePrefix: 'GB0'}, {namePrefix: 'GT01'}, {namePrefix: 'CAT'}
+];
+/* Model-specific scan filters: the picker lists ONLY the selected printer family first */
+const PHOMEMO_FILTERS = [
+  {namePrefix: 'M02'}, {namePrefix: 'Mr.in'}, {namePrefix: 'T02'}, {namePrefix: 'Phomemo'},
+  {services: [M02X_FF00_SVC]}
 ];
 const CAT_FILTERS = [
-  {namePrefix: 'MXW01'},
-  {namePrefix: 'GB0'},
-  {namePrefix: 'GT01'},
-  {namePrefix: 'CAT'}
+  {namePrefix: 'MXW01'}, {namePrefix: 'GB0'}, {namePrefix: 'GT01'}, {namePrefix: 'CAT'}, {namePrefix: 'Cat'},
+  {services: [CAT_AE30_SVC]}
 ];
 const PROPS = ['read','write','writeWithoutResponse','notify','indicate'];
 let dev = null, server = null, writable = [], catChars = {}, m02xChar = null, printing = false;
 let overheated = false, lastBattery = null;
 
-/* Strict single-shot lock so Bluefy cannot loop/replay a finished job */
-let activeJobToken = null;
-let completedJobTokens = new Set();
-let lastPrintTriggerMs = 0;
+/* Print Session Lock: Fixes Bluefy iOS endless print loop */
+let isPrintingSessionActive = false;
+let currentPrintJobId = null;
 
 function renderFuseIcon(state){
   const svg = $('fuseSvg');
@@ -1087,7 +1087,7 @@ function renderFuseIcon(state){
 function updateCamSign(connected){
   const btn = $('btnConnect');
   btn.classList.remove('ready', 'busy');
-  if(printing || activeJobToken !== null){
+  if(printing || isPrintingSessionActive){
     btn.classList.add('busy');
     btn.title = 'Printing — busy';
     renderFuseIcon('busy');
@@ -1134,9 +1134,7 @@ async function attachDevice(targetDev){
   dev = targetDev;
   dev.addEventListener('gattserverdisconnected', () => {
     log('GATT disconnected','err');
-    writable = []; catChars = {}; m02xChar = null;
-    printing = false; activeJobToken = null;
-    fillWritable();
+    writable = []; catChars = {}; m02xChar = null; fillWritable();
     setState(false);
   });
   updateCamSign(false);
@@ -1153,10 +1151,7 @@ async function autoReconnectKnown(){
   try{
     const devices = await navigator.bluetooth.getDevices();
     if(!devices || !devices.length) return;
-    const model = $('printerModel').value;
-    const preferred = model === 'm02x'
-      ? (devices.find(d => /M02|Phomemo/i.test(d.name||'')) || devices[0])
-      : (devices.find(d => /MXW01|GB0|GT01|CAT/i.test(d.name||'')) || devices[0]);
+    const preferred = devices.find(d => /M02X|MXW01/i.test(d.name||'')) || devices[0];
     if(preferred && (!dev || !dev.gatt || !dev.gatt.connected)){
       log('Auto-connecting to known device: '+(preferred.name||preferred.id));
       await attachDevice(preferred);
@@ -1171,27 +1166,31 @@ async function connect(){
   }
   if(!navigator.bluetooth){ log('Web Bluetooth unavailable in this browser.','err'); return; }
   const model = $('printerModel').value;
-  const primaryFilters = model === 'm02x' ? M02X_FILTERS : CAT_FILTERS;
-  const secondaryFilters = model === 'm02x' ? CAT_FILTERS : M02X_FILTERS;
-  const cleanOptional = Array.from(new Set(SERVICES.map(s => s.toLowerCase())));
-
   try{
     let picked = null;
-    log(`Scanning BLE with ${model === 'm02x' ? 'Phomemo M02X' : 'Cat Printer'} prioritized at top…`);
-    try{
-      picked = await navigator.bluetooth.requestDevice({
-        filters: [...primaryFilters, ...secondaryFilters],
-        optionalServices: cleanOptional
-      });
-    } catch(errFiltered){
-      log('Filtered scan fallback -> open scan: ' + errStr(errFiltered));
-      picked = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: cleanOptional
-      });
+    const showAll = !!($('bleAll') && $('bleAll').checked);
+    log(`Requesting ${model === 'm02x' ? 'Phomemo M02X' : 'Cat Printer'} via Bluetooth${showAll ? ' (all devices)' : ''}…`);
+    const cleanOptional = Array.from(new Set(SERVICES.map(s => s.toLowerCase())));
+    if(showAll){
+      picked = await navigator.bluetooth.requestDevice({acceptAllDevices: true, optionalServices: cleanOptional});
+    } else {
+      try{
+        picked = await navigator.bluetooth.requestDevice({
+          filters: model === 'm02x' ? PHOMEMO_FILTERS : CAT_FILTERS,
+          optionalServices: cleanOptional
+        });
+      } catch(err1){
+        const cancelled = err1 && /cancel/i.test(String(err1.message || ''));
+        if(err1 && err1.name === 'NotFoundError' && !cancelled){
+          log('No matching printer name nearby — showing all devices instead.');
+          picked = await navigator.bluetooth.requestDevice({acceptAllDevices: true, optionalServices: cleanOptional});
+        } else {
+          if(cancelled) log('Picker closed. If your printer was not listed, tick "all" next to the BLE button and retry.');
+          throw err1;
+        }
+      }
     }
-
-    if(!picked) throw new Error('No device selected');
+        if(!picked) throw new Error('No device selected');
     log('Selected: "'+(picked.name||'unnamed')+'"');
     await attachDevice(picked);
   }catch(e){
@@ -1276,7 +1275,6 @@ async function sendHex(){
 
 function disconnect(){
   if(dev && dev.gatt && dev.gatt.connected){ log('Disconnecting…'); dev.gatt.disconnect(); }
-  printing = false; activeJobToken = null;
   setState(false);
 }
 
@@ -1336,7 +1334,8 @@ function getStampText(){
   return '';
 }
 
-function ditherGrayToMono(g, w, h, mode, t, sfVal){
+function ditherGrayToMono(g, w, h, mode, t, sfVal, yOff){
+  yOff = yOff || 0;
   const mono = new Uint8Array(w * h);
   if(mode === 'gameboy'){
     const scale = 3, gw = Math.floor(w / scale), gh = Math.floor(h / scale);
@@ -1357,7 +1356,7 @@ function ditherGrayToMono(g, w, h, mode, t, sfVal){
         const gx = Math.min(gw - 1, Math.floor(x / scale));
         const gy = Math.min(gh - 1, Math.floor(y / scale));
         const val = small[gy*gw + gx];
-        const b = (BAYER[(y&7)*8 + (x&7)] + 0.5) * 4;
+        const b = (BAYER[((y+yOff)&7)*8 + (x&7)] + 0.5) * 4;
         mono[y*w + x] = val < b ? 1 : 0;
       }
     }
@@ -1368,8 +1367,9 @@ function ditherGrayToMono(g, w, h, mode, t, sfVal){
     const freq = 0.92;
     for(let y = 0; y < h; y++){
       for(let x = 0; x < w; x++){
-        const u = x * 0.866 - y * 0.5;
-        const v = x * 0.5 + y * 0.866;
+        const yy = y + yOff;
+        const u = x * 0.866 - yy * 0.5;
+        const v = x * 0.5 + yy * 0.866;
         const spot = (Math.sin(u * freq) * Math.sin(v * freq) + 1) * 127.5;
         const lum = g[y*w + x] + (128 - t);
         mono[y*w + x] = lum < spot ? 1 : 0;
@@ -1381,7 +1381,7 @@ function ditherGrayToMono(g, w, h, mode, t, sfVal){
   if(mode === 'lines'){
     const pitch = 4;
     for(let y = 0; y < h; y++){
-      const phase = Math.abs((y % pitch) - (pitch - 1) / 2) / (pitch / 2);
+      const phase = Math.abs(((y + yOff) % pitch) - (pitch - 1) / 2) / (pitch / 2);
       for(let x = 0; x < w; x++){
         const lum = Math.max(0, Math.min(255, g[y*w + x] + (128 - t)));
         const darkness = 1 - lum / 255;
@@ -1424,11 +1424,11 @@ function ditherGrayToMono(g, w, h, mode, t, sfVal){
       const i = y*w + x, old = g[i];
       if(mode === 'soft'){
         let sv = (old - (t - band)) / (2*band); sv = sv < 0 ? 0 : sv > 1 ? 1 : sv; sv = sv*sv*(3 - 2*sv);
-        const n = (52.9829189 * ((0.06711056*x + 0.00583715*y) % 1)) % 1;
+        const n = (52.9829189 * ((0.06711056*x + 0.00583715*(y+yOff)) % 1)) % 1;
         mono[i] = sv > n ? 0 : 1; continue;
       }
       if(mode === 'bayer'){
-        mono[i] = old < (BAYER[(y&7)*8 + (x&7)] + 0.5) * 3.984375 + (t - 128) ? 1 : 0;
+        mono[i] = old < (BAYER[((y+yOff)&7)*8 + (x&7)] + 0.5) * 3.984375 + (t - 128) ? 1 : 0;
         continue;
       }
       const nw = old < t ? 0 : 255, e = old - nw;
@@ -1454,7 +1454,7 @@ function composeWithFrame(photoMono, pw, ph){
   const outW = W;
   const innerW = outW - padSide * 2;
   const innerH = Math.round(ph * (innerW / pw));
-  const outH = Math.min(3600, padTop + innerH + padBot);
+  const outH = Math.min(2400, padTop + innerH + padBot);
 
   const fc = document.createElement('canvas');
   fc.width = outW; fc.height = outH;
@@ -1561,7 +1561,7 @@ function buildPosterStrips(finalImg, numStrips){
     return finalImg;
   }
   const fullW = W * numStrips;
-  const fullH = Math.min(3600, Math.round(finalImg.h * numStrips));
+  const fullH = Math.min(2200, Math.round(finalImg.h * numStrips));
   const fullCv = document.createElement('canvas'); fullCv.width = fullW; fullCv.height = fullH;
   const fctx = fullCv.getContext('2d');
   fctx.fillStyle = '#fff'; fctx.fillRect(0, 0, fullW, fullH);
@@ -1631,7 +1631,7 @@ function draw(){
   const totalRot = (rot + extraRot) % 4;
   const odd = totalRot % 2 === 1;
   const sw = odd ? src.h : src.w, sh = odd ? src.w : src.h;
-  const H = Math.min(3600, Math.max(8, Math.round(W * sh / sw)));
+  const H = Math.min(2200, Math.max(8, Math.round(W * sh / sw)));
   work.width = W; work.height = H;
   const c = work.getContext('2d', {willReadFrequently:true});
   c.fillStyle = '#fff'; c.fillRect(0,0,W,H);
@@ -1706,7 +1706,7 @@ $('btnSaveRoll').addEventListener('click', () => {
   log('Saved bitmap to Roll ('+last.w+'×'+last.h+')','ok');
 });
 
-/* ---------- Presets & Synced Burn Intensity ---------- */
+/* ---------- Presets ---------- */
 const LOOK_NAMES = {
   natural:'Natural', portrait:'High-Key Portrait', xerox:'Xerox', cool:'❄ Cool (Giveaway)',
   gameboy:'Game Boy', halftone:'Halftone', ascii:'ASCII', blueprint:'Blueprint'
@@ -1722,17 +1722,6 @@ const LOOKS = {
   blueprint: {mode:'stucki',   br:10,  ct:10,  gm:1.0,  th:128, inv:true,  inten:72, coolPause:1}
 };
 
-function syncBurnIntensity(val){
-  const n = Math.max(0, Math.min(255, +val || 0));
-  $('burnIntensity').value = n;
-  $('burnv').textContent = n;
-  $('inten').value = n;
-  $('inv').textContent = n;
-}
-
-$('burnIntensity').addEventListener('input', e => syncBurnIntensity(e.target.value));
-$('inten').addEventListener('input', e => syncBurnIntensity(e.target.value));
-
 function applyLook(key){
   document.querySelectorAll('#presetBar .pill').forEach(b => b.classList.toggle('active', b.dataset.look === key));
   const L = LOOKS[key];
@@ -1741,7 +1730,7 @@ function applyLook(key){
   $('mode').value = L.mode;
   $('br').value = L.br; $('ct').value = L.ct; $('gm').value = L.gm; $('th').value = L.th;
   $('invert').checked = L.inv;
-  syncBurnIntensity(L.inten);
+  $('inten').value = L.inten; $('inv').textContent = L.inten;
   $('coolPause').value = L.coolPause; $('cpv').textContent = L.coolPause + 's';
   schedule();
 }
@@ -1754,6 +1743,7 @@ $('presetBar').addEventListener('click', e => {
 /* ---------- Photomaton Booth Auto-Save & Camera Control ---------- */
 function stopCam(){
   slitActive = false;
+  if(typeof weirdStream !== 'undefined' && weirdStream) weirdStream.stop = true;
   cancelAnimationFrame(slitRaf);
   setLiveCountdown(null);
   if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
@@ -2017,44 +2007,51 @@ async function runFastSlitForBooth(durationMs){
   return accum;
 }
 
-/* ---------- Weird Scanner (Live Streamed Slices + Smooth Pacing) ---------- */
-let weirdSliceSending = false;
+/* ---------- Endless 10-Line Oscillating Weird Scanner (prints live while it scans) ---------- */
+var weirdStream = null, weirdRow = 0;
 
-function canvasStripToMono(srcCanvas, sx, sy, sw, sh){
-  const tmp = document.createElement('canvas');
-  tmp.width = sw; tmp.height = sh;
-  const ctx = tmp.getContext('2d');
-  ctx.drawImage(srcCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
-  const d = ctx.getImageData(0, 0, sw, sh).data;
-  const t = +$('th').value || 136;
-  const inv = $('invert').checked;
-  const mono = new Uint8Array(sw * sh);
-  for(let i = 0, j = 0; i < mono.length; i++, j += 4){
-    const lum = 0.299*d[j] + 0.587*d[j+1] + 0.114*d[j+2];
-    const black = lum < t ? 1 : 0;
-    mono[i] = inv ? (black ^ 1) : black;
-  }
-  return {mono, w: sw, h: sh};
+async function startWeirdPrint(){
+  if(!printerReady()){ log('Weird Scanner: printer not connected, scanning on screen only.'); return; }
+  if(isPrintingSessionActive || overheated){ log('Weird Scanner: printer busy, scanning on screen only.','err'); return; }
+  const jobId = sessionOpen();
+  const ws = {jobId, queue: [], stop: false, task: null};
+  weirdStream = ws;
+  ws.task = (async () => {
+    try{
+      const sink = await makeSink(jobId, 240);
+      log('Weird Scanner: live printing started','ok');
+      while(true){
+        if(streamAbort) break;
+        if(ws.queue.length){ const b = ws.queue.shift(); await sink.push(b.mono, b.w, b.h); continue; }
+        if(ws.stop) break;
+        await sleep(15);
+      }
+      await sink.end();
+      log('Weird Scanner: live print finished','ok');
+    }catch(e){ log('Weird Scanner print failed: '+errStr(e),'err'); }
+    finally{ ws.stop = true; if(weirdStream === ws) weirdStream = null; sessionClose(); }
+  })();
 }
 
-async function streamWeirdSliceToPrinter(sliceMonoObj){
-  if(!$('weirdLivePrint').checked) return;
-  if(!dev || !dev.gatt || !dev.gatt.connected || printing || weirdSliceSending) return;
-  weirdSliceSending = true;
-  try{
-    const model = $('printerModel').value;
-    if(model === 'm02x' && m02xChar){
-      const pkt = buildM02xRasterPacket(sliceMonoObj.mono, sliceMonoObj.w, sliceMonoObj.h, +$('burnIntensity').value || 82);
-      await writeChunked(m02xChar, pkt, 96, 35);
-    } else if(model === 'cat' && catChars.ae01){
-      const pkt = buildCatRasterPacket(sliceMonoObj.mono, sliceMonoObj.w, sliceMonoObj.h, +$('burnIntensity').value || 82);
-      await writeChunked(catChars.ae01, pkt, 96, 35);
+/* Turns the slice just captured into printer rows and queues it */
+function queueWeirdSlice(tctx, dir, pos, chunk, sw, sh){
+  let lum;
+  if(dir === 'v'){
+    const d = tctx.getImageData(0, pos, sw, chunk).data;
+    lum = new Float32Array(sw * chunk);
+    for(let i = 0, j = 0; i < lum.length; i++, j += 4) lum[i] = 0.299*d[j] + 0.587*d[j+1] + 0.114*d[j+2];
+  } else {
+    /* horizontal sweep: each captured column becomes one printed row */
+    const d = tctx.getImageData(pos, 0, chunk, sh).data;
+    lum = new Float32Array(sh * chunk);
+    for(let r = 0; r < chunk; r++) for(let x = 0; x < sh; x++){
+      const j = (x * chunk + r) * 4;
+      lum[r * sh + x] = 0.299*d[j] + 0.587*d[j+1] + 0.114*d[j+2];
     }
-  }catch(e){
-    log('Live slice stream note: '+errStr(e));
-  }finally{
-    weirdSliceSending = false;
   }
+  const outW = dir === 'v' ? sw : sh;
+  weirdStream.queue.push({mono: lumToMono(lum, outW, chunk, weirdRow), w: outW, h: chunk});
+  weirdRow += chunk;
 }
 
 async function startSlitScan(){
@@ -2064,7 +2061,7 @@ async function startSlitScan(){
     if(!ok) return;
   }
   const dir = $('weirdSweepDir').value;
-  const sw = 384, sh = dir === 'v' ? 320 : 384;
+  const sw = 384, sh = dir === 'v' ? 512 : 384;
   slitCv.width = sw; slitCv.height = sh;
   const ctx = slitCv.getContext('2d');
   ctx.fillStyle = '#141210'; ctx.fillRect(0, 0, sw, sh);
@@ -2074,21 +2071,23 @@ async function startSlitScan(){
   const actx = slitAccum.getContext('2d');
   actx.fillStyle = '#141210'; actx.fillRect(0, 0, sw, sh);
 
-  slitPos = 0; slitDirOsc = 1; slitActive = true;
+  slitPos = 0; slitDirOsc = 1; slitActive = true; weirdRow = 0;
   vidWrap.hidden = true; view.hidden = true; slitCv.hidden = false;
   $('btnShot').hidden = true;
   $('btnFinishWeirdScan').disabled = false;
   $('btnStartWeirdScan').textContent = '⏸ Pause Scanner';
-  $('info').textContent = 'Weird Scanner streaming…';
+  $('info').textContent = 'Continuous 10-Line Oscillating Scanner active…';
+  startWeirdPrint();
 
   const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
-  const tctx = tmp.getContext('2d');
+  const tctx = tmp.getContext('2d', {willReadFrequently: true});
 
   let passCount = 1;
-  let lastSliceSentAt = 0;
 
-  const tick = now => {
+  const tick = () => {
     if(!slitActive) return;
+    /* the printer sets the pace: wait while its queue is full so no scanned line is skipped */
+    if(weirdStream && !weirdStream.stop && weirdStream.queue.length >= 2){ slitRaf = requestAnimationFrame(tick); return; }
     const sliceChunk = +$('weirdSpeed').value || 10;
     const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
     const scale = Math.max(sw / vw, sh / vh);
@@ -2098,6 +2097,8 @@ async function startSlitScan(){
     tctx.drawImage(vid, (sw - dw)/2, (sh - dh)/2, dw, dh);
     tctx.restore();
 
+    if(weirdStream && !weirdStream.stop) queueWeirdSlice(tctx, dir, slitPos, sliceChunk, sw, sh);
+
     if(dir === 'v'){
       actx.drawImage(tmp, 0, slitPos, sw, sliceChunk, 0, slitPos, sw, sliceChunk);
       ctx.fillStyle = '#141210'; ctx.fillRect(0, 0, sw, sh);
@@ -2106,17 +2107,11 @@ async function startSlitScan(){
       ctx.fillStyle = '#ff2e63';
       ctx.fillRect(0, slitPos, sw, 4);
 
-      if(now - lastSliceSentAt >= 260){
-        lastSliceSentAt = now;
-        const sliceObj = canvasStripToMono(tmp, 0, slitPos, sw, sliceChunk);
-        streamWeirdSliceToPrinter(sliceObj);
-      }
-
       slitPos += sliceChunk * slitDirOsc;
       if(slitPos >= sh - sliceChunk){ slitPos = sh - sliceChunk; slitDirOsc = -1; passCount++; }
       else if(slitPos <= 0){ slitPos = 0; slitDirOsc = 1; passCount++; }
 
-      $('info').textContent = `Weird Scanner · Pass ${passCount} · Line ${slitPos}/${sh}`;
+      $('info').textContent = `Continuous Scanner · Pass ${passCount} · Line ${slitPos}/${sh}` + (weirdStream ? ' · printing' : '');
     } else {
       actx.drawImage(tmp, slitPos, 0, sliceChunk, sh, slitPos, 0, sliceChunk, sh);
       ctx.fillStyle = '#141210'; ctx.fillRect(0, 0, sw, sh);
@@ -2125,17 +2120,11 @@ async function startSlitScan(){
       ctx.fillStyle = '#ff2e63';
       ctx.fillRect(slitPos, 0, 4, sh);
 
-      if(now - lastSliceSentAt >= 260){
-        lastSliceSentAt = now;
-        const sliceObj = canvasStripToMono(tmp, slitPos, 0, sliceChunk, sh);
-        streamWeirdSliceToPrinter(sliceObj);
-      }
-
       slitPos += sliceChunk * slitDirOsc;
       if(slitPos >= sw - sliceChunk){ slitPos = sw - sliceChunk; slitDirOsc = -1; passCount++; }
       else if(slitPos <= 0){ slitPos = 0; slitDirOsc = 1; passCount++; }
 
-      $('info').textContent = `Weird Scanner · Pass ${passCount} · Col ${slitPos}/${sw}`;
+      $('info').textContent = `Continuous Scanner · Pass ${passCount} · Col ${slitPos}/${sw}` + (weirdStream ? ' · printing' : '');
     }
     slitRaf = requestAnimationFrame(tick);
   };
@@ -2143,16 +2132,17 @@ async function startSlitScan(){
 }
 
 function finishSlitScan(){
+  if(weirdStream) weirdStream.stop = true;
   if(!slitAccum) return;
   const out = document.createElement('canvas'); out.width = slitAccum.width; out.height = slitAccum.height;
   out.getContext('2d').drawImage(slitAccum, 0, 0);
   sidewaysBanner = false;
   $('btnBanner').classList.remove('active-toggle');
-  $('btnStartWeirdScan').textContent = '▶ Start Scanner';
+  $('btnStartWeirdScan').textContent = '▶ Start Continuous Scanner';
   $('btnFinishWeirdScan').disabled = true;
   src = {el: out, w: out.width, h: out.height};
   rot = 0; stopCam(); draw();
-  log('Scanner strip captured ('+out.width+'×'+out.height+')','ok');
+  log('Endless Scanner strip captured ('+out.width+'×'+out.height+')','ok');
 }
 
 $('btnStartWeirdScan').addEventListener('click', () => {
@@ -2683,25 +2673,37 @@ $('btnStereoSwap').addEventListener('click', () => {
 $('stereoMode').addEventListener('change', () => autoAlignAndComposeStereo(false));
 $('stereoWindow').addEventListener('input', () => autoAlignAndComposeStereo(false));
 
-/* ---------- Double Exposure Engine (A Sets Frame, B Crops Within & Positions) ---------- */
+/* ---------- Double Exposure Engine ---------- */
+function drawThumbContain(canvasId, imgCanvas){
+  const cv = $(canvasId);
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#111'; ctx.fillRect(0, 0, cv.width, cv.height);
+  if(!imgCanvas) return;
+  const sc = Math.min(cv.width / imgCanvas.width, cv.height / imgCanvas.height);
+  const dw = imgCanvas.width * sc, dh = imgCanvas.height * sc;
+  ctx.drawImage(imgCanvas, (cv.width - dw)/2, (cv.height - dh)/2, dw, dh);
+}
+/* Keeps the FULL original frame (no crop), only capped in size for memory */
+function rawCanvas(el, w, h){
+  const sc = Math.min(1, 1600 / Math.max(w, h));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(h * sc));
+  c.getContext('2d').drawImage(el, 0, 0, c.width, c.height);
+  return c;
+}
+
 function setDexpSide(slot, el, w, h){
+  const norm = rawCanvas(el, w, h);
   if(slot === 'A'){
-    const normA = document.createElement('canvas');
-    normA.width = 480;
-    normA.height = Math.max(240, Math.min(720, Math.round(480 * (h / Math.max(1, w)))));
-    normA.getContext('2d').drawImage(el, 0, 0, normA.width, normA.height);
-    dexpA = normA;
+    dexpA = norm;
     $('slotDexpA').classList.add('loaded');
-    drawThumb('cvDexpA', normA);
-    log('Double Exposure A sets frame ('+normA.width+'×'+normA.height+')');
+    drawThumbContain('cvDexpA', norm);
+    log('Double Exposure A set (sets the framing)');
   } else {
-    const cB = document.createElement('canvas');
-    cB.width = w; cB.height = h;
-    cB.getContext('2d').drawImage(el, 0, 0, w, h);
-    dexpB = cB;
+    dexpB = norm;
     $('slotDexpB').classList.add('loaded');
-    drawThumb('cvDexpB', cB);
-    log('Double Exposure B loaded ('+w+'×'+h+')');
+    drawThumbContain('cvDexpB', norm);
+    log('Double Exposure B set (fills A\'s frame)');
   }
   syncDualSlotLiveVideos();
   if(dexpA && dexpB) combineDoubleExposure(false);
@@ -2711,11 +2713,11 @@ function clearDexpSlot(slot){
   if(slot === 'A'){
     dexpA = null;
     $('slotDexpA').classList.remove('loaded');
-    drawThumb('cvDexpA', null);
+    drawThumbContain('cvDexpA', null);
   } else {
     dexpB = null;
     $('slotDexpB').classList.remove('loaded');
-    drawThumb('cvDexpB', null);
+    drawThumbContain('cvDexpB', null);
   }
   syncDualSlotLiveVideos();
   if(dexpTabOpen) startDualSlotLive();
@@ -2750,35 +2752,30 @@ function combineDoubleExposure(andScroll){
   const mode = $('dexpMode').value;
   const mix = (+$('dexpMix').value || 65) / 100;
   const thresh = +$('dexpThresh').value || 135;
-  const posX = (+$('dexpPosX').value || 0) / 100;
-  const posY = (+$('dexpPosY').value || 0) / 100;
 
   $('dxmv').textContent = Math.round(mix * 100) + '%';
   $('dxtv').textContent = String(thresh);
-  $('dxbxv').textContent = Math.round(posX * 100) + '%';
-  $('dxbyv').textContent = Math.round(posY * 100) + '%';
   $('dexpBadge').textContent = mode === 'hilo' ? `Hi→Lo @${thresh}` : mode.toUpperCase();
 
-  /* Image A sets the exact frame dimensions */
-  const cw = dexpA.width, ch = dexpA.height;
+  /* Image A defines the frame (its full aspect ratio, nothing cropped).
+     Image B is scaled to cover that frame, then cropped inside it; position + zoom are adjustable. */
+  const bx = +$('dexpBX').value || 0, by = +$('dexpBY').value || 0, bz = (+$('dexpBZ').value || 100) / 100;
+  $('dxpxv').textContent = String(bx); $('dxpyv').textContent = String(by); $('dxpzv').textContent = Math.round(bz * 100) + '%';
+  const cw = 480;
+  const ch = Math.max(120, Math.min(1400, Math.round(cw * dexpA.height / dexpA.width)));
   const cA = document.createElement('canvas'); cA.width = cw; cA.height = ch;
   cA.getContext('2d').drawImage(dexpA, 0, 0, cw, ch);
-
-  /* Image B scales to cover A's frame, then crops within A using posX / posY */
   const cB = document.createElement('canvas'); cB.width = cw; cB.height = ch;
-  const ctxB = cB.getContext('2d');
-  ctxB.fillStyle = '#fff'; ctxB.fillRect(0, 0, cw, ch);
-  const coverScale = Math.max(cw / Math.max(1, dexpB.width), ch / Math.max(1, dexpB.height));
-  const dwB = dexpB.width * coverScale;
-  const dhB = dexpB.height * coverScale;
-  const extraX = Math.max(0, dwB - cw);
-  const extraY = Math.max(0, dhB - ch);
-  const bx = -extraX * (0.5 + 0.5 * posX);
-  const by = -extraY * (0.5 + 0.5 * posY);
-  ctxB.drawImage(dexpB, bx, by, dwB, dhB);
+  const bctx = cB.getContext('2d');
+  bctx.fillStyle = '#808080'; bctx.fillRect(0, 0, cw, ch);
+  const bs = Math.max(cw / dexpB.width, ch / dexpB.height) * bz;
+  const bdw = dexpB.width * bs, bdh = dexpB.height * bs;
+  const bdx = (cw - bdw) / 2 + (bx / 100) * ((bdw - cw) / 2);
+  const bdy = (ch - bdh) / 2 + (by / 100) * ((bdh - ch) / 2);
+  bctx.drawImage(dexpB, bdx, bdy, bdw, bdh);
 
   const dA = cA.getContext('2d').getImageData(0, 0, cw, ch).data;
-  const dB = ctxB.getImageData(0, 0, cw, ch).data;
+  const dB = cB.getContext('2d').getImageData(0, 0, cw, ch).data;
 
   const out = document.createElement('canvas'); out.width = cw; out.height = ch;
   const octx = out.getContext('2d');
@@ -2822,7 +2819,7 @@ function combineDoubleExposure(andScroll){
   sidewaysBanner = false; $('btnBanner').classList.remove('active-toggle');
   src = {el: out, w: cw, h: ch}; rot = 0; stopCam(); draw();
   if(andScroll) scrollToStage();
-  log('Double Exposure rendered (A frames '+cw+'×'+ch+', B pos='+Math.round(posX*100)+'%, '+Math.round(posY*100)+'%)','ok');
+  log('Double Exposure rendered ('+mode+', thresh='+thresh+')','ok');
 }
 
 $('btnSnapDexpA').addEventListener('click', () => captureDexpSlot('A'));
@@ -2846,11 +2843,16 @@ $('btnDexpSwap').addEventListener('click', () => {
   const tmp = dexpA; dexpA = dexpB; dexpB = tmp;
   $('slotDexpA').classList.toggle('loaded', !!dexpA);
   $('slotDexpB').classList.toggle('loaded', !!dexpB);
-  drawThumb('cvDexpA', dexpA); drawThumb('cvDexpB', dexpB);
+  drawThumbContain('cvDexpA', dexpA); drawThumbContain('cvDexpB', dexpB);
   if(dexpA && dexpB) combineDoubleExposure(false);
 });
 $('btnDexpBuild').addEventListener('click', () => combineDoubleExposure(true));
-['dexpMode','dexpMix','dexpThresh','dexpPosX','dexpPosY'].forEach(id => $(id).addEventListener('input', () => combineDoubleExposure(false)));
+['dexpMode','dexpMix','dexpThresh','dexpBX','dexpBY','dexpBZ'].forEach(id => $(id).addEventListener('input', () => combineDoubleExposure(false)));
+$('btnDexpBReset').addEventListener('click', () => {
+  $('dexpBX').value = 0; $('dexpBY').value = 0; $('dexpBZ').value = 100;
+  $('dxpxv').textContent = '0'; $('dxpyv').textContent = '0'; $('dxpzv').textContent = '100%';
+  if(dexpA && dexpB) combineDoubleExposure(false);
+});
 
 /* ---------- Zine Maker Studio Logic ---------- */
 let activeZineSubTab = 'p3Type';
@@ -2863,6 +2865,7 @@ $('p3Tabs').addEventListener('click', e => {
   updateZineLivePreview();
 });
 
+/* Zine Text Quick Helpers */
 $('btnZineDate').addEventListener('click', () => {
   const ta = $('zineBody');
   const d = new Date();
@@ -2936,655 +2939,825 @@ function buildZineSlipCanvas(){
 function drawQrFinder(ctx, ox, oy, cell){
   for(let r = 0; r < 7; r++){
     for(let c = 0; c < 7; c++){
-      const border = r === 0 || r === 6 || c === 0 || c === 6;
-      const center = r >= 2 && r <= 4 && c >= 2 && c <= 4;
-      ctx.fillStyle = (border || center) ? '#000' : '#fff';
-      ctx.fillRect(ox + c*cell, oy + r*cell, cell, cell);
+      const edge = r === 0 || r === 6 || c === 0 || c === 6;
+      const core = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+      if(edge || core){
+        ctx.fillRect(ox + c * cell, oy + r * cell, cell, cell);
+      }
     }
   }
 }
 
-function buildCipherCanvas(){
-  const raw = ($('cipherInput').value || 'NORMAL AINT REAL').trim();
+function buildCipherSlipCanvas(){
+  const raw = $('cipherInput').value.trim() || 'https://zinester.lab/58mm';
   const style = $('cipherStyle').value;
-  const c = document.createElement('canvas'); c.width = W; c.height = 320;
+  const c = document.createElement('canvas'); c.width = W;
   const ctx = c.getContext('2d');
-  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, 320);
-  ctx.fillStyle = '#000'; ctx.strokeStyle = '#000';
 
   if(style === 'rot13'){
-    const rot13 = raw.replace(/[a-zA-Z]/g, ch => {
+    const rotText = raw.replace(/[a-zA-Z]/g, ch => {
       const base = ch <= 'Z' ? 65 : 97;
       return String.fromCharCode(((ch.charCodeAt(0) - base + 13) % 26) + base);
     });
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('ROT13 DISPATCH:', 18, 30);
-    const lines = wrapCanvasText(ctx, rot13, W - 36);
-    ctx.font = 'bold 18px monospace';
-    lines.forEach((ln, idx) => ctx.fillText(ln, 18, 66 + idx * 26));
+    ctx.font = 'bold 16px monospace';
+    const lines = wrapCanvasText(ctx, rotText, W - 40);
+    const h = Math.max(150, 74 + lines.length * 24);
+    c.height = h;
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, h);
+    ctx.fillStyle = '#000'; ctx.strokeRect(10, 10, W - 20, h - 20);
+    ctx.font = 'bold 12px monospace'; ctx.fillText('CIPHER // ROT13', 20, 32);
+    ctx.font = 'bold 16px monospace';
+    lines.forEach((l, idx) => ctx.fillText(l, 20, 62 + idx * 24));
     return c;
   }
 
   if(style === 'barcode'){
-    ctx.font = 'bold 13px monospace';
-    ctx.fillText('ZINE CODE: ' + raw.slice(0, 28), 18, 28);
-    let hash = 2166136261;
-    for(let i = 0; i < raw.length; i++){
-      hash ^= raw.charCodeAt(i);
-      hash = Math.imul(hash, 16777619);
-    }
-    let x = 24;
-    for(let i = 0; i < 64; i++){
-      const bit = (hash >>> (i % 31)) & 1;
-      const bw = bit ? 5 : 2;
-      if(x + bw < W - 24){
-        ctx.fillRect(x, 54, bw, 170);
+    const h = 190; c.height = h;
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, h);
+    ctx.fillStyle = '#000';
+    let bx = 24;
+    for(let i = 0; i < raw.length && bx < W - 36; i++){
+      const code = raw.charCodeAt(i);
+      for(let b = 0; b < 7 && bx < W - 28; b++){
+        const bit = (code >> b) & 1;
+        const wBar = bit ? 3 : 1;
+        if((b + i) % 2 === 0) ctx.fillRect(bx, 22, wBar, 118);
+        bx += wBar + 2;
       }
-      x += bw + 2;
     }
-    ctx.font = 'bold 12px monospace'; ctx.textAlign = 'center';
-    ctx.fillText(raw.slice(0, 36), W/2, 248);
+    ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(raw.slice(0, 34), W/2, 166);
     return c;
   }
 
-  const n = 25, cell = 9, gridPx = n * cell;
-  const ox = Math.floor((W - gridPx) / 2), oy = 24;
-  ctx.lineWidth = 2; ctx.strokeRect(ox - 6, oy - 6, gridPx + 12, gridPx + 12);
+  const grid = 25, cell = 11;
+  const padX = Math.floor((W - grid * cell) / 2);
+  const padY = 22;
+  const h = padY + grid * cell + 52;
+  c.height = h;
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, h);
+  ctx.fillStyle = '#000';
 
-  let seed = 1337;
+  const isFinderArea = (r, col) =>
+    (r < 8 && col < 8) || (r < 8 && col >= grid - 8) || (r >= grid - 8 && col < 8);
+
+  let state = 0x811c9dc5;
   for(let i = 0; i < raw.length; i++){
-    seed = ((seed << 5) - seed + raw.charCodeAt(i) * (i + 7)) | 0;
+    state ^= raw.charCodeAt(i);
+    state = Math.imul(state, 0x01000193) >>> 0;
   }
-  for(let r = 0; r < n; r++){
-    for(let col = 0; col < n; col++){
-      const inTL = r < 8 && col < 8;
-      const inTR = r < 8 && col >= n - 8;
-      const inBL = r >= n - 8 && col < 8;
-      if(inTL || inTR || inBL) continue;
-      const v = Math.abs(Math.sin(seed * 0.0013 + r * 12.9898 + col * 78.233) * 43758.5453);
-      if((v - Math.floor(v)) > 0.5){
-        ctx.fillRect(ox + col*cell, oy + r*cell, cell, cell);
+
+  for(let r = 0; r < grid; r++){
+    for(let col = 0; col < grid; col++){
+      if(isFinderArea(r, col)) continue;
+      if(r === 6 || col === 6){
+        if((r + col) % 2 === 0) ctx.fillRect(padX + col * cell, padY + r * cell, cell, cell);
+        continue;
+      }
+      const byteCh = raw.charCodeAt((r * grid + col) % raw.length);
+      state = (Math.imul(state ^ byteCh, 1664525) + 1013904223) >>> 0;
+      if(((state >>> 3) ^ (r * 7 + col * 13)) & 1){
+        ctx.fillRect(padX + col * cell, padY + r * cell, cell, cell);
       }
     }
   }
-  drawQrFinder(ctx, ox, oy, cell);
-  drawQrFinder(ctx, ox + (n - 7)*cell, oy, cell);
-  drawQrFinder(ctx, ox, oy + (n - 7)*cell, cell);
+
+  drawQrFinder(ctx, padX, padY, cell);
+  drawQrFinder(ctx, padX + (grid - 7) * cell, padY, cell);
+  drawQrFinder(ctx, padX, padY + (grid - 7) * cell, cell);
 
   ctx.font = 'bold 12px monospace'; ctx.textAlign = 'center';
-  ctx.fillText(raw.slice(0, 38), W/2, oy + gridPx + 28);
+  ctx.fillText(raw.slice(0, 36), W/2, h - 18);
   return c;
 }
 
-function getOpticTargetHeight(){
-  const isCont = $('opticContinuous') && $('opticContinuous').checked;
-  const cm = Math.max(5, Math.min(1500, +($('opticLengthCm') && $('opticLengthCm').value) || 300));
-  /* Thermal printers are ~8 dots/mm -> 80 px/cm. We scale/cap cleanly so browser & printer stay responsive */
-  const rawPx = cm * 80;
-  if(!isCont){
-    if($('opticCmInfo')) $('opticCmInfo').textContent = `${cm} cm (${rawPx} px raw · toggle Continuous)`;
-    return 440;
-  }
-  /* Scale factor if over 3600px so the full length fits into the continuous roll buffer */
-  const cappedH = Math.min(3600, Math.max(240, rawPx));
-  const scaleFactor = rawPx > 3600 ? (3600 / rawPx) : 1;
-  if($('opticCmInfo')){
-    $('opticCmInfo').textContent = scaleFactor < 1
-      ? `${cm} cm → ${cappedH} px (${Math.round(scaleFactor*100)}% vertical scale)`
-      : `${cm} cm → ${cappedH} px (1:1 @ 8px/mm)`;
-  }
-  return cappedH;
+function opticParams(){
+  const P = {
+    pat: $('opticPattern').value,
+    f1: +$('opticFreq').value || 18,
+    f2: +$('opticFreq2').value || 19,
+    ox: +$('opticOffX').value || 0,
+    oy: +$('opticOffY').value || 0,
+    twistDeg: +$('opticTwist').value || 0,
+    warp: +$('opticWarp').value || 1.0,
+    pinch: +$('opticPinch').value || 0.0,
+    folds: +$('opticFolds').value || 1,
+    phase: +$('opticPhase').value || 0.0,
+    poster: +$('opticPoster').value || 0,
+    txt: $('opticOverlayText').value.trim(),
+    txtMode: $('opticTextMode').value
+  };
+  $('opv1').textContent = P.f1;
+  $('opv2').textContent = P.f2;
+  $('opv3').textContent = P.ox;
+  $('opv4').textContent = P.oy;
+  $('opv5').textContent = P.twistDeg + '°';
+  $('opv6').textContent = P.warp.toFixed(1);
+  $('opv7').textContent = P.pinch.toFixed(1);
+  $('opv8').textContent = String(P.folds);
+  $('opv9').textContent = P.phase.toFixed(1);
+  $('opv10').textContent = String(P.poster);
+  const twist = P.twistDeg * Math.PI / 180;
+  P.cosT = Math.cos(twist); P.sinT = Math.sin(twist);
+  P.foldSector = (Math.PI * 2) / Math.max(1, P.folds);
+  return P;
 }
 
-function buildOpticalCanvas(){
-  const pat = $('opticPattern').value;
-  const textMode = $('opticTextMode').value;
-  const overlayTxt = $('opticOverlayText').value.trim();
+function opticLenCm(){
+  const v = parseFloat(String($('opticLenCm').value).replace(',', '.'));
+  return (isFinite(v) && v > 0) ? Math.min(v, 500) : 0;
+}
 
-  const f1 = +$('opticFreq').value || 18;
-  const f2 = +$('opticFreq2').value || 19;
-  const ox = +$('opticOffX').value || 0;
-  const oy = +$('opticOffY').value || 0;
-  const twistDeg = +$('opticTwist').value || 0;
-  const warp = +$('opticWarp').value || 1.0;
-  const pinch = +$('opticPinch').value || 0.0;
-  const folds = Math.max(1, +$('opticFolds').value || 1);
-  const phase = +$('opticPhase').value || 0.0;
-  const poster = +$('opticPoster').value || 0;
+/* Renders rows y0 .. y0+rows-1 of the optical design (W px wide).
+   yMap(globalRow) gives the row inside the 384-px design; centers = global rows where the stamped text sits. */
+function opticBand(P, y0, rows, yMap, centers){
+  const TXT_PAD = 40;
+  const near = P.txt ? centers.filter(c => c >= y0 - TXT_PAD && c < y0 + rows + TXT_PAD) : [];
+  const pad = near.length ? TXT_PAD : 0;
+  const hh = rows + pad * 2, gy0 = y0 - pad;
+  const {pat, f1, f2, ox, oy, warp, pinch, folds, phase, poster, cosT, sinT, foldSector, txt, txtMode} = P;
 
-  $('opv1').textContent = f1;
-  $('opv2').textContent = f2;
-  $('opv3').textContent = ox;
-  $('opv4').textContent = oy;
-  $('opv5').textContent = twistDeg + '°';
-  $('opv6').textContent = warp.toFixed(1);
-  $('opv7').textContent = pinch.toFixed(1);
-  $('opv8').textContent = folds;
-  $('opv9').textContent = phase.toFixed(1);
-  $('opv10').textContent = poster;
-
-  const H = getOpticTargetHeight();
-  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const c = document.createElement('canvas'); c.width = W; c.height = hh;
   const ctx = c.getContext('2d');
-  const img = ctx.createImageData(W, H);
-  const d = img.data;
+  const id = ctx.createImageData(W, hh);
+  const cx = W / 2, cy = 192;
+  const maxR = Math.hypot(cx, cy);
 
-  const cx = W / 2, cy = H / 2;
-  const rad = twistDeg * Math.PI / 180;
-  const cosA = Math.cos(rad), sinA = Math.sin(rad);
-  const maxR = Math.hypot(cx, cy) || 1;
-
-  for(let y = 0; y < H; y++){
+  for(let yy = 0; yy < hh; yy++){
+    const y = yMap(gy0 + yy);
     for(let x = 0; x < W; x++){
-      let dx = (x - cx) / maxR;
-      let dy = (y - cy) / maxR;
+      const dx0 = x - cx, dy0 = y - cy;
+      let dx = dx0 * cosT - dy0 * sinT;
+      let dy = dx0 * sinT + dy0 * cosT;
+
+      let r = Math.hypot(dx, dy);
+      let a = Math.atan2(dy, dx);
 
       if(Math.abs(pinch) > 0.01){
-        const r = Math.hypot(dx, dy);
-        const factor = 1 + pinch * r * r;
+        const normR = Math.min(1.5, r / maxR);
+        const factor = Math.max(0.2, 1 + pinch * (1 - normR));
+        r *= factor;
         dx *= factor; dy *= factor;
       }
 
       if(folds > 1){
-        let ang = Math.atan2(dy, dx);
-        const radius = Math.hypot(dx, dy);
-        const sector = (Math.PI * 2) / folds;
-        ang = ((ang % sector) + sector) % sector;
-        if(ang > sector / 2) ang = sector - ang;
-        dx = Math.cos(ang) * radius;
-        dy = Math.sin(ang) * radius;
+        let kAngle = ((a % foldSector) + foldSector) % foldSector;
+        const half = foldSector * 0.5;
+        if(kAngle > half) kAngle = foldSector - kAngle;
+        a = kAngle;
+        dx = Math.cos(a) * r;
+        dy = Math.sin(a) * r;
       }
-
-      const rx = dx * cosA - dy * sinA;
-      const ry = dx * sinA + dy * cosA;
 
       let v = 0;
       if(pat === 'moire'){
-        const d1 = Math.hypot(rx - ox/140, ry - oy/140);
-        const d2 = Math.hypot(rx + ox/140, ry + oy/140);
-        v = Math.sin(d1 * f1 * 6.28 + phase) * Math.cos(d2 * f2 * 6.28 - phase);
+        const r2 = Math.hypot(dx - ox, dy - oy);
+        const w1 = Math.sin(r * (f1 * 0.045) + phase + Math.sin(a * warp) * 1.5);
+        const w2 = Math.sin(r2 * (f2 * 0.045) - phase * 0.5);
+        v = w1 * w2;
       } else if(pat === 'spiral'){
-        const ang = Math.atan2(ry - oy/160, rx - ox/160);
-        const r = Math.hypot(rx - ox/160, ry - oy/160);
-        v = Math.sin(r * f1 * 5.0 + ang * Math.max(1, Math.round(f2 / 4)) + phase);
+        const r2 = Math.hypot(dx - ox * 0.5, dy - oy * 0.5);
+        const a2 = Math.atan2(dy - oy * 0.5, dx - ox * 0.5);
+        v = Math.sin(a * Math.max(1, Math.round(f1 / 2)) + r * 0.14 * warp + phase)
+          * Math.cos(a2 * Math.max(1, Math.round(f2 / 3)) - r2 * 0.08 - phase);
       } else if(pat === 'sunburst'){
-        const ang = Math.atan2(ry - oy/160, rx - ox/160);
-        v = Math.sin(ang * Math.max(2, f1) + phase) * Math.cos(Math.hypot(rx, ry) * f2 * 2.0);
+        const r2 = Math.hypot(dx - ox, dy - oy);
+        const a2 = Math.atan2(dy - oy, dx - ox);
+        v = Math.sin(a * f1 + phase + Math.sin(r * 0.03) * warp * 2)
+          * Math.cos(a2 * f2 + r2 * 0.02 - phase);
       } else if(pat === 'waves'){
-        v = Math.sin((rx * f1 + Math.sin(ry * f2 * 0.5 + phase) * warp) * 3.14 + ox * 0.05)
-          * Math.cos((ry * f2 + oy * 0.05) * 3.14 - phase);
+        const wave1 = Math.sin((dx + ox) * f1 * 0.016 + phase + Math.sin((dy + oy) * 0.045) * 3 * warp);
+        const wave2 = Math.cos((dy - oy) * f2 * 0.016 - phase + Math.cos((dx - ox) * 0.045) * 3 * warp);
+        v = (wave1 + wave2) * 0.5;
       } else if(pat === 'voronoi'){
-        const gx = Math.sin(rx * f1 * 2.5 + phase + ox * 0.03);
-        const gy = Math.cos(ry * f2 * 2.5 - phase + oy * 0.03);
-        v = gx * gy;
-      } else if(pat === 'glitch'){
-        const band = Math.floor((y + oy) / Math.max(2, Math.round(f2 / 2)));
-        const shift = Math.sin(band * 1.7 + phase) * (ox * 0.004);
-        v = Math.sin((rx + shift) * f1 * 6.0) * Math.cos(ry * f2 * 3.0 + phase);
+        const cellSz = Math.max(14, 140 / Math.max(4, f1));
+        const gx = Math.abs(((dx + ox) % cellSz + cellSz) % cellSz - cellSz * 0.5);
+        const gy = Math.abs(((dy + oy) % cellSz + cellSz) % cellSz - cellSz * 0.5);
+        const edge = Math.min(gx, gy) / (cellSz * 0.5);
+        v = Math.cos(edge * Math.PI * (1 + warp) + phase);
+      } else {
+        const scan = Math.sin(y * (0.25 + f2 * 0.02) + phase);
+        const beat = Math.sin((x + ox) * f1 * 0.03 + scan * 4 * warp);
+        v = scan * 0.45 + beat * 0.55;
       }
 
-      let lum = (v * warp * 0.5 + 0.5) * 255;
-      lum = Math.max(0, Math.min(255, lum));
-      if(poster >= 2){
-        const step = 255 / (poster - 1);
-        lum = Math.round(lum / step) * step;
+      let normLum = (Math.max(-1, Math.min(1, v * (0.7 + warp * 0.45))) * 0.5 + 0.5) * 255;
+      if(poster > 1){
+        const step = 255 / poster;
+        normLum = Math.round(normLum / step) * step;
       }
-
-      const idx = (y * W + x) * 4;
-      d[idx] = d[idx+1] = d[idx+2] = lum;
-      d[idx+3] = 255;
+      const lum = Math.max(0, Math.min(255, Math.round(normLum)));
+      const j = (yy * W + x) * 4;
+      id.data[j] = id.data[j+1] = id.data[j+2] = lum; id.data[j+3] = 255;
     }
   }
-  ctx.putImageData(img, 0, 0);
+  ctx.putImageData(id, 0, 0);
 
-  if(overlayTxt){
-    const tc = document.createElement('canvas'); tc.width = W; tc.height = H;
-    const tctx = tc.getContext('2d');
-    tctx.fillStyle = '#000';
-    tctx.font = '900 32px Impact, Arial Black, sans-serif';
-    tctx.textAlign = 'center';
-    tctx.textBaseline = 'middle';
-    tctx.fillText(overlayTxt, cx + ox * 0.4, cy + oy * 0.4);
-
-    if(textMode === 'clean'){
-      ctx.drawImage(tc, 0, 0);
-    } else {
-      const td = tctx.getImageData(0, 0, W, H).data;
-      const outD = ctx.getImageData(0, 0, W, H);
-      for(let y = 0; y < H; y++){
+  if(near.length){
+    if(txtMode === 'warp'){
+      const tCv = document.createElement('canvas'); tCv.width = W; tCv.height = hh;
+      const tCtx = tCv.getContext('2d');
+      tCtx.font = 'bold 28px monospace'; tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle';
+      tCtx.fillStyle = '#fff';
+      for(const cc of near) tCtx.fillText(txt, W / 2, cc - gy0);
+      const tData = tCtx.getImageData(0, 0, W, hh).data;
+      const baseData = ctx.getImageData(0, 0, W, hh).data;
+      const outData = new ImageData(W, hh);
+      outData.data.set(baseData);
+      for(let yy = 0; yy < hh; yy++){
+        const gy = gy0 + yy;
         for(let x = 0; x < W; x++){
-          const i = (y * W + x) * 4;
-          if(td[i+3] > 128){
-            const wx = Math.round(x + Math.sin(y * 0.08 * warp + phase) * (f1 * 0.35));
-            const wy = Math.round(y + Math.cos(x * 0.08 * warp - phase) * (f2 * 0.25));
-            if(wx >= 0 && wx < W && wy >= 0 && wy < H){
-              const wi = (wy * W + wx) * 4;
-              outD.data[i] = outD.data[i+1] = outD.data[i+2] = 0;
+          const dispX = Math.round(Math.sin(gy * (0.04 + f1 * 0.002) + phase) * 8 * warp);
+          const dispY = Math.round(Math.cos(x * (0.04 + f2 * 0.002) - phase) * 6 * warp);
+          const sx = x - dispX, sy = yy - dispY;
+          if(sx >= 0 && sx < W && sy >= 0 && sy < hh){
+            const alpha = tData[(sy * W + sx) * 4] / 255;
+            if(alpha > 0.15){
+              const j = (yy * W + x) * 4;
+              const ink = alpha > 0.55 ? 0 : 255;
+              outData.data[j] = outData.data[j+1] = outData.data[j+2] = ink;
             }
           }
         }
       }
-      ctx.putImageData(outD, 0, 0);
+      ctx.putImageData(outData, 0, 0);
+    } else {
+      ctx.save();
+      ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 5; ctx.strokeStyle = '#fff';
+      for(const cc of near){
+        ctx.strokeText(txt, W / 2, cc - gy0);
+        ctx.fillStyle = '#000';
+        ctx.fillText(txt, W / 2, cc - gy0);
+      }
+      ctx.restore();
     }
   }
 
-  return c;
+  if(!pad) return c;
+  const out = document.createElement('canvas'); out.width = W; out.height = rows;
+  out.getContext('2d').drawImage(c, 0, -pad);
+  return out;
+}
+
+/* Visual for the screen. Single square when length = 0; otherwise the whole strip, rescaled to fit the viewport. */
+function buildOpticArtCanvas(){
+  const P = opticParams();
+  const cm = opticLenCm();
+  if(!cm){
+    $('opticLenInfo').textContent = '0 = single square (4.8 cm). Enter e.g. 300 for a continuous 3 m strip.';
+    return opticBand(P, 0, 384, g => g, [192]);
+  }
+  const H = Math.round(cm * 80);
+  const fit = $('opticFit').value;
+  const prevH = Math.min(H, 1100);
+  const {yMap, centers} = opticMapping(fit, H);
+  $('opticLenInfo').textContent = cm+' cm = '+H+' rows · '+(fit === 'stretch' ? 'design stretched over the full length' : 'design repeats every 9.6 cm (mirrored, seamless)')
+    + (prevH < H ? ' · preview scaled 1:'+(H / prevH).toFixed(1) : '');
+  if(fit === 'stretch'){
+    return opticBand(P, 0, prevH, r => yMap(r * H / prevH), [prevH / 2]);
+  }
+  if(H <= 1100) return opticBand(P, 0, H, yMap, centers);
+  const period = opticBand(P, 0, 768, yMap, [192, 576]);
+  const pv = document.createElement('canvas'); pv.width = W; pv.height = prevH;
+  const pc = pv.getContext('2d');
+  pc.fillStyle = '#fff'; pc.fillRect(0, 0, W, prevH);
+  pc.imageSmoothingEnabled = true; pc.imageSmoothingQuality = 'high';
+  const sc = prevH / H;
+  for(let k = 0; k * 768 < H; k++){
+    const rr = Math.min(768, H - k * 768);
+    pc.drawImage(period, 0, 0, W, rr, 0, k * 768 * sc, W, rr * sc);
+  }
+  return pv;
 }
 
 function updateZineLivePreview(){
-  let zc = null;
-  if(activeZineSubTab === 'p3Type') zc = buildZineSlipCanvas();
-  else if(activeZineSubTab === 'p3Cipher') zc = buildCipherCanvas();
-  else if(activeZineSubTab === 'p3Optic') zc = buildOpticalCanvas();
-  if(!zc) return;
+  clearInterval(wiggleTimer);
+  let c, long = false;
+  if(activeZineSubTab === 'p3Type') c = buildZineSlipCanvas();
+  else if(activeZineSubTab === 'p3Cipher') c = buildCipherSlipCanvas();
+  else { c = buildOpticArtCanvas(); long = opticLenCm() > 0; }
+
   sidewaysBanner = false; $('btnBanner').classList.remove('active-toggle');
-  src = {el: zc, w: zc.width, h: zc.height};
+  if(stream) stopCam();
+  src = {el: c, w: c.width, h: c.height, opticLong: long};
   rot = 0;
   draw();
+  if(long) $('info').textContent = 'Optical strip · '+opticLenCm()+' cm · press Print to stream it continuously';
 }
 
-['zineTitle','zineBody','zineFontSize','zineAlign','cipherInput','cipherStyle'].forEach(id => {
-  $(id).addEventListener('input', () => { if(activeZineSubTab !== 'p3Optic') updateZineLivePreview(); });
-  $(id).addEventListener('change', () => { if(activeZineSubTab !== 'p3Optic') updateZineLivePreview(); });
-});
-['opticPattern','opticTextMode','opticOverlayText','opticFreq','opticFreq2','opticOffX','opticOffY','opticTwist','opticWarp','opticPinch','opticFolds','opticPhase','opticPoster','opticContinuous','opticLengthCm'].forEach(id => {
-  $(id).addEventListener('input', () => { if(activeZineSubTab === 'p3Optic') updateZineLivePreview(); });
-  $(id).addEventListener('change', () => { if(activeZineSubTab === 'p3Optic') updateZineLivePreview(); });
+[
+  'zineTitle','zineBody','zineAlign','zineFontSize',
+  'cipherInput','cipherStyle',
+  'opticPattern','opticOverlayText','opticTextMode',
+  'opticFreq','opticFreq2','opticOffX','opticOffY','opticTwist','opticWarp',
+  'opticPinch','opticFolds','opticPhase','opticPoster','opticLenCm','opticFit'
+].forEach(id => {
+  $(id).addEventListener('input', updateZineLivePreview);
+  $(id).addEventListener('change', updateZineLivePreview);
 });
 
-/* ---------- Camera Roll / Reprint Queue ---------- */
-const rollStore = [];
-function saveToHistory(imgObj){
-  if(!imgObj || !imgObj.mono) return;
-  const snap = {mono: new Uint8Array(imgObj.mono), w: imgObj.w, h: imgObj.h, ts: Date.now()};
-  rollStore.unshift(snap);
-  if(rollStore.length > 16) rollStore.pop();
+/* ---------- Event Wiring ---------- */
+$('btnLive').addEventListener('click', () => stream && !slitActive ? stopCam() : startCam(false, false));
+$('btnSelfie').addEventListener('click', toggleSelfie);
+$('btnShot').addEventListener('click', shot);
+$('btnBooth').addEventListener('click', runPhotoBooth);
+$('btnBanner').addEventListener('click', () => {
+  sidewaysBanner = !sidewaysBanner;
+  $('btnBanner').classList.toggle('active-toggle', sidewaysBanner);
+  schedule();
+});
+$('stripChoiceBar').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-strips]');
+  if(!btn) return;
+  selectedStrips = +btn.dataset.strips || 1;
+  $('stripChoiceBar').querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+  $('posterDims').textContent = `${selectedStrips}× · ${selectedStrips * 58} mm wide`;
+  schedule();
+  scrollToStage();
+});
+$('btnCam').addEventListener('click', () => $('fCam').click());
+$('btnLib').addEventListener('click', () => $('fLib').click());
+$('btnRot').addEventListener('click', () => { rot = (rot + 1) % 4; schedule(); });
+$('btnFlip').addEventListener('click', () => { mirror = !mirror; schedule(); });
+['fCam','fLib'].forEach(id => $(id).addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; }));
+['mode','frame','stampOpt','br','ct','gm','th','sf','invert'].forEach(id => $(id).addEventListener('input', schedule));
+$('caption').addEventListener('input', schedule);
+blank(); applyLook('portrait');
+
+/* ---------- Camera Roll Queue ---------- */
+const historyQueue = [];
+function saveToHistory(img){
+  const clone = {mono: new Uint8Array(img.mono), w: img.w, h: img.h, ts: new Date().toTimeString().slice(0,5)};
+  historyQueue.unshift(clone);
+  if(historyQueue.length > 16) historyQueue.pop();
   renderHistory();
 }
 
 function renderHistory(){
   const box = $('histList');
-  if(!rollStore.length){
+  if(!historyQueue.length){
     box.innerHTML = '<span style="color:var(--mut);font-size:12px">Saved or printed bitmaps appear on the roll for 1-tap load &amp; reprint.</span>';
     return;
   }
   box.innerHTML = '';
-  rollStore.forEach((item, idx) => {
-    const div = document.createElement('div');
-    div.className = 'hitem';
-    const cv = document.createElement('canvas');
-    cv.width = item.w; cv.height = item.h;
+  historyQueue.forEach(item => {
+    const wrap = document.createElement('div'); wrap.className = 'hitem';
+    const cv = document.createElement('canvas'); cv.width = item.w; cv.height = item.h;
     const id = cv.getContext('2d').createImageData(item.w, item.h);
     for(let i = 0, j = 0; i < item.mono.length; i++, j += 4){
       const v = item.mono[i] ? 0 : 255;
       id.data[j] = id.data[j+1] = id.data[j+2] = v; id.data[j+3] = 255;
     }
     cv.getContext('2d').putImageData(id, 0, 0);
-
-    const bLoad = document.createElement('button');
-    bLoad.type = 'button';
-    bLoad.textContent = 'Load';
-    bLoad.addEventListener('click', () => {
-      renderBitmapToView(item, `Roll #${idx+1}`);
+    const btn = document.createElement('button');
+    btn.textContent = 'Load ' + item.ts;
+    btn.addEventListener('click', () => {
+      if(stream) stopCam();
+      last = {mono: new Uint8Array(item.mono), w: item.w, h: item.h};
+      renderBitmapToView(last, 'Roll ' + item.ts);
       scrollToStage();
+      log('Loaded roll item ('+item.w+'×'+item.h+') into main viewport','ok');
     });
-
-    const bPrint = document.createElement('button');
-    bPrint.type = 'button';
-    bPrint.textContent = 'Print';
-    bPrint.addEventListener('click', () => {
-      renderBitmapToView(item, `Roll #${idx+1}`);
-      scrollToStage();
-      printBitmap();
-    });
-
-    div.appendChild(cv);
-    div.appendChild(bLoad);
-    div.appendChild(bPrint);
-    box.appendChild(div);
+    wrap.appendChild(cv); wrap.appendChild(btn); box.appendChild(wrap);
   });
 }
+$('btnClearHist').addEventListener('click', () => { historyQueue.length = 0; renderHistory(); });
 
-$('btnClearHist').addEventListener('click', () => {
-  rollStore.length = 0;
-  renderHistory();
-});
-
-/* ---------- Thermal Protocol & Single-Shot Print Engine ---------- */
-const CRC8_07 = (() => {
-  const t = new Uint8Array(256);
-  for(let i = 0; i < 256; i++){
-    let c = i;
-    for(let k = 0; k < 8; k++) c = (c & 0x80) ? ((c << 1) ^ 0x07) & 0xff : (c << 1) & 0xff;
-    t[i] = c;
-  }
-  return t;
-})();
-const CRC8_31 = (() => {
-  const t = new Uint8Array(256);
-  for(let i = 0; i < 256; i++){
-    let c = i;
-    for(let k = 0; k < 8; k++) c = (c & 0x80) ? ((c << 1) ^ 0x31) & 0xff : (c << 1) & 0xff;
-    t[i] = c;
-  }
-  return t;
-})();
-const crc8 = u8 => {
-  const tbl = $('crcv').value === '31' ? CRC8_31 : CRC8_07;
-  let c = 0;
-  for(let i = 0; i < u8.length; i++) c = tbl[(c ^ u8[i]) & 0xff];
-  return c;
-};
-const catPkt = (cmd, payload) => {
-  const n = payload.length, out = new Uint8Array(6 + n + 2);
-  out[0] = 0x51; out[1] = 0x78; out[2] = cmd; out[3] = 0x00;
-  out[4] = n & 0xff; out[5] = (n >>> 8) & 0xff;
-  out.set(payload, 6);
-  out[6+n] = crc8(payload); out[7+n] = 0xff;
-  return out;
-};
-const hexByte = (id, fb) => { const v = parseInt($(id).value, 16); return Number.isFinite(v) ? v & 0xff : fb; };
+/* ---------- Printer Drivers & Non-Reentrant Session Lock ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const isConnected = () => !!(dev && dev.gatt && dev.gatt.connected);
-
-function updPrint(){
-  const busy = printing || activeJobToken !== null;
-  $('btnPrint').disabled = !last || busy || overheated;
-  $('btnSave').disabled = !last;
-  $('btnSaveRoll').disabled = !last;
-  $('btnTest').disabled = !isConnected() || busy || overheated;
-  $('btnStat').disabled = !isConnected() || busy;
-  $('btnProbe').disabled = !isConnected() || busy || overheated;
-  updateCamSign(isConnected());
+function crc8(arr){ const poly = $('crcv').value === '31' ? 0x31 : 0x07; let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ poly) & 0xff : (c << 1) & 0xff; } return c; }
+function pkt(cmd, payload){
+  const p = Uint8Array.from(payload), n = p.length, o = new Uint8Array(8 + n);
+  o.set([0x22,0x21,cmd,0x00,n & 255,n >> 8]); o.set(p,6); o[6+n] = crc8(p); o[7+n] = 0xFF; return o;
 }
+async function wr(ch, bytes){
+  const b = new Uint8Array(bytes.length); b.set(bytes);
+  if(ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) await ch.writeValueWithoutResponse(b);
+  else await ch.writeValue(b);
+}
+let waiters = [], rxCount = 0;
 
-function onNotify(ch, dv){
-  const u = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
-  if(ch === 'ae02' || ch === 'ae03'){
-    if(u[0] === 0x51 && u[1] === 0x78){
-      const cmd = u[2], len = u[4] | (u[5] << 8), pay = u.subarray(6, 6+len);
-      if(cmd === 0xa1 && pay.length){
-        const flags = pay[0];
-        log('CAT STATUS flags=0x'+flags.toString(16).padStart(2,'0')+' ['+[
-          flags & 1 ? 'no-paper' : 'paper-ok',
-          flags & 2 ? 'paper-jam' : '',
-          flags & 4 ? 'overheat' : '',
-          flags & 8 ? 'low-volt' : ''
-        ].filter(Boolean).join(',')+']', flags & 6 ? 'err' : 'ok');
-        if(flags & 4) setHeatAlert(true, 'OVERHEAT');
-        else if(flags & 2) setHeatAlert(true, 'JAM');
-        else setHeatAlert(false);
-      }
-      if(cmd === 0xa3 && pay.length) setBatteryPct(pay[0]);
-      if(cmd === 0xab && pay.length){
-        const tempC = pay.length > 1 ? pay[1] : pay[0];
-        if(tempC >= 65) setHeatAlert(true, tempC+'°C');
-        else if(!overheated) setHeatAlert(false);
-      }
+/* Explicit GATT Notification Handler — STRICTLY STATUS REGISTERS ONLY (No recursive printing calls) */
+function onNotify(id, dv){
+  rxCount++;
+  if(id !== 'ae02') return;
+  const b = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
+  if(b.length < 8 || b[0] !== 0x22 || b[1] !== 0x21) return;
+  const cmd = b[2], n = b[4] | (b[5] << 8);
+  const pl = b.subarray(6, 6+n);
+  log('  RX cmd 0x'+cmd.toString(16)+' payload: '+hex(pl));
+  if(cmd === 0xA1 && b.length >= 14){
+    const st = decodeStatus(b);
+    setBatteryPct(st.battery);
+    if(st.flag || st.temp >= 60) setHeatAlert(true, st.temp >= 60 ? st.temp+'°C' : 'ERR '+st.err);
+    else setHeatAlert(false);
+  }
+  if(cmd === 0xAA && pl.length >= 1){
+    if(pl[0] === 0xfc || (pl[0] !== 0x00 && pl[0] !== 0x01)){
+      setHeatAlert(true, 'STOP');
     }
   }
-  if(ch === 'ff01' || ch === 'ff03' || ch === 'ff02'){
-    const txt = new TextDecoder().decode(u).toLowerCase();
-    if(txt.includes('hot') || txt.includes('overheat') || txt.includes('temp')){
-      setHeatAlert(true, 'HOT');
-    } else if(txt.includes('cool') || txt.includes('normal') || txt.includes('ok')){
-      setHeatAlert(false);
-    }
-    for(let i = 0; i < u.length; i++){
-      if(u[i] === 0x68 && i + 2 < u.length){
-        setBatteryPct(u[i+1]);
-        break;
-      }
-    }
-  }
+  waiters = waiters.filter(w => { if(w.cmd === cmd){ w.res(b); return false; } return true; });
 }
 
-async function writeChunked(c, data, chunk, delay){
-  const p = c.properties;
-  const canWNR = !!(p.writeWithoutResponse && c.writeValueWithoutResponse);
-  const canW = !!p.write;
-  if(!canWNR && !canW) throw new Error('characteristic not writable');
-  let n = 0;
-  for(let i = 0; i < data.length; i += chunk){
-    if(!isConnected()) throw new Error('disconnected mid-transfer');
-    const sl = data.subarray(i, Math.min(data.length, i + chunk));
-    if(canWNR && (!canW || (n % 32 !== 0))) await c.writeValueWithoutResponse(sl);
-    else await c.writeValue(sl);
-    n++;
-    if(delay > 0) await sleep(delay);
-  }
-  return n;
+function waitCmd(cmd, ms){
+  return new Promise(res => {
+    const w = {cmd, res}; waiters.push(w);
+    setTimeout(() => { if(waiters.includes(w)){ waiters = waiters.filter(x => x !== w); res(null); } }, ms);
+  });
 }
-
-function packRows(mono, w, h, msb){
-  const bpr = Math.ceil(w / 8), out = new Uint8Array(h * bpr);
-  for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
-    if(!mono[y*w+x]) continue;
-    const bit = msb ? (7 - (x & 7)) : (x & 7);
-    out[y*bpr + (x >> 3)] |= 1 << bit;
-  }
-  return {bytes: out, bpr};
-}
-
-function rotateMono180(mono, w, h){
-  const out = new Uint8Array(mono.length);
-  for(let i = 0; i < mono.length; i++) out[mono.length - 1 - i] = mono[i];
+function packRows(mono, w, h, lsb, rows){
+  const rb = w >> 3, out = new Uint8Array(rb * rows);
+  for(let y = 0; y < h; y++) for(let x = 0; x < w; x++)
+    if(mono[y*w+x]) out[y*rb + (x >> 3)] |= lsb ? (1 << (x & 7)) : (0x80 >> (x & 7));
   return out;
 }
-
-function buildCatRasterPacket(mono, w, h, inten){
-  const msb = $('bits').value === 'msb';
-  const {bytes: rows, bpr} = packRows(mono, w, h, msb);
-  const feed = Math.max(0, Math.min(255, +$('feed').value || 0));
-  const parts = [
-    catPkt(0xa1, new Uint8Array([hexByte('rq3', 0x30)])),
-    catPkt(0xbe, new Uint8Array([0x01])),
-    catPkt(0xa2, new Uint8Array([inten & 0xff])),
-    catPkt(0xa9, new Uint8Array([hexByte('rq4', 0x00)])),
-  ];
-  for(let y = 0; y < h; y += 256){
-    const blk = Math.min(256, h - y), pay = new Uint8Array(2 + blk * bpr);
-    pay[0] = blk & 0xff; pay[1] = (blk >>> 8) & 0xff;
-    pay.set(rows.subarray(y * bpr, (y + blk) * bpr), 2);
-    parts.push(catPkt(0xa6, pay));
-  }
-  if(feed) parts.push(catPkt(0xa1, new Uint8Array([feed])));
-  parts.push(catPkt(0xa1, new Uint8Array([0x00])));
-  let tot = 0; for(const p of parts) tot += p.length;
-  const pkt = new Uint8Array(tot); let o = 0;
-  for(const p of parts){ pkt.set(p, o); o += p.length; }
-  return pkt;
-}
-
-function buildM02xRasterPacket(mono, w, h, inten){
-  const msb = $('bits').value === 'msb';
-  const {bytes: rows, bpr} = packRows(mono, w, h, msb);
-  const feed = Math.max(0, Math.min(255, +$('feed').value || 0));
-  const densityByte = Math.max(1, Math.min(3, Math.round((inten / 255) * 3) || 2));
-  const chunks = [];
-
-  chunks.push(new Uint8Array([0x1b, 0x40]));
-  chunks.push(new Uint8Array([0x1f, 0x11, 0x02, 0x04]));
-  chunks.push(new Uint8Array([0x1d, 0x76, 0x30, 0x00, bpr & 0xff, (bpr >>> 8) & 0xff, h & 0xff, (h >>> 8) & 0xff]));
-  chunks.push(rows);
-  if(feed > 0){
-    chunks.push(new Uint8Array([0x1b, 0x64, feed]));
-  }
-  chunks.push(new Uint8Array([0x1f, 0x11, 0x03, densityByte]));
-
-  let tot = 0;
-  for(const c of chunks) tot += c.length;
-  const out = new Uint8Array(tot);
-  let off = 0;
-  for(const c of chunks){ out.set(c, off); off += c.length; }
-  return out;
-}
+function decodeStatus(b){ return {state:b[6], battery:b[9], temp:b[10], flag:b[12], err:b[13]}; }
 
 async function getStatus(){
-  if(!catChars.ae01){ log('No ae01 characteristic','err'); return; }
-  const pkt = catPkt(0xa1, new Uint8Array([0x00]));
-  log('TX ae01 status: '+hex(pkt),'tx');
-  await writeChunked(catChars.ae01, pkt, +$('chunk').value||20, +$('delay').value||25);
+  const c1 = catChars.ae01; if(!c1) return null;
+  const w = waitCmd(0xA1, 3000), p = pkt(0xA1, [0x00]);
+  log('TX ae01: '+hex(p),'tx'); await wr(c1, p);
+  const r = await w;
+  if(!r){ log('No status answer within 3 s','err'); return null; }
+  const st = decodeStatus(r);
+  setBatteryPct(st.battery);
+  if(st.flag || st.temp >= 60) setHeatAlert(true, st.temp >= 60 ? st.temp+'°C' : 'ERR '+st.err);
+  else setHeatAlert(false);
+  log('Status: state '+st.state+', battery '+st.battery+'%, temp '+st.temp+'°C, flag '+st.flag+(st.flag ? ', error '+st.err : ' (OK)'), st.flag ? 'err' : 'ok');
+  return st;
 }
 
-async function testPattern(){
-  const w = 384, h = 96, m = new Uint8Array(w * h);
-  for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
-    const border = y < 4 || y >= h - 4 || x < 4 || x >= w - 4;
-    const diag = ((x + y) % 32) < 4;
-    const bar = y >= 36 && y < 60 && ((x >> 4) & 1);
-    m[y*w+x] = (border || diag || bar) ? 1 : 0;
+const catDriver = {
+  name:'MXW01', widthPx:384,
+  connect, disconnect,
+  async printBitmap(mono, w, h, jobId){
+    if(jobId !== currentPrintJobId || !isPrintingSessionActive){
+      log('Aborting printBitmap: stale or cancelled job token','err'); return;
+    }
+    const c1 = catChars.ae01, c3 = catChars.ae03;
+    if(!(dev && dev.gatt.connected && c1 && c3)) throw new Error('Not connected (need ae01 + ae03)');
+    if(w !== 384) throw new Error('Width must be 384');
+    let m = mono;
+    if($('rot180').checked){ m = new Uint8Array(mono.length); for(let i = 0; i < mono.length; i++) m[i] = mono[mono.length - 1 - i]; }
+    const rows = Math.max(h + (+$('feed').value | 0), 90);
+    const lsb = $('bits').value === 'lsb';
+    const data = packRows(m, w, h, lsb, rows);
+    const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
+    const ch = Math.max(20, +$('chunk').value | 0), dl = +$('delay').value | 0;
+    log('Print start ['+jobId+']: '+w+' × '+rows+' rows, '+data.length+' bytes');
+    await ctl(0xA2, [+$('inten').value & 255]);
+    await sleep(50);
+    const st = await getStatus();
+    if(st && (st.flag || st.temp >= 60)){
+      setHeatAlert(true, st.temp >= 60 ? st.temp+'°C' : 'ERR '+st.err);
+      throw new Error('Printer overheated / stopped: wait for cooldown');
+    }
+    const r3 = parseInt($('rq3').value, 16) & 255, r4 = parseInt($('rq4').value, 16) & 255;
+    const ack = waitCmd(0xA9, 3000);
+    await ctl(0xA9, [rows & 255, rows >> 8, r3, r4]);
+    const a = await ack;
+    if(!a) throw new Error('No answer to print request: power-cycle the printer');
+    if(a[6] !== 0){
+      setHeatAlert(true, 'BUSY/HOT');
+      throw new Error('Print request rejected (code '+a[6]+').');
+    }
+    log('Print request accepted','ok');
+    const rx0 = rxCount; let n = 0;
+    for(let o = 0; o < data.length; o += ch, n++){
+      if(jobId !== currentPrintJobId) break;
+      await wr(c3, data.subarray(o, o + ch));
+      if(dl) await sleep(dl);
+      if(n % 150 === 0) log('  data '+Math.round(o * 100 / data.length)+'%');
+    }
+    log('Data sent: '+n+' writes','ok');
+    const done = waitCmd(0xAA, 45000);
+    await ctl(0xAD, [0x00]);
+    let polling = $('poll').checked;
+    (async () => { while(polling && jobId === currentPrintJobId){ await sleep(3000); if(polling) await getStatus(); } })();
+    const d = await done; polling = false;
+    log(d ? 'Print complete (0xAA received)' : 'No complete notice within 45 s', d ? 'ok' : 'err');
+    const cp = +$('coolPause').value || 0;
+    if(cp > 0){ log('Cooldown pause: '+cp+'s…','ok'); await sleep(cp * 1000); }
   }
-  renderBitmapToView({mono: m, w, h}, 'Test Pattern');
-  await printBitmap();
+};
+
+function testPattern(){
+  const w = 384, h = 200, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0,0,w,h); x.fillStyle = '#000';
+  x.fillRect(0,0,w,6); x.fillRect(0,h-6,w,6); x.fillRect(0,0,6,h); x.fillRect(w-6,0,6,h); x.fillRect(12,12,28,28);
+  x.fillRect(12, 140, w - 24, 40);
+  x.font = 'bold 110px sans-serif'; x.textBaseline = 'top'; x.fillText('F', 70, 20);
+  const d = x.getImageData(0,0,w,h).data, m = new Uint8Array(w*h);
+  for(let i = 0; i < m.length; i++) m[i] = d[i*4] < 128 ? 1 : 0;
+  return {mono:m, w, h};
+}
+
+/* ---- M02X protocol helpers (shared by single prints and streaming) ---- */
+function m02xHeader(){ return new Uint8Array([0x1B,0x40, 0x1B,0x61,0x01, 0x1F,0x11,0x02,0x04]); }
+function m02xFooter(){ return new Uint8Array([0x1B,0x64,0x04, 0x1F,0x11,0x08, 0x1F,0x11,0x0E, 0x1F,0x11,0x07, 0x1F,0x11,0x09]); }
+/* One GS v 0 raster block (<=255 rows) taken from mono rows y0..y0+rows of a w-wide bitmap with srcH rows. Rows >= srcH stay blank. */
+function m02xBlock(m, w, y0, rows, srcH){
+  const out = new Uint8Array(8 + rows * 48);
+  out.set([0x1D,0x76,0x30,0x00, 48,0, rows & 255, rows >> 8]);
+  for(let y = 0; y < rows; y++){
+    const sy = y0 + y;
+    if(sy >= srcH) continue;
+    for(let x = 0; x < 384; x++){
+      if(m[sy * w + x]) out[8 + y * 48 + (x >> 3)] |= (0x80 >> (x & 7));
+    }
+  }
+  return out;
+}
+async function m02xWrite(bytes){
+  const useWoR = m02xChar.properties.writeWithoutResponse && m02xChar.writeValueWithoutResponse;
+  for(let o = 0; o < bytes.length; o += 160){
+    const chunk = bytes.slice(o, o + 160);
+    if(useWoR) await m02xChar.writeValueWithoutResponse(chunk);
+    else await m02xChar.writeValue(chunk);
+    await sleep(20);
+  }
+}
+function rot180Mono(mono){ const r = new Uint8Array(mono.length); for(let i = 0; i < mono.length; i++) r[i] = mono[mono.length - 1 - i]; return r; }
+
+/* End of an M02X job: feed, closing commands, then (optionally) reset + disconnect so the
+   printer cannot keep re-printing what it was given (the endless-loop problem in Bluefy). */
+async function m02xEndJob(rowsSent){
+  const feedRows = Math.max(0, +$('feed').value | 0);
+  for(let y = 0; y < feedRows; y += 255){
+    await m02xWrite(m02xBlock(new Uint8Array(0), 384, 0, Math.min(255, feedRows - y), 0));
+  }
+  await m02xWrite(m02xFooter());
+  log('M02X: job data sent ('+rowsSent+' rows + '+feedRows+' feed)','ok');
+  if($('autoDisc') && $('autoDisc').checked){
+    await sleep(2000);
+    try{ await m02xWrite(new Uint8Array([0x1B,0x40])); }catch(_){}
+    await sleep(300);
+    log('M02X: reset sent, disconnecting to prevent reprint loop. Tap BLE to reconnect.','ok');
+    disconnect();
+  }
+}
+
+const phomemoDriver = {
+  name:'Phomemo M02X', widthPx:384,
+  connect, disconnect,
+  async printBitmap(mono, w, h, jobId){
+    if(jobId !== currentPrintJobId || !isPrintingSessionActive){
+      log('Aborting printBitmap: stale or cancelled job token','err'); return;
+    }
+    if(!(dev && dev.gatt && dev.gatt.connected && m02xChar)) throw new Error('Phomemo M02X not connected');
+    if(w !== 384) throw new Error('Width must be 384');
+    const m = $('rot180').checked ? rot180Mono(mono) : mono;
+    log('M02X print start ['+jobId+']: '+w+' × '+h+' rows');
+    await m02xWrite(m02xHeader());
+    for(let y0 = 0; y0 < h; y0 += 255){
+      if(jobId !== currentPrintJobId) break;
+      await m02xWrite(m02xBlock(m, w, y0, Math.min(255, h - y0), h));
+    }
+    await m02xEndJob(h);
+    const cp = +$('coolPause').value || 0;
+    if(cp > 0){ log('Cooldown pause: '+cp+'s…','ok'); await sleep(cp * 1000); }
+  }
+};
+
+function updPrint(){
+  const model = $('printerModel').value;
+  const connected = !!(dev && dev.gatt && dev.gatt.connected);
+  const driverReady = model === 'm02x' ? !!m02xChar : !!(catChars.ae01 && catChars.ae03);
+  const bleOk = connected && driverReady && !printing && !isPrintingSessionActive && !overheated;
+  $('btnPrint').disabled = !bleOk || !last;
+  $('btnSave').disabled = !last;
+  $('btnSaveRoll').disabled = !last;
+  $('btnTest').disabled = !bleOk;
+  $('btnStat').disabled = !(connected && catChars.ae01 && !printing && !isPrintingSessionActive);
+  $('btnProbe').disabled = !(connected && catChars.ae01 && catChars.ae03 && !printing && !isPrintingSessionActive);
+  updateCamSign(connected);
 }
 
 async function probeSize(){
-  if(!catChars.ae01){ log('Probe size is for Cat ae30 protocol; M02X uses 384px (58mm).','err'); return; }
-  const c = +$('chunk').value||20, d = +$('delay').value||25, inten = +$('burnIntensity').value||82;
-  for(const w of [384, 576]){
-    if(!isConnected()) break;
-    const m = new Uint8Array(w * 24);
-    for(let y = 0; y < 24; y++) for(let x = 0; x < w; x++) if(y === 0 || y === 23 || x === 0 || x === w - 1 || (x % 8 === 0 && y < 12)) m[y*w+x] = 1;
-    log('=== PROBE width='+w+'px ('+(w/8)+'mm) ===','ok');
-    await writeChunked(catChars.ae01, buildCatRasterPacket(m, w, 24, inten), c, d);
-    await sleep(1500);
+  if(printing || isPrintingSessionActive) return;
+  const jobId = 'probe_' + Date.now();
+  isPrintingSessionActive = true; currentPrintJobId = jobId; printing = true; updPrint();
+  try{
+    const c1 = catChars.ae01, c3 = catChars.ae03;
+    if(!(dev && dev.gatt.connected && c1 && c3)) throw new Error('Not connected');
+    const t = testPattern(), rows = t.h, img = packRows(t.mono, t.w, t.h, true, rows), exp = img.length;
+    const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
+    const ch = 20, dl = +$('delay').value | 0, cap = exp * 4;
+    log('PROBE: '+rows+' rows requested');
+    await ctl(0xA2, [+$('inten').value & 255]); await sleep(50);
+    const ack = waitCmd(0xA9, 3000);
+    await ctl(0xA9, [rows & 255, rows >> 8, parseInt($('rq3').value, 16) & 255, parseInt($('rq4').value, 16) & 255]);
+    if(!(await ack)) throw new Error('No answer to print request');
+    const rx0 = rxCount; let sent = 0;
+    while(sent < cap && rxCount === rx0){
+      const part = sent < exp ? img.subarray(sent, sent + ch) : new Uint8Array(ch);
+      await wr(c3, part); sent += part.length;
+      if(dl) await sleep(dl);
+    }
+    await ctl(0xAD, [0x00]);
+    await sleep(4000);
+  }catch(e){ log('Probe failed: '+errStr(e),'err'); }
+  finally{
+    isPrintingSessionActive = false; currentPrintJobId = null; printing = false; updPrint();
   }
 }
 
-/* Single-shot print dispatcher with debounce & lock so Bluefy cannot loop */
-async function printBitmap(){
-  if(!last) return;
-  const now = Date.now();
-  if(now - lastPrintTriggerMs < 800){
-    log('Ignored duplicate print trigger within 800ms','err');
-    return;
-  }
-  lastPrintTriggerMs = now;
-
-  if(printing || activeJobToken !== null){
-    log('Print already in progress — ignoring duplicate trigger','err');
-    return;
-  }
-  if(overheated){
-    log('Print blocked: printer reports overheated / stop state.','err');
-    return;
-  }
-  if(!isConnected()){
-    log('Not connected to BLE printer. Use Export PNG or Roll to save.','err');
+/* Strict Single-Session Non-Reentrant Print Dispatch */
+async function doPrint(m, isReprint){
+  if(isPrintingSessionActive || overheated || !m){
+    log('Print request ignored: session active or overheated','err');
     return;
   }
 
-  const jobToken = 'job_' + now + '_' + Math.random().toString(36).slice(2, 7);
-  if(completedJobTokens.has(jobToken)) return;
-
-  activeJobToken = jobToken;
+  const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+  isPrintingSessionActive = true;
+  currentPrintJobId = jobId;
   printing = true;
   updPrint();
-  saveToHistory(last);
 
-  const model = $('printerModel').value;
-  let m = last.mono, w = last.w, h = last.h;
-  if($('rot180').checked){
-    m = rotateMono180(m, w, h);
-    log('Rotated bitmap 180° for print');
-  }
-  const c = Math.max(20, Math.min(240, +$('chunk').value || 20));
-  const d = Math.max(5, Math.min(200, +$('delay').value || 25));
-  const inten = +$('burnIntensity').value || 82;
-
-  let poller = null;
   try{
-    if(model === 'm02x'){
-      const target = m02xChar || (writable[+$('wsel').value] && writable[+$('wsel').value].c);
-      if(!target) throw new Error('No M02X writable characteristic found');
-      const pkt = buildM02xRasterPacket(m, w, h, inten);
-      log(`M02X single-shot print ${w}×${h} (${pkt.length} B, burn=${inten}) via ${short(target.uuid)}…`);
-      const n = await writeChunked(target, pkt, c, d);
-      log(`M02X print complete: ${n} chunks sent (1 job only).`,'ok');
-    } else {
-      if(!catChars.ae01) throw new Error('No Cat ae01 characteristic found');
-      if($('poll').checked){
-        poller = setInterval(() => { getStatus().catch(()=>{}); }, 1500);
-      }
-      const pkt = buildCatRasterPacket(m, w, h, inten);
-      log(`Cat single-shot print ${w}×${h} (${pkt.length} B, burn=${inten})…`);
-      const n = await writeChunked(catChars.ae01, pkt, c, d);
-      log(`Cat print complete: ${n} chunks sent (1 job only).`,'ok');
-    }
-    completedJobTokens.add(jobToken);
-    if(completedJobTokens.size > 40){
-      const first = completedJobTokens.values().next().value;
-      completedJobTokens.delete(first);
-    }
+    if(!isReprint && m !== null && last === m) saveToHistory(m);
+    const driver = $('printerModel').value === 'm02x' ? phomemoDriver : catDriver;
+    log(`Starting print job [${jobId}] via ${driver.name}…`, 'ok');
+    await driver.printBitmap(m.mono, m.w, m.h, jobId);
   }catch(e){
-    log('Print error: '+errStr(e),'err');
+    log('Print failed: '+errStr(e),'err');
   }finally{
-    if(poller) clearInterval(poller);
+    isPrintingSessionActive = false;
+    currentPrintJobId = null;
     printing = false;
-    activeJobToken = null;
     updPrint();
+    log(`Print job [${jobId}] finished & session unlocked.`, 'ok');
   }
 }
 
-/* ---------- Event Listeners & Initialization ---------- */
+$('btnPrint').addEventListener('click', () => {
+  if(src && src.opticLong && activeZineSubTab === 'p3Optic' && opticLenCm() > 0) printOpticContinuous();
+  else if(last) doPrint(last, false);
+});
+$('btnTest').addEventListener('click', () => doPrint(testPattern(), true));
+$('btnProbe').addEventListener('click', probeSize);
+function applyPreset(){ const v = $('preset').value.split(','); $('chunk').value = v[0]; $('delay').value = v[1]; }
+$('preset').addEventListener('change', applyPreset);
+if(/Bluefy/i.test(navigator.userAgent)) $('preset').value = '96,20';
+applyPreset();
+$('btnStat').addEventListener('click', () => getStatus());
+$('inten').addEventListener('input', () => { $('inv').textContent = $('inten').value; });
+$('inv').textContent = $('inten').value;
+$('coolPause').addEventListener('input', () => { $('cpv').textContent = $('coolPause').value + 's'; });
+$('cpv').textContent = $('coolPause').value + 's';
+
+/* ---------- Streaming print layer (continuous jobs) ---------- */
+var streamAbort = false, opticAbort = false;
+
+function printerReady(){
+  const model = $('printerModel').value;
+  const connected = !!(dev && dev.gatt && dev.gatt.connected);
+  const ready = model === 'm02x' ? !!m02xChar : !!(catChars.ae01 && catChars.ae03);
+  return connected && ready;
+}
+function sessionOpen(){
+  const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+  isPrintingSessionActive = true; currentPrintJobId = jobId; printing = true; streamAbort = false; updPrint();
+  return jobId;
+}
+function sessionClose(){
+  isPrintingSessionActive = false; currentPrintJobId = null; printing = false; updPrint();
+}
+
+/* Converts luminance (0-255 per pixel) to printer mono using the current Brightness/Contrast/Gamma/Mode/Invert controls */
+function lumToMono(lum, w, h, yOff){
+  const br = +$('br').value * 2.55, ct = +$('ct').value * 2.55, gm = +$('gm').value, t = +$('th').value;
+  const cf = (259 * (ct + 255)) / (255 * (259 - ct));
+  const g = new Float32Array(w * h);
+  for(let i = 0; i < g.length; i++){
+    let v = lum[i] + br;
+    v = cf * (v - 128) + 128;
+    v = v < 0 ? 0 : v > 255 ? 255 : v;
+    g[i] = 255 * Math.pow(v / 255, 1 / gm);
+  }
+  const m = ditherGrayToMono(g, w, h, $('mode').value, t, +$('sf').value, yOff || 0);
+  if($('invert').checked) for(let i = 0; i < m.length; i++) m[i] ^= 1;
+  return m;
+}
+function canvasLum(cv){
+  const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+  const lum = new Float32Array(cv.width * cv.height);
+  for(let i = 0, j = 0; i < lum.length; i++, j += 4) lum[i] = 0.299*d[j] + 0.587*d[j+1] + 0.114*d[j+2];
+  return lum;
+}
+
+/* A sink accepts successive mono bands (w=384). M02X: written live. Cat: collected into jobs of segRows. */
+async function makeSink(jobId, segRows){
+  if($('printerModel').value === 'm02x'){
+    const flip = $('rot180').checked;
+    await m02xWrite(m02xHeader());
+    let total = 0;
+    return {
+      async push(mono, w, h){
+        const m = flip ? rot180Mono(mono) : mono;
+        for(let y0 = 0; y0 < h; y0 += 255) await m02xWrite(m02xBlock(m, w, y0, Math.min(255, h - y0), h));
+        total += h;
+      },
+      async end(){ await m02xEndJob(total); }
+    };
+  }
+  let parts = [], n = 0;
+  const flush = async () => {
+    if(!n) return;
+    const m = new Uint8Array(n * 384); let o = 0;
+    for(const p of parts){ m.set(p, o); o += p.length; }
+    const h = n; parts = []; n = 0;
+    await catDriver.printBitmap(m, 384, h, jobId);
+  };
+  return {
+    async push(mono, w, h){ parts.push(mono); n += h; if(n >= segRows) await flush(); },
+    async end(){ await flush(); }
+  };
+}
+
+/* Emergency stop: reset the printer's buffer and drop the link */
+async function panicStop(){
+  streamAbort = true; opticAbort = true;
+  if(typeof weirdStream !== 'undefined' && weirdStream) weirdStream.stop = true;
+  try{
+    if(dev && dev.gatt && dev.gatt.connected && m02xChar && $('printerModel').value === 'm02x'){
+      const rst = new Uint8Array([0x1B,0x40]);
+      for(let k = 0; k < 2; k++){
+        if(m02xChar.writeValueWithoutResponse) await m02xChar.writeValueWithoutResponse(rst); else await m02xChar.writeValue(rst);
+        await sleep(60);
+      }
+    }
+  }catch(_){}
+  log('EMERGENCY STOP: reset sent, disconnecting.','err');
+  disconnect();
+  isPrintingSessionActive = false; currentPrintJobId = null; printing = false; updPrint();
+}
+$('btnPanic').addEventListener('click', panicStop);
+
+/* ---------- Optical continuous print ---------- */
+function opticMapping(fit, H){
+  if(fit === 'stretch'){
+    return {yMap: g => g * 384 / H, centers: [H / 2]};
+  }
+  const centers = []; for(let k = 0; k * 384 + 192 < H; k++) centers.push(k * 384 + 192);
+  return {yMap: g => { const t = ((g % 768) + 768) % 768; return t < 384 ? t : 767 - t; }, centers};
+}
+
+async function printOpticContinuous(){
+  const cm = opticLenCm();
+  if(!cm){ log('Optical: enter a total length in cm first.','err'); return; }
+  if(!printerReady()){ log('Optical: connect the printer first.','err'); return; }
+  if(isPrintingSessionActive || overheated){ log('Optical: printer busy or overheated.','err'); return; }
+  const H = Math.round(cm * 80), fit = $('opticFit').value, P = opticParams(), model = $('printerModel').value;
+  const {yMap, centers} = opticMapping(fit, H);
+  const BAND = 192;
+  const jobId = sessionOpen(); opticAbort = false;
+  $('btnOpticStop').disabled = false; $('btnOpticPrint').disabled = true;
+  try{
+    const sink = await makeSink(jobId, Infinity);
+    const starts = []; for(let y0 = 0; y0 < H; y0 += BAND) starts.push(y0);
+    if(model === 'm02x' && $('rot180').checked) starts.reverse();
+    log('Optical continuous: '+cm+' cm = '+H+' rows ('+fit+')','ok');
+    let done = 0;
+    for(const y0 of starts){
+      if(opticAbort || streamAbort) break;
+      const rows = Math.min(BAND, H - y0);
+      const cv = opticBand(P, y0, rows, yMap, centers);
+      const mono = lumToMono(canvasLum(cv), W, rows, y0);
+      await sink.push(mono, W, rows);
+      done += rows;
+      $('info').textContent = 'Optical print '+Math.round(done * 100 / H)+'% · '+(done / 80).toFixed(0)+' / '+cm+' cm';
+      await sleep(0);
+    }
+    await sink.end();
+    log(opticAbort ? 'Optical print stopped early ('+(done/80).toFixed(0)+' cm)' : 'Optical print complete','ok');
+  }catch(e){ log('Optical print failed: '+errStr(e),'err'); }
+  finally{
+    sessionClose();
+    $('btnOpticStop').disabled = true; $('btnOpticPrint').disabled = false;
+  }
+}
+$('btnOpticPrint').addEventListener('click', printOpticContinuous);
+$('btnOpticStop').addEventListener('click', () => { opticAbort = true; log('Optical: stop requested…'); });
+
+/* ---------- Wiring & Initialization ---------- */
+$('printerModel').addEventListener('change', () => {
+  if(dev && dev.gatt && dev.gatt.connected) disconnect();
+  fillWritable();
+  updPrint();
+});
 $('btnConnect').addEventListener('click', connect);
 $('btnDisc').addEventListener('click', disconnect);
 $('btnSend').addEventListener('click', sendHex);
-$('btnPrint').addEventListener('click', printBitmap);
-$('btnTest').addEventListener('click', testPattern);
-$('btnStat').addEventListener('click', getStatus);
-$('btnProbe').addEventListener('click', probeSize);
 $('btnCopy').addEventListener('click', copyLog);
-$('btnClear').addEventListener('click', () => { logEl.innerHTML = ''; });
+$('btnClear').addEventListener('click', () => { logEl.textContent = ''; });
 
-$('printerModel').addEventListener('change', () => {
-  fillWritable();
-  log('Switched target model to ' + ($('printerModel').value === 'm02x' ? 'Phomemo M02X' : 'Cat / MXW01'));
-});
-
-$('preset').addEventListener('change', () => {
-  const [c, d] = $('preset').value.split(',').map(Number);
-  $('chunk').value = c; $('delay').value = d;
-});
-
-$('btnLive').addEventListener('click', () => {
-  if(stream || slitActive) stopCam();
-  else { scrollToStage(); startCam(false, false); }
-});
-$('btnSelfie').addEventListener('click', toggleSelfie);
-$('btnShot').addEventListener('click', shot);
-$('btnCam').addEventListener('click', () => $('fCam').click());
-$('btnLib').addEventListener('click', () => $('fLib').click());
-$('fCam').addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; });
-$('fLib').addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; });
-$('btnRot').addEventListener('click', () => { rot = (rot + 1) % 4; schedule(); });
-$('btnFlip').addEventListener('click', () => { mirror = !mirror; schedule(); });
-$('btnBooth').addEventListener('click', runPhotoBooth);
-
-$('btnBanner').addEventListener('click', () => {
-  sidewaysBanner = !sidewaysBanner;
-  $('btnBanner').classList.toggle('active-toggle', sidewaysBanner);
-  if(src) schedule();
-});
-
-$('stripChoiceBar').addEventListener('click', e => {
-  const btn = e.target.closest('button[data-strips]');
-  if(!btn) return;
-  selectedStrips = +btn.dataset.strips || 1;
-  $('stripChoiceBar').querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
-  if(src) schedule();
-});
-
-['mode','frame','caption','stampOpt','invert','br','ct','gm','th','sf'].forEach(id => {
-  $(id).addEventListener('input', schedule);
-  $(id).addEventListener('change', schedule);
-});
-
-blank();
-syncBurnIntensity(82);
-$('cpv').textContent = $('coolPause').value + 's';
-setState(false);
+updateCamSign(false);
+log('Zinester Print Lab Build 19 ready. UA: '+navigator.userAgent);
+log('Secure context: '+window.isSecureContext+' | Web Bluetooth: '+!!navigator.bluetooth);
 autoReconnectKnown();
 </script>
 </body>
