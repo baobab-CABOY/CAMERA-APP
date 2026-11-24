@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zinester Print Lab — Build 19</title>
+<title>Zinester Print Lab — Build 20</title>
 <style>
 :root{
   --bg:#f4efe6;--fg:#181512;--mut:#685f56;--card:#fffdf9;--line:#181512;
@@ -381,7 +381,7 @@ button.slot-x{
       </svg>
       <span id="connLabel">BLE</span>
     </button>
-    <label class="micro-chk" title="Show every Bluetooth device in the picker (otherwise only your printer model is listed)"><input type="checkbox" id="bleAll"> all</label>
+    <label class="micro-chk" title="Show every Bluetooth device in the picker (Bluefy always does)"><input type="checkbox" id="bleAll"> all</label>
   </div>
 
   <div class="telem-group">
@@ -932,7 +932,7 @@ button.slot-x{
       <label class="sl">Chunk bytes <input id="chunk" type="number" value="20" min="20" max="240"></label>
       <label class="sl">Delay ms <input id="delay" type="number" value="25" min="0" max="100"></label>
       <label class="sl"><input id="rot180" type="checkbox" style="width:auto"> Rotate 180° when printing</label>
-      <label class="sl"><input id="autoDisc" type="checkbox" style="width:auto" checked> M02X: reset + disconnect after each print (stops endless reprint)</label>
+      <label class="sl"><input id="autoDisc" type="checkbox" style="width:auto"> M02X: disconnect after each print (waits until it has finished)</label>
       <label class="sl"><input id="poll" type="checkbox" style="width:auto"> Poll status while printing</label>
       <label class="sl">Feed rows after image <input id="feed" type="number" value="40" min="0" max="200"></label>
     </div>
@@ -1168,8 +1168,10 @@ async function connect(){
   const model = $('printerModel').value;
   try{
     let picked = null;
-    const showAll = !!($('bleAll') && $('bleAll').checked);
+    const isBluefy = /Bluefy/i.test(navigator.userAgent);
+    const showAll = isBluefy || !!($('bleAll') && $('bleAll').checked);
     log(`Requesting ${model === 'm02x' ? 'Phomemo M02X' : 'Cat Printer'} via Bluetooth${showAll ? ' (all devices)' : ''}…`);
+    if(isBluefy) log('Bluefy: showing every nearby device (its picker cannot filter by printer name).');
     const cleanOptional = Array.from(new Set(SERVICES.map(s => s.toLowerCase())));
     if(showAll){
       picked = await navigator.bluetooth.requestDevice({acceptAllDevices: true, optionalServices: cleanOptional});
@@ -3491,10 +3493,10 @@ async function m02xEndJob(rowsSent){
   await m02xWrite(m02xFooter());
   log('M02X: job data sent ('+rowsSent+' rows + '+feedRows+' feed)','ok');
   if($('autoDisc') && $('autoDisc').checked){
-    await sleep(2000);
-    try{ await m02xWrite(new Uint8Array([0x1B,0x40])); }catch(_){}
-    await sleep(300);
-    log('M02X: reset sent, disconnecting to prevent reprint loop. Tap BLE to reconnect.','ok');
+    /* optional: only after the printer has had time to finish what it received (no reset command, so nothing is cut) */
+    const wait = 3000 + rowsSent * 12 + feedRows * 12;
+    log('M02X: waiting '+(wait/1000).toFixed(0)+' s for the printer to finish, then disconnecting…');
+    await sleep(wait);
     disconnect();
   }
 }
@@ -3756,7 +3758,7 @@ $('btnCopy').addEventListener('click', copyLog);
 $('btnClear').addEventListener('click', () => { logEl.textContent = ''; });
 
 updateCamSign(false);
-log('Zinester Print Lab Build 19 ready. UA: '+navigator.userAgent);
+log('Zinester Print Lab Build 20 ready. UA: '+navigator.userAgent);
 log('Secure context: '+window.isSecureContext+' | Web Bluetooth: '+!!navigator.bluetooth);
 autoReconnectKnown();
 </script>
