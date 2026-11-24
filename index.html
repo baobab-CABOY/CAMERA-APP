@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zinester Print Lab — Build 17</title>
+<title>Zinester Print Lab — Build 18</title>
 <style>
 :root{
   --bg:#f4efe6;--fg:#181512;--mut:#685f56;--card:#fffdf9;--line:#181512;
@@ -27,9 +27,9 @@ body{
   padding:calc(8px + env(safe-area-inset-top,0px)) 12px calc(28px + env(safe-area-inset-bottom,0px));
 }
 
-/* Minimalist Top Bar: Fused BLE / 35mm Camera Connect Button + Heat Stop + Battery + Disconnect */
+/* Minimalist Top Bar: Printer selector, BLE status, heat/battery indicators */
 .topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  display:flex;align-items:center;justify-space-between;gap:6px;
   margin-bottom:8px;padding:6px 8px;background:var(--card);
   border:1.5px solid var(--line);border-radius:8px;box-shadow:2px 2px 0 var(--line);
 }
@@ -75,7 +75,7 @@ button.micro{
 button.micro:active:not(:disabled){transform:translate(1px,1px);box-shadow:0.5px 0.5px 0 var(--line)}
 button.micro:disabled{opacity:.35;box-shadow:none;cursor:not-allowed}
 
-/* Pinned Persistent Top Viewport Stage (stays visible at all times & never drops) */
+/* Pinned Persistent Stage Wrapper */
 .sticky-stage-wrap{
   position:sticky;
   top:calc(4px + env(safe-area-inset-top,0px));
@@ -108,46 +108,46 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   outline:2.5px solid var(--accent);outline-offset:2px;
 }
 
-/* Primary Action Row above viewport: Tightened & Mobile Safe */
-.cta-row{display:flex;gap:4px;margin-bottom:8px;align-items:stretch;width:100%}
+/* Primary CTA Action Row: Print takes 50% width, Roll & Export share remaining 50% */
+.cta-row{display:flex;gap:6px;margin-bottom:8px;align-items:stretch;width:100%}
 button.zinester-print{
-  flex:1.4 1 0;min-width:0;min-height:46px;padding:8px 4px;
-  background:var(--accent);color:#fff;border:2px solid var(--line);border-radius:4px;
+  flex:2 1 0;min-width:0;min-height:48px;padding:8px 6px;
+  background:var(--accent);color:#fff;border:2px solid var(--line);border-radius:6px;
   box-shadow:2.5px 2.5px 0 var(--line);
-  font-size:13px;letter-spacing:.03em;text-transform:uppercase;
-  display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:13.5px;letter-spacing:.03em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:5px;
 }
-button.zinester-print::before{content:"★";font-size:11px}
+button.zinester-print::before{content:"★";font-size:12px}
 button.zinester-print::after{
-  content:"58MM";font-size:9px;padding:1px 3px;border:1px solid #fff;border-radius:2px;letter-spacing:.02em;
+  content:"58MM";font-size:9.5px;padding:1px 4px;border:1px solid #fff;border-radius:3px;letter-spacing:.02em;
 }
 button.zinester-print:active:not(:disabled){
   transform:translate(1.5px,1.5px);box-shadow:1px 1px 0 var(--line);
 }
 
 button.roll-cta{
-  flex:1 1 0;min-width:0;min-height:46px;padding:8px 4px;
-  background:var(--ok);color:#fff;border:2px solid var(--line);border-radius:4px;
+  flex:1 1 0;min-width:0;min-height:48px;padding:8px 4px;
+  background:var(--ok);color:#fff;border:2px solid var(--line);border-radius:6px;
   box-shadow:2.5px 2.5px 0 var(--line);
-  font-size:11px;letter-spacing:.02em;text-transform:uppercase;
-  display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;
+  font-size:11.5px;letter-spacing:.02em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;
 }
 button.roll-cta:active:not(:disabled){
   transform:translate(1.5px,1.5px);box-shadow:1px 1px 0 var(--line);
 }
 
 button.save-cta{
-  flex:1 1 0;min-width:0;min-height:46px;padding:8px 4px;
-  background:var(--accent2);color:#fff;border:2px solid var(--line);border-radius:4px;
+  flex:1 1 0;min-width:0;min-height:48px;padding:8px 4px;
+  background:var(--accent2);color:#fff;border:2px solid var(--line);border-radius:6px;
   box-shadow:2.5px 2.5px 0 var(--line);
-  font-size:11px;letter-spacing:.02em;text-transform:uppercase;
-  display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;
+  font-size:11.5px;letter-spacing:.02em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;
 }
 button.save-cta:active:not(:disabled){
   transform:translate(1.5px,1.5px);box-shadow:1px 1px 0 var(--line);
 }
 
-/* High-visibility Shutter / Snap CTA when live camera is active */
+/* Shutter CTA when live camera is on stage */
 button.shutter-cta{
   flex:1.6 1 auto;min-height:46px;
   background:#ff2e63;color:#fff;border:2px solid var(--line);
@@ -156,16 +156,6 @@ button.shutter-cta{
 }
 button.shutter-cta:active:not(:disabled){
   transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line);
-}
-
-/* Secondary / Utility Slit-Scan button */
-button.slit-sub{
-  flex:0 0 auto;min-height:36px;padding:6px 10px;font-size:11.5px;font-weight:700;
-  color:var(--fg);background:var(--bg);border:1.5px dashed var(--line);border-radius:6px;
-  box-shadow:1.5px 1.5px 0 var(--line);
-}
-button.slit-sub.active-toggle{
-  background:var(--accent2);color:#fff;border-style:solid;
 }
 
 input,select,textarea{
@@ -184,7 +174,7 @@ input,select,textarea{
 }
 [hidden]{display:none!important}
 
-/* Stage & Viewport sizing — locked so image stays visible and never drops */
+/* Stage & Viewport sizing */
 .stage{
   position:relative;width:100%;display:flex;justify-content:center;align-items:center;
   background:color-mix(in srgb, var(--bg) 70%, var(--card));
@@ -250,18 +240,10 @@ input[type=range]{padding:0;border:0;background:none}
 .hitem canvas{width:100%;height:76px;object-fit:contain;background:#fff;border-radius:3px;display:block;image-rendering:pixelated}
 .hitem button{width:100%;margin-top:4px;padding:4px 2px;min-height:28px;font-size:10.5px;border-radius:4px;box-shadow:1px 1px 0 var(--line)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-summary.adv-sum{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;list-style:none}
-summary.adv-sum::-webkit-details-marker{display:none}
-summary.adv-sum::before{content:"▸ ";color:var(--accent)}
-details[open] > summary.adv-sum::before{content:"▾ "}
+
 .sub-box{margin-top:10px;padding-top:10px;border-top:1.5px dashed var(--line)}
 
-.tool-footer-row{
-  margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--line);
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-}
-
-/* Integrated Roll Bar: Compact Photomaton Booth + Separated Banner */
+/* Roll Bar */
 .roll-bar{
   margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--line);
   display:flex;gap:6px;align-items:stretch;flex-wrap:nowrap;
@@ -285,7 +267,7 @@ details[open] > summary.adv-sum::before{content:"▾ "}
 }
 button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--line)}
 
-/* Collapsible Drawer Cards */
+/* Drawer Cards */
 .tab-card{padding:0}
 .tab-toggle{
   width:100%;min-height:46px;padding:11px 12px;border:0;border-radius:8px;
@@ -303,7 +285,7 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
 .stereo-card{background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--card)), var(--card));}
 .dexp-card{background:linear-gradient(135deg, color-mix(in srgb, var(--warn) 8%, var(--card)), var(--card));}
 .weird-card{background:linear-gradient(135deg, color-mix(in srgb, #9333ea 7%, var(--card)), var(--card));}
-.cyano-card{background:linear-gradient(135deg, color-mix(in srgb, #0284c7 9%, var(--card)), var(--card));}
+.parallax-card{background:linear-gradient(135deg, color-mix(in srgb, #0284c7 9%, var(--card)), var(--card));}
 
 .stereo-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .stereo-slot{
@@ -329,7 +311,7 @@ button.slot-x{
 .stereo-slot-btns{display:flex;gap:4px}
 .stereo-slot-btns button{min-height:30px;padding:4px 6px;font-size:11px}
 
-/* Dedicated Poster Strip Slicer Section */
+/* Poster Strip */
 .poster-card{
   background:linear-gradient(135deg, color-mix(in srgb, var(--accent2) 6%, var(--card)), var(--card));
 }
@@ -351,15 +333,39 @@ button.slot-x{
   align-items:center;flex-wrap:wrap;
 }
 
-/* Zine Maker Studio */
+/* Zine Studio */
 .phase3-tabs{display:flex;gap:6px;margin-bottom:8px}
 .phase3-tabs button{min-height:34px;padding:6px 8px;font-size:12px}
 .phase3-tabs button.active{background:var(--fg);color:var(--bg)}
+
+.zine-helper-bar{
+  display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-top:4px;
+}
+.zine-helper-bar button{
+  flex:0 0 auto;min-height:28px;padding:2px 8px;font-size:11px;border-radius:4px;
+}
+
+/* Warning Banner for High Consumption Features */
+.warning-banner{
+  background:color-mix(in srgb, var(--danger) 16%, var(--card));
+  border:1.5px solid var(--danger);color:var(--danger);
+  font-size:11.5px;font-weight:700;padding:8px;border-radius:6px;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;line-height:1.3;
+}
+
+/* Console Header Toggle */
+.console-toggle{
+  width:100%;min-height:42px;padding:8px 12px;border-radius:8px;
+  border:1.5px solid var(--line);background:var(--card);color:var(--fg);
+  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:2px 2px 0 var(--line);margin-bottom:4px;
+}
 </style>
 </head>
 <body>
 
-<!-- Top Bar: Printer Model Selector + Fused BLE / 35mm Camera Connect Button + Heat Stop + Battery + Disconnect -->
+<!-- Top Bar: Selector + Fused BLE Connect Button + Telemetry -->
 <div class="topbar">
   <div class="conn-group">
     <select id="printerModel" class="model-sel" aria-label="Printer Model" title="Choose Printer Model">
@@ -385,13 +391,13 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Pinned Top Viewport Stage: Stays visible at all times & holds Print / Save to Roll / Export -->
+<!-- Pinned Top Viewport Stage: Print takes 50% width, Roll & Export share remaining 50% -->
 <div class="sticky-stage-wrap" id="mainStageCard">
   <div class="stage-card">
     <div class="cta-row">
       <button id="btnPrint" class="zinester-print" disabled>Print</button>
-      <button id="btnSaveRoll" class="roll-cta" disabled title="Save current image to Roll">🎞 Save to Roll</button>
-      <button id="btnSave" class="save-cta" disabled title="Export PNG image">⬇ Export</button>
+      <button id="btnSaveRoll" class="roll-cta" disabled title="Save current image to Roll">↓ Roll</button>
+      <button id="btnSave" class="save-cta" disabled title="Export PNG image">↓ Export</button>
     </div>
 
     <div class="stage">
@@ -418,26 +424,23 @@ button.slot-x{
 <!-- Capture & Source Controls -->
 <div class="card">
   <p class="label">Capture &amp; Source</p>
-  <!-- Live / Selfie / High-Visibility Take Photo -->
   <div class="row">
     <button id="btnLive">Live</button>
     <button id="btnSelfie" title="Switch Front / Back Camera" aria-label="Switch Front / Back Camera">🤳</button>
     <button id="btnShot" class="shutter-cta" hidden>● TAKE PHOTO</button>
   </div>
 
-  <!-- Camera app & Library -->
   <div class="row" style="margin-top:8px">
     <button id="btnCam">📷 Camera</button>
     <button id="btnLib">🖼 Library</button>
   </div>
 
-  <!-- Rotate & Mirror icons -->
   <div class="row" style="margin-top:8px">
     <button id="btnRot" class="icon-only" title="Rotate 90°" aria-label="Rotate 90°">↻</button>
     <button id="btnFlip" class="icon-only" title="Mirror horizontal" aria-label="Mirror horizontal">⇄</button>
   </div>
 
-  <!-- Integrated Roll Layouts: Photomaton Booth + Separated Banner -->
+  <!-- Integrated Roll Layouts: Photomaton Booth + Banner -->
   <div class="roll-bar">
     <div class="booth-group">
       <button id="btnBooth" type="button" title="Multi-shot Photomaton Booth (starts in Selfie)">
@@ -474,7 +477,7 @@ button.slot-x{
   <input id="fDexpB" type="file" accept="image/*" hidden>
 </div>
 
-<!-- Tab 1: Look & Frame (Collapsible) -->
+<!-- Tab 1: Look & Frame (Borderless & No Date Default) -->
 <div class="card tab-card" id="tabLookCard">
   <button type="button" class="tab-toggle" data-target="tabLookBody">
     <span class="chev">Look &amp; Frame</span>
@@ -508,8 +511,8 @@ button.slot-x{
       </label>
       <label class="sl" style="margin-top:4px">Frame
         <select id="frame">
-          <option value="none">Borderless Full Bleed</option>
-          <option value="polaroid" selected>Instant Film (Polaroid)</option>
+          <option value="none" selected>Borderless Full Bleed</option>
+          <option value="polaroid">Instant Film (Polaroid)</option>
           <option value="ticket">Cinema Stub</option>
           <option value="film">35mm Sprocket Strip</option>
           <option value="stamp">Postage Stamp</option>
@@ -520,15 +523,14 @@ button.slot-x{
     <div class="grid2">
       <input id="caption" placeholder="Caption (Polaroid / borderless)" maxlength="42">
       <select id="stampOpt">
-        <option value="none">No date stamp</option>
-        <option value="date" selected>Date (YYYY.MM.DD)</option>
+        <option value="none" selected>No date stamp</option>
+        <option value="date">Date (YYYY.MM.DD)</option>
         <option value="datetime">Date + Time</option>
         <option value="sign">Caption only</option>
       </select>
     </div>
 
     <label class="sl" style="margin-top:8px"><input id="invert" type="checkbox" style="width:auto"> Invert black &amp; white</label>
-    <label class="sl" style="margin-top:6px"><input id="printSim" type="checkbox" checked style="width:auto"> Subtle thermal paper preview (warm paper + soft dot bloom)</label>
 
     <details style="margin-top:8px"><summary style="font-size:12.5px;font-weight:700;cursor:pointer">Tone &amp; Dither Sliders</summary>
       <label class="sl">Brightness <b id="brv"></b><input id="br" type="range" min="-100" max="100" value="0"></label>
@@ -582,8 +584,8 @@ button.slot-x{
     <div class="row">
       <button type="button" id="btnStereoChaCha">⚡ AUTO</button>
       <button type="button" id="btnStereoAlign">🎯 Auto-Align &amp; Build</button>
-      <button type="button" id="btnStereoSwap" style="flex:0 0 46px" title="Swap Left & Right (Parallel vs Cross-eye)">⇄</button>
-      <button type="button" id="btnStereoClearAll" style="flex:0 0 46px" title="Clear Both Eyes & restart live">✕</button>
+      <button type="button" id="btnStereoSwap" style="flex:0 0 46px" title="Swap Left & Right">⇄</button>
+      <button type="button" id="btnStereoClearAll" style="flex:0 0 46px" title="Clear Both Eyes">✕</button>
     </div>
     <div class="grid2" style="margin-top:6px">
       <label class="sl" style="margin-top:4px">Viewer Layout
@@ -610,8 +612,8 @@ button.slot-x{
     <div class="stereo-slots">
       <div class="stereo-slot" id="slotDexpA">
         <div class="slot-head">
-          <strong>EXPOSURE A (HI / BASE)</strong>
-          <button type="button" id="btnClearDexpA" class="slot-x" title="Clear A & restart live">✕</button>
+          <strong>EXPOSURE A (BASE)</strong>
+          <button type="button" id="btnClearDexpA" class="slot-x" title="Clear A">✕</button>
         </div>
         <div class="stereo-media">
           <video id="vidDexpA" playsinline muted autoplay hidden></video>
@@ -624,8 +626,8 @@ button.slot-x{
       </div>
       <div class="stereo-slot" id="slotDexpB">
         <div class="slot-head">
-          <strong>EXPOSURE B (LO / OVERLAY)</strong>
-          <button type="button" id="btnClearDexpB" class="slot-x" title="Clear B & restart live">✕</button>
+          <strong>EXPOSURE B (OVERLAY)</strong>
+          <button type="button" id="btnClearDexpB" class="slot-x" title="Clear B">✕</button>
         </div>
         <div class="stereo-media">
           <video id="vidDexpB" playsinline muted autoplay hidden></video>
@@ -685,7 +687,7 @@ button.slot-x{
 <div class="card tab-card" id="tabZineCard">
   <button type="button" class="tab-toggle" data-target="tabZineBody">
     <span class="chev">✦ Zine Maker</span>
-    <span id="zineModeBadge" class="poster-badge">Live on Main View</span>
+    <span id="zineModeBadge" class="poster-badge">Live View</span>
   </button>
   <div class="tab-body" id="tabZineBody" hidden>
     <div class="phase3-tabs" id="p3Tabs">
@@ -697,17 +699,35 @@ button.slot-x{
     <!-- Sub-tab 1: Zine Type / Manifesto Card -->
     <div id="p3Type">
       <input id="zineTitle" placeholder="Headline (e.g. NORMAL AIN'T REAL)" maxlength="32">
-      <textarea id="zineBody" rows="3" placeholder="Type a poem, manifesto, prompt, or intention slip to render onto 58mm thermal paper…"></textarea>
+      <textarea id="zineBody" rows="4" placeholder="Type a poem, manifesto, prompt, or intention slip to render onto 58mm thermal paper…"></textarea>
+
+      <!-- Quick helper toolbar for Zine Note editing -->
+      <div class="zine-helper-bar">
+        <button type="button" id="btnZineDate">+ Date/Time</button>
+        <button type="button" id="btnZineTag">+ #ZINE 01</button>
+        <button type="button" id="btnZineBullet">+ Bullet</button>
+        <button type="button" id="btnZineClear" style="background:color-mix(in srgb, var(--danger) 15%, var(--bg));color:var(--danger)">Clear</button>
+      </div>
+
       <div class="grid2" style="margin-top:6px">
-        <select id="zineAlign">
-          <option value="left">Align: Editorial Left</option>
-          <option value="center">Align: Centered Broadside</option>
-        </select>
-        <button id="btnRenderZine" type="button">Render Slip</button>
+        <label class="sl" style="margin-top:0">Font Size
+          <select id="zineFontSize">
+            <option value="14">Small (14px)</option>
+            <option value="17" selected>Medium (17px Bold)</option>
+            <option value="21">Large (21px Heavy)</option>
+            <option value="26">Huge (26px Headline)</option>
+          </select>
+        </label>
+        <label class="sl" style="margin-top:0">Alignment
+          <select id="zineAlign">
+            <option value="left">Align: Editorial Left</option>
+            <option value="center">Align: Centered Broadside</option>
+          </select>
+        </label>
       </div>
     </div>
 
-    <!-- Sub-tab 2: QR Code First + Barcode / ROT13 -->
+    <!-- Sub-tab 2: QR Code / Barcode -->
     <div id="p3Cipher" hidden>
       <input id="cipherInput" placeholder="URL, secret note, or clue…" maxlength="80">
       <div class="grid2" style="margin-top:6px">
@@ -716,7 +736,6 @@ button.slot-x{
           <option value="barcode">1D Zine Barcode</option>
           <option value="rot13">ROT13 Secret Dispatch</option>
         </select>
-        <button id="btnRenderCipher" type="button">Render Code</button>
       </div>
     </div>
 
@@ -731,16 +750,13 @@ button.slot-x{
           <option value="voronoi">5. Kaleido Prism Lattice</option>
           <option value="glitch">6. Scanline CRT Harmonics</option>
         </select>
-        <button id="btnRenderOptic" type="button">Lock Art</button>
-      </div>
-
-      <div class="grid2" style="margin-top:6px">
-        <input id="opticOverlayText" placeholder="Optional stamped / warped text…" maxlength="28">
         <select id="opticTextMode">
           <option value="warp">Text: Warped by Sliders</option>
           <option value="clean">Text: Crisp Unwarped Stamp</option>
         </select>
       </div>
+
+      <input id="opticOverlayText" placeholder="Optional stamped / warped text…" maxlength="28" style="margin-top:6px">
 
       <div class="grid2" style="margin-top:4px">
         <label class="sl">1. Frequency <b id="opv1">18</b><input id="opticFreq" type="range" min="4" max="48" value="18"></label>
@@ -758,70 +774,93 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Tab 6: Weird Scanner (Dedicated Slit-Scan Time-Warp Drawer) -->
+<!-- Tab 6: Weird Scanner (Continuous 10-Line Oscillating Scanner + Paper Warning) -->
 <div class="card tab-card weird-card" id="tabWeirdCard">
   <button type="button" class="tab-toggle" data-target="tabWeirdBody">
     <span class="chev">〰 Weird Scanner</span>
-    <span id="weirdBadge" class="poster-badge">Slit-Scan Warp</span>
+    <span id="weirdBadge" class="poster-badge">10-Line Continuous Sweep</span>
   </button>
   <div class="tab-body" id="tabWeirdBody" hidden>
+    
+    <div class="warning-banner">
+      <span>⚠️</span>
+      <div>
+        <strong>HIGH PAPER CONSUMPTION WARNING:</strong> Continuous live 10-line scanning sends non-stop slice output to thermal paper when connected.
+      </div>
+    </div>
+
     <p style="font-size:11.5px;color:var(--mut);margin:0 0 8px">
-      Continuous slice-by-slice time deformation scanner. Captures movement over time into a warped thermal ribbon.
+      Sweeps continuously up and down across the live camera feed 10 lines at a time, rendering an infinite slice deformation strip on screen and sending data continuously to the printer.
     </p>
+
     <div class="grid2">
-      <label class="sl" style="margin-top:0">Scan Sweep Direction
+      <label class="sl" style="margin-top:0">Sweep Direction
         <select id="weirdSweepDir">
-          <option value="v" selected>Vertical (Top → Down)</option>
-          <option value="h">Horizontal (Left → Right)</option>
+          <option value="v" selected>Vertical (Oscillate Up / Down)</option>
+          <option value="h">Horizontal (Oscillate Left / Right)</option>
         </select>
       </label>
-      <label class="sl" style="margin-top:0">Sweep Speed
+      <label class="sl" style="margin-top:0">Step Speed
         <select id="weirdSpeed">
-          <option value="2" selected>Normal (2 px/frame)</option>
-          <option value="1">Slow / Fine (1 px/frame)</option>
-          <option value="4">Fast (4 px/frame)</option>
+          <option value="10" selected>10 Lines / Step (Standard)</option>
+          <option value="5">5 Lines / Step (High Precision)</option>
+          <option value="15">15 Lines / Step (Fast Motion)</option>
         </select>
       </label>
     </div>
+
     <div class="row" style="margin-top:10px">
-      <button id="btnStartWeirdScan" type="button" style="background:var(--accent2);color:#fff">▶ Start Weird Scan</button>
-      <button id="btnFinishWeirdScan" type="button" style="flex:0 0 90px" disabled>■ Finish</button>
+      <button id="btnStartWeirdScan" type="button" style="background:var(--accent2);color:#fff">▶ Start Continuous Scanner</button>
+      <button id="btnFinishWeirdScan" type="button" style="flex:0 0 90px" disabled>■ Stop</button>
     </div>
   </div>
 </div>
 
-<!-- Tab 7: Cyanotype & Caustics (Solar Exposure & Refraction Studio) -->
-<div class="card tab-card cyano-card" id="tabCyanoCard">
-  <button type="button" class="tab-toggle" data-target="tabCyanoBody">
-    <span class="chev">☀️ Cyanotype &amp; Caustics</span>
-    <span id="cyanoBadge" class="poster-badge">Solar &amp; Refraction</span>
+<!-- Tab 7: Camera-Powered Parallax & Stereo Cam Drawer -->
+<div class="card tab-card parallax-card" id="tabParallaxCard">
+  <button type="button" class="tab-toggle" data-target="tabParallaxBody">
+    <span class="chev">📸 Parallax &amp; Stereo Cam</span>
+    <span id="parallaxBadge" class="poster-badge">Live Camera 3D</span>
   </button>
-  <div class="tab-body" id="tabCyanoBody" hidden>
+  <div class="tab-body" id="tabParallaxBody" hidden>
     <p style="font-size:11.5px;color:var(--mut);margin:0 0 8px">
-      Simulates Prussian-blue sun exposure negatives, caustics water refraction, and dichroic light filters optimized for high-contrast 58mm thermal prints.
+      Capture stereo pair shots live with camera alignment guides. Shot A creates a live semi-transparent ghost overlay on camera view so you can shift laterally for Shot B.
     </p>
-    <div class="grid2">
-      <label class="sl" style="margin-top:0">Exposure Mode
-        <select id="cyanoMode">
-          <option value="sunprint" selected>Prussian Solar Negative (High Contrast)</option>
-          <option value="water">Caustic Water Pool Refraction</option>
-          <option value="dichroic">Dichroic Crystal Grid</option>
-        </select>
-      </label>
-      <label class="sl" style="margin-top:0">UV Solar Exposure <b id="uvVal">75%</b>
-        <input id="rngCyanoExpo" type="range" min="10" max="100" value="75">
-      </label>
+
+    <div class="stereo-slots">
+      <div class="stereo-slot" id="slotParaA">
+        <div class="slot-head">
+          <strong>SHOT A (LEFT EYE)</strong>
+          <button type="button" id="btnClearParaA" class="slot-x" title="Clear Shot A">✕</button>
+        </div>
+        <div class="stereo-media">
+          <canvas id="cvParaA" width="200" height="150"></canvas>
+        </div>
+        <div class="stereo-slot-btns">
+          <button type="button" id="btnSnapParaA">📷 Snap A</button>
+        </div>
+      </div>
+      <div class="stereo-slot" id="slotParaB">
+        <div class="slot-head">
+          <strong>SHOT B (RIGHT EYE)</strong>
+          <button type="button" id="btnClearParaB" class="slot-x" title="Clear Shot B">✕</button>
+        </div>
+        <div class="stereo-media">
+          <canvas id="cvParaB" width="200" height="150"></canvas>
+        </div>
+        <div class="stereo-slot-btns">
+          <button type="button" id="btnSnapParaB">📷 Snap B</button>
+        </div>
+      </div>
     </div>
-    <div class="grid2" style="margin-top:4px">
-      <label class="sl">Refraction Density <b id="refVal">40</b>
-        <input id="rngCyanoRefract" type="range" min="10" max="100" value="40">
-      </label>
-      <label class="sl">Solar Noise Grain <b id="grainVal">25%</b>
-        <input id="rngCyanoGrain" type="range" min="0" max="80" value="25">
-      </label>
-    </div>
+
+    <label class="sl">Ghost Guide Opacity <b id="ghostOpVal">45%</b>
+      <input id="rngGhostOp" type="range" min="10" max="90" value="45">
+    </label>
+
     <div class="row" style="margin-top:10px">
-      <button id="btnRenderCyanotype" type="button" style="background:var(--accent2);color:#fff">☀️ Lock Solar Exposure</button>
+      <button type="button" id="btnParaAutoSequence" style="background:var(--accent2);color:#fff">⚡ Start Auto 2-Shot 3D</button>
+      <button type="button" id="btnParaBuild3D">👓 Combine 3D Stereo</button>
     </div>
   </div>
 </div>
@@ -835,11 +874,13 @@ button.slot-x{
   <div class="hist" id="histList"><span style="color:var(--mut);font-size:12px">Saved or printed bitmaps appear on the roll for 1-tap load &amp; reprint.</span></div>
 </div>
 
-<!-- Advanced Console -->
+<!-- Clean Collapsible Console Card -->
 <div class="card">
-  details>
-    <summary class="adv-sum">advanced console</summary>
-
+  <button id="btnToggleConsole" type="button" class="console-toggle">
+    <span>⚙️ Advanced Console &amp; Debug Log</span>
+    <span id="consoleChev" style="color:var(--accent)">▸</span>
+  </button>
+  <div id="advConsoleBody" hidden>
     <div class="sub-box">
       <p class="label">Diagnostics &amp; Calibration</p>
       <div class="row">
@@ -883,12 +924,12 @@ button.slot-x{
       <input id="hexin" placeholder="e.g. 01 02 ff" autocomplete="off" autocapitalize="off" spellcheck="false">
       <div class="row" style="margin-top:8px"><button id="btnSend" disabled>Send</button></div>
     </div>
-  </details>
+  </div>
 </div>
 
 <script>
 'use strict';
-/* ---------- helpers ---------- */
+/* ---------- Helpers ---------- */
 const $ = id => document.getElementById(id);
 const logEl = $('log');
 function log(msg, kind){
@@ -935,7 +976,7 @@ function setLiveCountdown(text){
   ov.hidden = false;
 }
 
-/* ---------- Collapsible Section Tabs ---------- */
+/* ---------- Collapsible Drawers & Console ---------- */
 let stereoTabOpen = false, dexpTabOpen = false;
 document.querySelectorAll('.tab-toggle').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -957,13 +998,21 @@ document.querySelectorAll('.tab-toggle').forEach(btn => {
   });
 });
 
-/* ---------- Fused BLE Driver & Bluefy iOS Fixes ---------- */
+/* Collapsible Console Toggle */
+$('btnToggleConsole').addEventListener('click', () => {
+  const body = $('advConsoleBody');
+  const chev = $('consoleChev');
+  const open = body.hidden;
+  body.hidden = !open;
+  chev.textContent = open ? '▾' : '▸';
+});
+
+/* ---------- BLE Driver & Print Loop Fix ---------- */
 const M02X_ALT_SVC = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 const M02X_ALT_CHAR = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
 const M02X_FF00_SVC = '0000ff00-0000-1000-8000-00805f9b34fb';
 const CAT_AE30_SVC = '0000ae30-0000-1000-8000-00805f9b34fb';
 
-/* Canonical 128-bit lowercase UUID list only — strict Bluefy iOS requirement */
 const SERVICES = [
   M02X_FF00_SVC,
   CAT_AE30_SVC,
@@ -983,6 +1032,10 @@ const PROPS = ['read','write','writeWithoutResponse','notify','indicate'];
 let dev = null, server = null, writable = [], catChars = {}, m02xChar = null, printing = false;
 let overheated = false, lastBattery = null;
 
+/* Print Session Lock: Fixes Bluefy iOS endless print loop */
+let isPrintingSessionActive = false;
+let currentPrintJobId = null;
+
 function renderFuseIcon(state){
   const svg = $('fuseSvg');
   const lbl = $('connLabel');
@@ -991,7 +1044,7 @@ function renderFuseIcon(state){
     svg.innerHTML = '<rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="10" cy="10" r="3"/><circle cx="20.5" cy="6.5" r="2" fill="currentColor" stroke="none"/>';
   } else if(state === 'ready'){
     lbl.textContent = 'CAM';
-    svg.innerHTML = '<path d="M3 6 H8 L10 3 H15 L17 6 H21 A2 2 0 0 1 23 8 V16 A2 2 0 0 1 21 18 H3 A2 2 0 0 1 1 16 V8 A2 2 0 0 1 3 6 Z"/><circle cx="12" cy="12" r="3.6"/><circle cx="20" cy="4.5" r="2.2" fill="currentColor" stroke="none"/>';
+    svg.innerHTML = '<path d="M3 6 H8 L10 3 H15 L17 6 H21 A2 2 0 0 1 23 8 V16 A2 2 0 0 1 21 18 H3 A2 2 0 0 1 3 6 Z"/><circle cx="12" cy="12" r="3.6"/><circle cx="20" cy="4.5" r="2.2" fill="currentColor" stroke="none"/>';
   } else {
     lbl.textContent = 'BLE';
     svg.innerHTML = '<polyline points="7 4 16 11 11.5 15.5 11.5 4.5 16 9 7 16"/>';
@@ -1001,13 +1054,13 @@ function renderFuseIcon(state){
 function updateCamSign(connected){
   const btn = $('btnConnect');
   btn.classList.remove('ready', 'busy');
-  if(printing){
+  if(printing || isPrintingSessionActive){
     btn.classList.add('busy');
-    btn.title = 'Printing — camera active';
+    btn.title = 'Printing — busy';
     renderFuseIcon('busy');
   } else if(connected){
     btn.classList.add('ready');
-    btn.title = 'Connected — camera turned on & ready';
+    btn.title = 'Connected — printer ready';
     renderFuseIcon('ready');
   } else {
     btn.title = 'Connect via Bluetooth';
@@ -1083,10 +1136,7 @@ async function connect(){
   try{
     let picked = null;
     log(`Requesting ${model === 'm02x' ? 'Phomemo M02X' : 'Cat Printer'} via Bluetooth…`);
-    
-    // Strict deduplicated lowercase 128-bit UUID optionalServices array for iOS Bluefy compatibility
     const cleanOptional = Array.from(new Set(SERVICES.map(s => s.toLowerCase())));
-    
     try{
       picked = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
@@ -1219,7 +1269,7 @@ const ASCII_RAMP = ' .:-=+*#%@';
 
 const view = $('view'), vid = $('vid'), vidWrap = $('vidWrap'), slitCv = $('slitCv'), work = document.createElement('canvas');
 let src = null, rot = 0, mirror = false, facing = 'environment', stream = null, last = null, raf = 0, lastUrl = null;
-let slitActive = false, slitRaf = 0, slitPos = 0, slitAccum = null;
+let slitActive = false, slitRaf = 0, slitPos = 0, slitAccum = null, slitDirOsc = 1;
 let posterStrips = [], activeStripIdx = 0, selectedStrips = 1, sidewaysBanner = false;
 
 function schedule(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
@@ -1425,9 +1475,7 @@ function composeWithFrame(photoMono, pw, ph){
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(pc, padSide, padTop, innerW, innerH);
 
-  // Unified Single-Line Stamp / Caption Drawing
   const displayLabel = stamp || cap || '';
-  
   if(frame === 'polaroid'){
     ctx.lineWidth = 2;
     ctx.strokeRect(padSide - 1, padTop - 1, innerW + 2, innerH + 2);
@@ -1437,31 +1485,17 @@ function composeWithFrame(photoMono, pw, ph){
       ctx.textAlign = 'center';
       ctx.fillText(displayLabel, outW / 2, outH - 20);
     }
-  } else if(frame === 'ticket'){
-    if(displayLabel){
-      ctx.fillStyle = '#000';
-      ctx.font = 'bold 11px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(displayLabel, outW / 2, outH - 12);
-    }
-  } else if(frame === 'film'){
-    if(displayLabel){
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 11px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(displayLabel, outW / 2, outH - 10);
-    }
-  } else if(frame === 'stamp'){
-    if(displayLabel){
-      ctx.fillStyle = '#000';
-      ctx.font = 'bold 11px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(displayLabel, outW / 2, outH - 10);
-    }
+  } else if(frame === 'ticket' && displayLabel){
+    ctx.fillStyle = '#000'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(displayLabel, outW / 2, outH - 12);
+  } else if(frame === 'film' && displayLabel){
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(displayLabel, outW / 2, outH - 10);
+  } else if(frame === 'stamp' && displayLabel){
+    ctx.fillStyle = '#000'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(displayLabel, outW / 2, outH - 10);
   } else if(frame === 'none' && displayLabel){
-    ctx.fillStyle = '#000';
-    ctx.font = 'bold 12px monospace';
-    ctx.textAlign = 'right';
+    ctx.fillStyle = '#000'; ctx.font = 'bold 12px monospace'; ctx.textAlign = 'right';
     ctx.fillText(displayLabel, outW - 10, outH - 8);
   }
 
@@ -1533,34 +1567,13 @@ function buildPosterStrips(finalImg, numStrips){
 }
 
 function renderBitmapToView(imgObj, tagNote){
-  const useSim = $('printSim').checked;
   const w = imgObj.w, h = imgObj.h, m = imgObj.mono;
   const outId = new ImageData(w, h);
-  for(let y = 0; y < h; y++){
-    for(let x = 0; x < w; x++){
-      const i = y * w + x;
-      const j = i * 4;
-      if(m[i] === 1){
-        outId.data[j]   = useSim ? 30 : 0;
-        outId.data[j+1] = useSim ? 27 : 0;
-        outId.data[j+2] = useSim ? 25 : 0;
-        outId.data[j+3] = 255;
-      } else if(useSim){
-        let nb = 0;
-        if(x > 0 && m[i - 1]) nb++;
-        if(x + 1 < w && m[i + 1]) nb++;
-        if(y > 0 && m[i - w]) nb++;
-        if(y + 1 < h && m[i + w]) nb++;
-        const bleed = nb * 7;
-        outId.data[j]   = 251 - bleed;
-        outId.data[j+1] = 247 - bleed;
-        outId.data[j+2] = 240 - Math.round(bleed * 1.1);
-        outId.data[j+3] = 255;
-      } else {
-        outId.data[j] = outId.data[j+1] = outId.data[j+2] = 255;
-        outId.data[j+3] = 255;
-      }
-    }
+  for(let i = 0; i < w*h; i++){
+    const j = i * 4;
+    const v = m[i] ? 0 : 255;
+    outId.data[j] = outId.data[j+1] = outId.data[j+2] = v;
+    outId.data[j+3] = 255;
   }
   view.width = w; view.height = h;
   view.getContext('2d').putImageData(outId, 0, 0);
@@ -1645,10 +1658,10 @@ $('btnSaveRoll').addEventListener('click', () => {
   if(!last) return;
   saveToHistory(last);
   const btn = $('btnSaveRoll');
-  const orig = btn.textContent;
-  btn.textContent = '✓ Saved!';
-  setTimeout(() => { btn.textContent = orig; }, 1100);
-  log('Saved bitmap to Camera Roll ('+last.w+'×'+last.h+')','ok');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✓ Saved!';
+  setTimeout(() => { btn.innerHTML = orig; }, 1100);
+  log('Saved bitmap to Roll ('+last.w+'×'+last.h+')','ok');
 });
 
 /* ---------- Presets ---------- */
@@ -1685,7 +1698,7 @@ $('presetBar').addEventListener('click', e => {
   if(btn) applyLook(btn.dataset.look);
 });
 
-/* ---------- Photomaton Booth Auto-Save & Live Automation ---------- */
+/* ---------- Photomaton Booth Auto-Save & Camera Control ---------- */
 function stopCam(){
   slitActive = false;
   cancelAnimationFrame(slitRaf);
@@ -1782,17 +1795,15 @@ function shot(){
 }
 
 async function runPhotoBooth(){
-  // AUTO-SAVE PREVIOUS STAGE IMAGE TO CAMERA ROLL BEFORE BOOTH STARTS
   if(last){
     saveToHistory(last);
-    log('Auto-saved previous image to Camera Roll before Photomaton Booth','ok');
+    log('Auto-saved previous image to Roll before Booth','ok');
   }
 
   const modeVal = $('boothCount').value;
   const sec = +$('boothDelay').value || 2;
   scrollToStage();
 
-  // FORCE LIVE VIEW & SWITCH TO SELFIE CAMERA IMMEDIATELY
   await setCameraFacing('user');
   const ok = await startCam(false, false);
   if(!ok) return;
@@ -1926,7 +1937,7 @@ async function runFastSlitForBooth(durationMs){
     const step = now => {
       const elapsed = now - start;
       const prog = Math.min(1, elapsed / durationMs);
-      const pos = Math.min(sh - 4, Math.floor(prog * sh));
+      const pos = Math.min(sh - 10, Math.floor(prog * sh));
       const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
       const scale = Math.max(sw / vw, sh / vh);
       const dw = vw * scale, dh = vh * scale;
@@ -1935,13 +1946,13 @@ async function runFastSlitForBooth(durationMs){
       tctx.drawImage(vid, (sw - dw)/2, (sh - dh)/2, dw, dh);
       tctx.restore();
 
-      actx.drawImage(tmp, 0, pos, sw, 6, 0, pos, sw, 6);
+      actx.drawImage(tmp, 0, pos, sw, 10, 0, pos, sw, 10);
       sctx.fillStyle = '#111'; sctx.fillRect(0, 0, sw, sh);
-      sctx.drawImage(accum, 0, 0, sw, pos + 6, 0, 0, sw, pos + 6);
+      sctx.drawImage(accum, 0, 0, sw, pos + 10, 0, 0, sw, pos + 10);
       sctx.globalAlpha = 0.35;
-      sctx.drawImage(tmp, 0, pos + 6, sw, sh - (pos + 6), 0, pos + 6, sw, sh - (pos + 6));
+      sctx.drawImage(tmp, 0, pos + 10, sw, sh - (pos + 10), 0, pos + 10, sw, sh - (pos + 10));
       sctx.globalAlpha = 1.0;
-      sctx.fillStyle = '#ff2e63'; sctx.fillRect(0, pos + 6, sw, 3);
+      sctx.fillStyle = '#ff2e63'; sctx.fillRect(0, pos + 10, sw, 4);
 
       if(prog < 1) requestAnimationFrame(step);
       else resolve();
@@ -1953,7 +1964,7 @@ async function runFastSlitForBooth(durationMs){
   return accum;
 }
 
-/* ---------- Dedicated Weird Scanner Drawer Logic ---------- */
+/* ---------- Endless 10-Line Oscillating Weird Scanner ---------- */
 async function startSlitScan(){
   if(slitActive){ finishSlitScan(); return; }
   if(!stream){
@@ -1969,22 +1980,23 @@ async function startSlitScan(){
   slitAccum = document.createElement('canvas');
   slitAccum.width = sw; slitAccum.height = sh;
   const actx = slitAccum.getContext('2d');
-  actx.fillStyle = '#141210';
-  actx.fillRect(0, 0, sw, sh);
+  actx.fillStyle = '#141210'; actx.fillRect(0, 0, sw, sh);
 
-  slitPos = 0; slitActive = true;
+  slitPos = 0; slitDirOsc = 1; slitActive = true;
   vidWrap.hidden = true; view.hidden = true; slitCv.hidden = false;
   $('btnShot').hidden = true;
   $('btnFinishWeirdScan').disabled = false;
-  $('btnStartWeirdScan').textContent = '⏸ Pause Scan';
-  $('info').textContent = 'Weird Scan emerging line by line…';
+  $('btnStartWeirdScan').textContent = '⏸ Pause Scanner';
+  $('info').textContent = 'Continuous 10-Line Oscillating Scanner active…';
 
   const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
   const tctx = tmp.getContext('2d');
 
+  let passCount = 1;
+
   const tick = () => {
     if(!slitActive) return;
-    const spd = +$('weirdSpeed').value || 2;
+    const sliceChunk = +$('weirdSpeed').value || 10;
     const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
     const scale = Math.max(sw / vw, sh / vh);
     const dw = vw * scale, dh = vh * scale;
@@ -1994,51 +2006,31 @@ async function startSlitScan(){
     tctx.restore();
 
     if(dir === 'v'){
-      const sliceH = Math.min(spd, sh - slitPos);
-      actx.drawImage(tmp, 0, slitPos, sw, sliceH, 0, slitPos, sw, sliceH);
+      actx.drawImage(tmp, 0, slitPos, sw, sliceChunk, 0, slitPos, sw, sliceChunk);
+      ctx.fillStyle = '#141210'; ctx.fillRect(0, 0, sw, sh);
+      ctx.drawImage(slitAccum, 0, 0);
 
-      ctx.fillStyle = '#141210';
-      ctx.fillRect(0, 0, sw, sh);
-      const emergedH = slitPos + sliceH;
-      ctx.drawImage(slitAccum, 0, 0, sw, emergedH, 0, 0, sw, emergedH);
-
-      if(emergedH < sh){
-        ctx.save();
-        ctx.globalAlpha = 0.28;
-        ctx.drawImage(tmp, 0, emergedH, sw, sh - emergedH, 0, emergedH, sw, sh - emergedH);
-        ctx.restore();
-      }
       ctx.fillStyle = '#ff2e63';
-      ctx.fillRect(0, emergedH, sw, 3);
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.fillRect(0, Math.max(0, emergedH - 1), sw, 1);
+      ctx.fillRect(0, slitPos, sw, 4);
 
-      slitPos += sliceH;
-      $('info').textContent = `Weird Scan: ${Math.round((slitPos / sh) * 100)}% (${slitPos}/${sh} lines)`;
-      if(slitPos >= sh){ finishSlitScan(); return; }
+      slitPos += sliceChunk * slitDirOsc;
+      if(slitPos >= sh - sliceChunk){ slitPos = sh - sliceChunk; slitDirOsc = -1; passCount++; }
+      else if(slitPos <= 0){ slitPos = 0; slitDirOsc = 1; passCount++; }
+
+      $('info').textContent = `Continuous Scanner · Pass ${passCount} · Line ${slitPos}/${sh}`;
     } else {
-      const sliceW = Math.min(spd, sw - slitPos);
-      actx.drawImage(tmp, slitPos, 0, sliceW, sh, slitPos, 0, sliceW, sh);
+      actx.drawImage(tmp, slitPos, 0, sliceChunk, sh, slitPos, 0, sliceChunk, sh);
+      ctx.fillStyle = '#141210'; ctx.fillRect(0, 0, sw, sh);
+      ctx.drawImage(slitAccum, 0, 0);
 
-      ctx.fillStyle = '#141210';
-      ctx.fillRect(0, 0, sw, sh);
-      const emergedW = slitPos + sliceW;
-      ctx.drawImage(slitAccum, 0, 0, emergedW, sh, 0, 0, emergedW, sh);
-
-      if(emergedW < sw){
-        ctx.save();
-        ctx.globalAlpha = 0.28;
-        ctx.drawImage(tmp, emergedW, 0, sw - emergedW, sh, emergedW, 0, sw - emergedW, sh);
-        ctx.restore();
-      }
       ctx.fillStyle = '#ff2e63';
-      ctx.fillRect(emergedW, 0, 3, sh);
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.fillRect(Math.max(0, emergedW - 1), 0, 1, sh);
+      ctx.fillRect(slitPos, 0, 4, sh);
 
-      slitPos += sliceW;
-      $('info').textContent = `Weird Scan: ${Math.round((slitPos / sw) * 100)}% (${slitPos}/${sw} cols)`;
-      if(slitPos >= sw){ finishSlitScan(); return; }
+      slitPos += sliceChunk * slitDirOsc;
+      if(slitPos >= sw - sliceChunk){ slitPos = sw - sliceChunk; slitDirOsc = -1; passCount++; }
+      else if(slitPos <= 0){ slitPos = 0; slitDirOsc = 1; passCount++; }
+
+      $('info').textContent = `Continuous Scanner · Pass ${passCount} · Col ${slitPos}/${sw}`;
     }
     slitRaf = requestAnimationFrame(tick);
   };
@@ -2047,18 +2039,15 @@ async function startSlitScan(){
 
 function finishSlitScan(){
   if(!slitAccum) return;
-  const dir = $('weirdSweepDir').value;
-  const finalH = Math.max(48, dir === 'v' ? Math.min(slitAccum.height, slitPos || slitAccum.height) : slitAccum.height);
-  const finalW = Math.max(48, dir === 'h' ? Math.min(slitAccum.width, slitPos || slitAccum.width) : slitAccum.width);
-  const out = document.createElement('canvas'); out.width = finalW; out.height = finalH;
-  out.getContext('2d').drawImage(slitAccum, 0, 0, finalW, finalH, 0, 0, finalW, finalH);
+  const out = document.createElement('canvas'); out.width = slitAccum.width; out.height = slitAccum.height;
+  out.getContext('2d').drawImage(slitAccum, 0, 0);
   sidewaysBanner = false;
   $('btnBanner').classList.remove('active-toggle');
-  $('btnStartWeirdScan').textContent = '▶ Start Weird Scan';
+  $('btnStartWeirdScan').textContent = '▶ Start Continuous Scanner';
   $('btnFinishWeirdScan').disabled = true;
-  src = {el: out, w: finalW, h: finalH};
+  src = {el: out, w: out.width, h: out.height};
   rot = 0; stopCam(); draw();
-  log('Weird Scan captured ('+finalW+'×'+finalH+')','ok');
+  log('Endless Scanner strip captured ('+out.width+'×'+out.height+')','ok');
 }
 
 $('btnStartWeirdScan').addEventListener('click', () => {
@@ -2070,82 +2059,88 @@ $('btnStartWeirdScan').addEventListener('click', () => {
 });
 $('btnFinishWeirdScan').addEventListener('click', finishSlitScan);
 
-/* ---------- Cyanotype & Caustics Studio Logic ---------- */
-function renderCyanotypeStudio(){
-  const mode = $('cyanoMode').value;
-  const expo = (+$('rngCyanoExpo').value) / 100;
-  const refract = +$('rngCyanoRefract').value;
-  const grain = (+$('rngCyanoGrain').value) / 100;
+/* ---------- Camera-Powered Parallax & Stereo Cam Studio ---------- */
+let paraA = null, paraB = null;
 
-  $('uvVal').textContent = Math.round(expo * 100) + '%';
-  $('refVal').textContent = String(refract);
-  $('grainVal').textContent = Math.round(grain * 100) + '%';
-
-  const h = 384;
-  const c = document.createElement('canvas'); c.width = W; c.height = h;
-  const ctx = c.getContext('2d');
-  const id = ctx.createImageData(W, h);
-
-  const cx = W / 2, cy = h / 2;
-
-  for(let y = 0; y < h; y++){
-    for(let x = 0; x < W; x++){
-      let v = 0;
-      const dx = x - cx, dy = y - cy;
-      const dist = Math.hypot(dx, dy);
-
-      if(mode === 'sunprint'){
-        const wave = Math.sin(x * 0.05 * (refract / 20)) + Math.cos(y * 0.05 * (refract / 20));
-        const ring = Math.sin(dist * 0.08 - wave * 2);
-        v = (ring * 0.5 + 0.5) * 255 * expo;
-      } else if(mode === 'water'){
-        const w1 = Math.sin((x + dy) * 0.04) * Math.cos((y - dx) * 0.04);
-        const w2 = Math.sin(dist * (refract * 0.003));
-        v = (w1 * 0.5 + w2 * 0.5 + 1) * 127.5 * expo;
-      } else {
-        const grid = (Math.floor(x / (refract * 0.3)) + Math.floor(y / (refract * 0.3))) % 2 === 0;
-        v = (grid ? 240 : 15) * expo;
-      }
-
-      if(grain > 0){
-        const n = (Math.random() - 0.5) * 255 * grain;
-        v = Math.max(0, Math.min(255, v + n));
-      }
-
-      const idx = (y * W + x) * 4;
-      id.data[idx] = id.data[idx+1] = id.data[idx+2] = Math.round(v);
-      id.data[idx+3] = 255;
-    }
-  }
-
-  ctx.putImageData(id, 0, 0);
-
-  // Overlay bold Solar Studio label
-  ctx.save();
-  ctx.font = 'bold 16px monospace';
-  ctx.fillStyle = '#000';
-  ctx.fillRect(16, h - 36, W - 32, 24);
-  ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
-  ctx.fillText(`CYANOTYPE // UV ${Math.round(expo*100)}%`, W/2, h - 20);
-  ctx.restore();
-
-  sidewaysBanner = false;
-  $('btnBanner').classList.remove('active-toggle');
-  if(stream) stopCam();
-  src = {el: c, w: W, h: h};
-  rot = 0;
-  draw();
+function drawParaThumb(canvasId, imgCanvas){
+  const cv = $(canvasId);
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#111'; ctx.fillRect(0, 0, cv.width, cv.height);
+  if(!imgCanvas) return;
+  const sc = Math.max(cv.width / imgCanvas.width, cv.height / imgCanvas.height);
+  const dw = imgCanvas.width * sc, dh = imgCanvas.height * sc;
+  ctx.drawImage(imgCanvas, (cv.width - dw)/2, (cv.height - dh)/2, dw, dh);
 }
 
-$('btnRenderCyanotype').addEventListener('click', () => {
-  renderCyanotypeStudio();
-  scrollToStage();
-  log('Rendered Cyanotype & Caustics exposure','ok');
+async function snapParallaxShot(slot){
+  if(!stream){
+    const ok = await startCam(false, true);
+    if(!ok) return;
+  }
+  const snap = grabFrameCanvas(true);
+  if(!snap) return;
+  triggerFlash();
+  if(slot === 'A'){
+    paraA = snap;
+    drawParaThumb('cvParaA', snap);
+    const ghost = $('ghostOverlay');
+    ghost.src = snap.toDataURL('image/jpeg', 0.7);
+    ghost.style.opacity = (+$('rngGhostOp').value || 45) / 100;
+    ghost.hidden = false;
+    log('Parallax Shot A set. Shift ~65mm for Shot B','ok');
+  } else {
+    paraB = snap;
+    drawParaThumb('cvParaB', snap);
+    $('ghostOverlay').hidden = true;
+    stopCam();
+    log('Parallax Shot B set. Ready to render 3D','ok');
+  }
+}
+
+$('rngGhostOp').addEventListener('input', e => {
+  const val = +e.target.value;
+  $('ghostOpVal').textContent = val + '%';
+  $('ghostOverlay').style.opacity = val / 100;
 });
 
-['cyanoMode','rngCyanoExpo','rngCyanoRefract','rngCyanoGrain'].forEach(id => {
-  $(id).addEventListener('input', renderCyanotypeStudio);
+$('btnSnapParaA').addEventListener('click', () => snapParallaxShot('A'));
+$('btnSnapParaB').addEventListener('click', () => snapParallaxShot('B'));
+$('btnClearParaA').addEventListener('click', () => { paraA = null; drawParaThumb('cvParaA', null); });
+$('btnClearParaB').addEventListener('click', () => { paraB = null; drawParaThumb('cvParaB', null); });
+
+$('btnParaAutoSequence').addEventListener('click', async () => {
+  stopDualSlotLive();
+  scrollToStage();
+  const ok = await startCam(false, true);
+  if(!ok) return;
+
+  for(let s = 3; s > 0; s--){
+    setLiveCountdown(`SHOT A · ${s}`);
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  setLiveCountdown('SHOT A!');
+  await snapParallaxShot('A');
+
+  for(let s = 3; s > 0; s--){
+    setLiveCountdown(`SHIFT RIGHT · ${s}`);
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  setLiveCountdown('SHOT B!');
+  await snapParallaxShot('B');
+  setLiveCountdown(null);
+});
+
+$('btnParaBuild3D').addEventListener('click', () => {
+  if(!paraA || !paraB){
+    log('Snap both Shot A and Shot B first','err');
+    return;
+  }
+  stereoL = normalizeLandscapeCanvas(paraA, paraA.width, paraA.height);
+  stereoR = normalizeLandscapeCanvas(paraB, paraB.width, paraB.height);
+  $('slotL').classList.add('loaded'); $('slotR').classList.add('loaded');
+  drawThumb('cvStereoL', stereoL); drawThumb('cvStereoR', stereoR);
+  autoAlignAndComposeStereo(true);
+  scrollToStage();
 });
 
 /* ---------- File & Basic Source Loading ---------- */
@@ -2162,7 +2157,7 @@ async function loadFile(f){
   }catch(e){ log('Image load failed: '+errStr(e),'err'); }
 }
 
-/* ---------- Shared Dual-Slot Live Stream ---------- */
+/* ---------- Shared Dual-Slot Stream ---------- */
 let stereoL = null, stereoR = null;
 let dexpA = null, dexpB = null;
 let dualSlotStream = null;
@@ -2741,6 +2736,31 @@ $('p3Tabs').addEventListener('click', e => {
   updateZineLivePreview();
 });
 
+/* Zine Text Quick Helpers */
+$('btnZineDate').addEventListener('click', () => {
+  const ta = $('zineBody');
+  const d = new Date();
+  const stamp = `\n— ${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}\n`;
+  ta.value += stamp;
+  updateZineLivePreview();
+});
+$('btnZineTag').addEventListener('click', () => {
+  const ta = $('zineBody');
+  ta.value += '\n[#ZINE 01]\n';
+  updateZineLivePreview();
+});
+$('btnZineBullet').addEventListener('click', () => {
+  const ta = $('zineBody');
+  ta.value += '\n• ';
+  ta.focus();
+  updateZineLivePreview();
+});
+$('btnZineClear').addEventListener('click', () => {
+  $('zineTitle').value = '';
+  $('zineBody').value = '';
+  updateZineLivePreview();
+});
+
 function wrapCanvasText(ctx, text, maxW){
   const lines = [];
   for(const para of text.split(/\r?\n/)){
@@ -2761,28 +2781,40 @@ function buildZineSlipCanvas(){
   const title = $('zineTitle').value.trim();
   const body = $('zineBody').value.trim() || 'NORMAL AIN\'T REAL\n— 58MM EDITION';
   const align = $('zineAlign').value;
+  const fontSize = +$('zineFontSize').value || 17;
+
   const c = document.createElement('canvas'); c.width = W;
   const ctx = c.getContext('2d');
-  ctx.font = '15px monospace';
-  const bodyLines = wrapCanvasText(ctx, body, W - 40);
-  const titleH = title ? 44 : 0;
-  const h = Math.max(160, 44 + titleH + bodyLines.length * 22);
+  ctx.font = `bold ${fontSize}px Space Mono, Courier New, monospace`;
+
+  const bodyLines = wrapCanvasText(ctx, body, W - 36);
+  const titleH = title ? 48 : 0;
+  const lineHeight = Math.round(fontSize * 1.35);
+  const h = Math.max(160, 40 + titleH + bodyLines.length * lineHeight);
   c.height = h;
+
   ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, h);
-  ctx.fillStyle = '#000'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+  ctx.fillStyle = '#000'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5;
   ctx.strokeRect(8, 8, W - 16, h - 16);
+
   let y = 24;
   if(title){
-    ctx.font = 'bold 20px monospace';
+    ctx.font = 'bold 20px Space Mono, Courier New, monospace';
     ctx.textAlign = align === 'center' ? 'center' : 'left';
-    ctx.fillText(title, align === 'center' ? W/2 : 20, y + 14);
-    ctx.fillRect(20, y + 24, W - 40, 2);
-    y += 42;
+    ctx.fillText(title, align === 'center' ? W/2 : 20, y + 16);
+    ctx.fillRect(20, y + 26, W - 40, 2);
+    y += 48;
   }
-  ctx.font = '15px monospace';
+
+  ctx.font = `bold ${fontSize}px Space Mono, Courier New, monospace`;
   ctx.textAlign = align === 'center' ? 'center' : 'left';
   const x = align === 'center' ? W/2 : 20;
-  bodyLines.forEach(line => { ctx.fillText(line, x, y + 12); y += 22; });
+
+  bodyLines.forEach(line => {
+    ctx.fillText(line, x, y + Math.round(fontSize * 0.85));
+    y += lineHeight;
+  });
+
   return c;
 }
 
@@ -3043,30 +3075,8 @@ function updateZineLivePreview(){
   draw();
 }
 
-function renderZineSlip(){
-  updateZineLivePreview();
-  scrollToStage();
-  log('Rendered zine text slip ('+src.w+'×'+src.h+')','ok');
-}
-
-function renderCipherSlip(){
-  updateZineLivePreview();
-  scrollToStage();
-  log('Rendered cipher/QR slip ('+src.w+'×'+src.h+')','ok');
-}
-
-function renderOpticArt(){
-  updateZineLivePreview();
-  scrollToStage();
-  log('Generated '+$('opticPattern').value+' optical art ('+src.w+'×'+src.h+')','ok');
-}
-
-$('btnRenderZine').addEventListener('click', renderZineSlip);
-$('btnRenderCipher').addEventListener('click', renderCipherSlip);
-$('btnRenderOptic').addEventListener('click', renderOpticArt);
-
 [
-  'zineTitle','zineBody','zineAlign',
+  'zineTitle','zineBody','zineAlign','zineFontSize',
   'cipherInput','cipherStyle',
   'opticPattern','opticOverlayText','opticTextMode',
   'opticFreq','opticFreq2','opticOffX','opticOffY','opticTwist','opticWarp',
@@ -3100,11 +3110,11 @@ $('btnLib').addEventListener('click', () => $('fLib').click());
 $('btnRot').addEventListener('click', () => { rot = (rot + 1) % 4; schedule(); });
 $('btnFlip').addEventListener('click', () => { mirror = !mirror; schedule(); });
 ['fCam','fLib'].forEach(id => $(id).addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; }));
-['mode','frame','stampOpt','br','ct','gm','th','sf','invert','printSim'].forEach(id => $(id).addEventListener('input', schedule));
+['mode','frame','stampOpt','br','ct','gm','th','sf','invert'].forEach(id => $(id).addEventListener('input', schedule));
 $('caption').addEventListener('input', schedule);
 blank(); applyLook('portrait');
 
-/* ---------- Camera Roll & Reprint Queue ---------- */
+/* ---------- Camera Roll Queue ---------- */
 const historyQueue = [];
 function saveToHistory(img){
   const clone = {mono: new Uint8Array(img.mono), w: img.w, h: img.h, ts: new Date().toTimeString().slice(0,5)};
@@ -3143,7 +3153,7 @@ function renderHistory(){
 }
 $('btnClearHist').addEventListener('click', () => { historyQueue.length = 0; renderHistory(); });
 
-/* ---------- Printer Drivers ---------- */
+/* ---------- Printer Drivers & Non-Reentrant Session Lock ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function crc8(arr){ const poly = $('crcv').value === '31' ? 0x31 : 0x07; let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ poly) & 0xff : (c << 1) & 0xff; } return c; }
 function pkt(cmd, payload){
@@ -3156,11 +3166,13 @@ async function wr(ch, bytes){
   else await ch.writeValue(b);
 }
 let waiters = [], rxCount = 0;
+
+/* Explicit GATT Notification Handler — STRICTLY STATUS REGISTERS ONLY (No recursive printing calls) */
 function onNotify(id, dv){
   rxCount++;
   if(id !== 'ae02') return;
   const b = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
-  if(b.length < 8 || b[0] !== 0x22 || b[1] !== 0x21){ log('  (unparsed notify)'); return; }
+  if(b.length < 8 || b[0] !== 0x22 || b[1] !== 0x21) return;
   const cmd = b[2], n = b[4] | (b[5] << 8);
   const pl = b.subarray(6, 6+n);
   log('  RX cmd 0x'+cmd.toString(16)+' payload: '+hex(pl));
@@ -3177,6 +3189,7 @@ function onNotify(id, dv){
   }
   waiters = waiters.filter(w => { if(w.cmd === cmd){ w.res(b); return false; } return true; });
 }
+
 function waitCmd(cmd, ms){
   return new Promise(res => {
     const w = {cmd, res}; waiters.push(w);
@@ -3190,6 +3203,7 @@ function packRows(mono, w, h, lsb, rows){
   return out;
 }
 function decodeStatus(b){ return {state:b[6], battery:b[9], temp:b[10], flag:b[12], err:b[13]}; }
+
 async function getStatus(){
   const c1 = catChars.ae01; if(!c1) return null;
   const w = waitCmd(0xA1, 3000), p = pkt(0xA1, [0x00]);
@@ -3203,10 +3217,14 @@ async function getStatus(){
   log('Status: state '+st.state+', battery '+st.battery+'%, temp '+st.temp+'°C, flag '+st.flag+(st.flag ? ', error '+st.err : ' (OK)'), st.flag ? 'err' : 'ok');
   return st;
 }
+
 const catDriver = {
   name:'MXW01', widthPx:384,
   connect, disconnect,
-  async printBitmap(mono, w, h){
+  async printBitmap(mono, w, h, jobId){
+    if(jobId !== currentPrintJobId || !isPrintingSessionActive){
+      log('Aborting printBitmap: stale or cancelled job token','err'); return;
+    }
     const c1 = catChars.ae01, c3 = catChars.ae03;
     if(!(dev && dev.gatt.connected && c1 && c3)) throw new Error('Not connected (need ae01 + ae03)');
     if(w !== 384) throw new Error('Width must be 384');
@@ -3217,19 +3235,19 @@ const catDriver = {
     const data = packRows(m, w, h, lsb, rows);
     const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
     const ch = Math.max(20, +$('chunk').value | 0), dl = +$('delay').value | 0;
-    log('Print start: '+w+' × '+rows+' rows, '+data.length+' bytes, '+(lsb ? 'LSB' : 'MSB')+' first, chunk '+ch+', delay '+dl+' ms');
+    log('Print start ['+jobId+']: '+w+' × '+rows+' rows, '+data.length+' bytes');
     await ctl(0xA2, [+$('inten').value & 255]);
     await sleep(50);
     const st = await getStatus();
     if(st && (st.flag || st.temp >= 60)){
       setHeatAlert(true, st.temp >= 60 ? st.temp+'°C' : 'ERR '+st.err);
-      throw new Error('Printer overheated / stopped (code '+st.err+', temp '+st.temp+'°C): wait for cooldown');
+      throw new Error('Printer overheated / stopped: wait for cooldown');
     }
     const r3 = parseInt($('rq3').value, 16) & 255, r4 = parseInt($('rq4').value, 16) & 255;
     const ack = waitCmd(0xA9, 3000);
     await ctl(0xA9, [rows & 255, rows >> 8, r3, r4]);
     const a = await ack;
-    if(!a) throw new Error('No answer to print request: power-cycle the printer and reconnect');
+    if(!a) throw new Error('No answer to print request: power-cycle the printer');
     if(a[6] !== 0){
       setHeatAlert(true, 'BUSY/HOT');
       throw new Error('Print request rejected (code '+a[6]+').');
@@ -3237,22 +3255,20 @@ const catDriver = {
     log('Print request accepted','ok');
     const rx0 = rxCount; let n = 0;
     for(let o = 0; o < data.length; o += ch, n++){
+      if(jobId !== currentPrintJobId) break;
       await wr(c3, data.subarray(o, o + ch));
       if(dl) await sleep(dl);
       if(n % 150 === 0) log('  data '+Math.round(o * 100 / data.length)+'%');
     }
-    log('Data sent: '+n+' writes. Printer messages during data phase: '+(rxCount - rx0), 'ok');
+    log('Data sent: '+n+' writes','ok');
     const done = waitCmd(0xAA, 45000);
     await ctl(0xAD, [0x00]);
     let polling = $('poll').checked;
-    (async () => { while(polling){ await sleep(3000); if(polling) await getStatus(); } })();
+    (async () => { while(polling && jobId === currentPrintJobId){ await sleep(3000); if(polling) await getStatus(); } })();
     const d = await done; polling = false;
     log(d ? 'Print complete (0xAA received)' : 'No complete notice within 45 s', d ? 'ok' : 'err');
     const cp = +$('coolPause').value || 0;
-    if(cp > 0){
-      log('Cool mode cooldown pause: '+cp+'s…','ok');
-      await sleep(cp * 1000);
-    }
+    if(cp > 0){ log('Cooldown pause: '+cp+'s…','ok'); await sleep(cp * 1000); }
   }
 };
 
@@ -3270,7 +3286,10 @@ function testPattern(){
 const phomemoDriver = {
   name:'Phomemo M02X', widthPx:384,
   connect, disconnect,
-  async printBitmap(mono, w, h){
+  async printBitmap(mono, w, h, jobId){
+    if(jobId !== currentPrintJobId || !isPrintingSessionActive){
+      log('Aborting printBitmap: stale or cancelled job token','err'); return;
+    }
     if(!(dev && dev.gatt && dev.gatt.connected && m02xChar)) throw new Error('Phomemo M02X not connected');
     if(w !== 384) throw new Error('Width must be 384');
     let m = mono;
@@ -3314,9 +3333,10 @@ const phomemoDriver = {
     const fullPayload = new Uint8Array(totalLen);
     let pos = 0;
     for(const p of parts){ fullPayload.set(p, pos); pos += p.length; }
-    log('M02X print start: '+w+' × '+totalH+' rows, '+fullPayload.length+' bytes');
+    log('M02X print start ['+jobId+']: '+w+' × '+totalH+' rows, '+fullPayload.length+' bytes');
     const useWoR = m02xChar.properties.writeWithoutResponse && m02xChar.writeValueWithoutResponse;
     for(let offset = 0; offset < fullPayload.length; offset += 160){
+      if(jobId !== currentPrintJobId) break;
       const chunk = fullPayload.subarray(offset, offset + 160);
       if(useWoR) await m02xChar.writeValueWithoutResponse(chunk);
       else await m02xChar.writeValue(chunk);
@@ -3324,10 +3344,7 @@ const phomemoDriver = {
     }
     log('M02X: Print job finished.','ok');
     const cp = +$('coolPause').value || 0;
-    if(cp > 0){
-      log('Cool mode cooldown pause: '+cp+'s…','ok');
-      await sleep(cp * 1000);
-    }
+    if(cp > 0){ log('Cooldown pause: '+cp+'s…','ok'); await sleep(cp * 1000); }
   }
 };
 
@@ -3335,53 +3352,72 @@ function updPrint(){
   const model = $('printerModel').value;
   const connected = !!(dev && dev.gatt && dev.gatt.connected);
   const driverReady = model === 'm02x' ? !!m02xChar : !!(catChars.ae01 && catChars.ae03);
-  const bleOk = connected && driverReady && !printing && !overheated;
+  const bleOk = connected && driverReady && !printing && !isPrintingSessionActive && !overheated;
   $('btnPrint').disabled = !bleOk || !last;
   $('btnSave').disabled = !last;
   $('btnSaveRoll').disabled = !last;
   $('btnTest').disabled = !bleOk;
-  $('btnStat').disabled = !(connected && catChars.ae01 && !printing);
-  $('btnProbe').disabled = !(connected && catChars.ae01 && catChars.ae03 && !printing);
+  $('btnStat').disabled = !(connected && catChars.ae01 && !printing && !isPrintingSessionActive);
+  $('btnProbe').disabled = !(connected && catChars.ae01 && catChars.ae03 && !printing && !isPrintingSessionActive);
   updateCamSign(connected);
 }
 
 async function probeSize(){
-  if(printing) return;
-  printing = true; updPrint();
+  if(printing || isPrintingSessionActive) return;
+  const jobId = 'probe_' + Date.now();
+  isPrintingSessionActive = true; currentPrintJobId = jobId; printing = true; updPrint();
   try{
     const c1 = catChars.ae01, c3 = catChars.ae03;
     if(!(dev && dev.gatt.connected && c1 && c3)) throw new Error('Not connected');
     const t = testPattern(), rows = t.h, img = packRows(t.mono, t.w, t.h, true, rows), exp = img.length;
     const ctl = async (cmd, pl) => { const p = pkt(cmd, pl); log('TX ae01: '+hex(p),'tx'); await wr(c1, p); };
     const ch = 20, dl = +$('delay').value | 0, cap = exp * 4;
-    log('PROBE: '+rows+' rows requested; streaming up to '+cap+' bytes.');
+    log('PROBE: '+rows+' rows requested');
     await ctl(0xA2, [+$('inten').value & 255]); await sleep(50);
     const ack = waitCmd(0xA9, 3000);
     await ctl(0xA9, [rows & 255, rows >> 8, parseInt($('rq3').value, 16) & 255, parseInt($('rq4').value, 16) & 255]);
-    if(!(await ack)) throw new Error('No answer to print request: power-cycle the printer');
+    if(!(await ack)) throw new Error('No answer to print request');
     const rx0 = rxCount; let sent = 0;
     while(sent < cap && rxCount === rx0){
       const part = sent < exp ? img.subarray(sent, sent + ch) : new Uint8Array(ch);
       await wr(c3, part); sent += part.length;
       if(dl) await sleep(dl);
     }
-    log(rxCount > rx0 ? 'Printer spoke after '+sent+' bytes' : 'No message after '+sent+' bytes', rxCount > rx0 ? 'ok' : 'err');
     await ctl(0xAD, [0x00]);
-    await sleep(6000);
+    await sleep(4000);
   }catch(e){ log('Probe failed: '+errStr(e),'err'); }
-  printing = false; updPrint();
+  finally{
+    isPrintingSessionActive = false; currentPrintJobId = null; printing = false; updPrint();
+  }
 }
 
+/* Strict Single-Session Non-Reentrant Print Dispatch */
 async function doPrint(m, isReprint){
-  if(printing || overheated) return;
-  printing = true; updPrint();
+  if(isPrintingSessionActive || overheated || !m){
+    log('Print request ignored: session active or overheated','err');
+    return;
+  }
+
+  const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+  isPrintingSessionActive = true;
+  currentPrintJobId = jobId;
+  printing = true;
+  updPrint();
+
   try{
     if(!isReprint && m !== null && last === m) saveToHistory(m);
     const driver = $('printerModel').value === 'm02x' ? phomemoDriver : catDriver;
-    await driver.printBitmap(m.mono, m.w, m.h);
+    log(`Starting print job [${jobId}] via ${driver.name}…`, 'ok');
+    await driver.printBitmap(m.mono, m.w, m.h, jobId);
+  }catch(e){
+    log('Print failed: '+errStr(e),'err');
+  }finally{
+    isPrintingSessionActive = false;
+    currentPrintJobId = null;
+    printing = false;
+    updPrint();
+    log(`Print job [${jobId}] finished & session unlocked.`, 'ok');
   }
-  catch(e){ log('Print failed: '+errStr(e),'err'); }
-  printing = false; updPrint();
 }
 
 $('btnPrint').addEventListener('click', () => last && doPrint(last, false));
@@ -3410,7 +3446,7 @@ $('btnCopy').addEventListener('click', copyLog);
 $('btnClear').addEventListener('click', () => { logEl.textContent = ''; });
 
 updateCamSign(false);
-log('Ready. UA: '+navigator.userAgent);
+log('Zinester Print Lab Build 18 ready. UA: '+navigator.userAgent);
 log('Secure context: '+window.isSecureContext+' | Web Bluetooth: '+!!navigator.bluetooth);
 autoReconnectKnown();
 </script>
