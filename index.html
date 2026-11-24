@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zinester Print Lab — Stereo & Thermal</title>
+<title>Zinester Print Lab — Build 17</title>
 <style>
 :root{
   --bg:#f4efe6;--fg:#181512;--mut:#685f56;--card:#fffdf9;--line:#181512;
@@ -29,21 +29,21 @@ body{
 
 /* Minimalist Top Bar: Fused BLE / 35mm Camera Connect Button + Heat Stop + Battery + Disconnect */
 .topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin-bottom:8px;padding:6px 10px;background:var(--card);
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  margin-bottom:8px;padding:6px 8px;background:var(--card);
   border:1.5px solid var(--line);border-radius:8px;box-shadow:2px 2px 0 var(--line);
 }
-.conn-group{display:flex;align-items:center;gap:5px;flex:0 1 auto;min-width:0}
+.conn-group{display:flex;align-items:center;gap:4px;flex:1 1 auto;min-width:0}
 select.model-sel{
-  margin-top:0;width:auto;min-width:0;min-height:32px;padding:3px 6px;
+  margin-top:0;width:auto;min-width:0;min-height:34px;padding:3px 5px;
   border-radius:6px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);
   font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:1.5px 1.5px 0 var(--line);
 }
 button.conn-fuse{
-  flex:0 0 auto;min-height:32px;padding:4px 10px;border-radius:6px;
+  flex:0 0 auto;min-height:34px;padding:4px 9px;border-radius:6px;
   border:1.5px solid var(--line);background:var(--bg);color:var(--fg);
-  font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px;
-  cursor:pointer;box-shadow:1.5px 1.5px 0 var(--line);
+  font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;
+  cursor:pointer;box-shadow:1.5px 1.5px 0 var(--line);-webkit-tap-highlight-color:transparent;
 }
 button.conn-fuse.ready{
   border-color:var(--ok);color:#fff;background:var(--ok);
@@ -53,9 +53,9 @@ button.conn-fuse.busy{
 }
 button.conn-fuse:active:not(:disabled){transform:translate(1px,1px);box-shadow:0.5px 0.5px 0 var(--line)}
 
-.telem-group{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.telem-group{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .telem-chip{
-  display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:6px;
+  display:inline-flex;align-items:center;gap:3px;padding:3px 6px;border-radius:6px;
   border:1.5px solid var(--line);background:var(--bg);font-size:11px;font-weight:700;
   color:var(--fg);min-height:28px;
 }
@@ -67,7 +67,7 @@ button.conn-fuse:active:not(:disabled){transform:translate(1px,1px);box-shadow:0
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
 button.micro{
-  min-height:28px;width:30px;padding:0;flex:0 0 30px;border-radius:6px;
+  min-height:28px;width:28px;padding:0;flex:0 0 28px;border-radius:6px;
   border:1.5px solid var(--line);background:var(--bg);color:var(--fg);
   font-size:13px;line-height:1;display:inline-flex;align-items:center;justify-content:center;
   cursor:pointer;box-shadow:1.5px 1.5px 0 var(--line);
@@ -108,43 +108,43 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   outline:2.5px solid var(--accent);outline-offset:2px;
 }
 
-/* Primary Action Row above viewport: Zinester Print + Save to Roll + Export */
-.cta-row{display:flex;gap:6px;margin-bottom:8px;align-items:stretch}
+/* Primary Action Row above viewport: Tightened & Mobile Safe */
+.cta-row{display:flex;gap:4px;margin-bottom:8px;align-items:stretch;width:100%}
 button.zinester-print{
-  flex:1.4 1 auto;min-height:48px;padding:10px 10px;
+  flex:1.4 1 0;min-width:0;min-height:46px;padding:8px 4px;
   background:var(--accent);color:#fff;border:2px solid var(--line);border-radius:4px;
-  box-shadow:3px 3px 0 var(--line);
-  font-size:14px;letter-spacing:.06em;text-transform:uppercase;
-  display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:2.5px 2.5px 0 var(--line);
+  font-size:13px;letter-spacing:.03em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:4px;
 }
-button.zinester-print::before{content:"★";font-size:12px}
+button.zinester-print::before{content:"★";font-size:11px}
 button.zinester-print::after{
-  content:"58MM";font-size:9.5px;padding:2px 4px;border:1px solid #fff;border-radius:2px;letter-spacing:.04em;
+  content:"58MM";font-size:9px;padding:1px 3px;border:1px solid #fff;border-radius:2px;letter-spacing:.02em;
 }
 button.zinester-print:active:not(:disabled){
-  transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line);
+  transform:translate(1.5px,1.5px);box-shadow:1px 1px 0 var(--line);
 }
 
 button.roll-cta{
-  flex:0 0 auto;min-height:48px;padding:10px 10px;
+  flex:1 1 0;min-width:0;min-height:46px;padding:8px 4px;
   background:var(--ok);color:#fff;border:2px solid var(--line);border-radius:4px;
-  box-shadow:3px 3px 0 var(--line);
-  font-size:12px;letter-spacing:.04em;text-transform:uppercase;
-  display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;
+  box-shadow:2.5px 2.5px 0 var(--line);
+  font-size:11px;letter-spacing:.02em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;
 }
 button.roll-cta:active:not(:disabled){
-  transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line);
+  transform:translate(1.5px,1.5px);box-shadow:1px 1px 0 var(--line);
 }
 
 button.save-cta{
-  flex:0 0 auto;min-height:48px;padding:10px 10px;
+  flex:1 1 0;min-width:0;min-height:46px;padding:8px 4px;
   background:var(--accent2);color:#fff;border:2px solid var(--line);border-radius:4px;
-  box-shadow:3px 3px 0 var(--line);
-  font-size:12px;letter-spacing:.04em;text-transform:uppercase;
-  display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;
+  box-shadow:2.5px 2.5px 0 var(--line);
+  font-size:11px;letter-spacing:.02em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;
 }
 button.save-cta:active:not(:disabled){
-  transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line);
+  transform:translate(1.5px,1.5px);box-shadow:1px 1px 0 var(--line);
 }
 
 /* High-visibility Shutter / Snap CTA when live camera is active */
@@ -299,13 +299,12 @@ button.active-toggle{background:var(--accent2);color:#fff;border-color:var(--lin
 .tab-card.open .tab-toggle{border-bottom:1.5px dashed var(--line);border-bottom-left-radius:0;border-bottom-right-radius:0}
 .tab-body{padding:12px}
 
-/* Dual-Eye Slots (Stereoscopic 3D + Double Exposure) */
-.stereo-card{
-  background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--card)), var(--card));
-}
-.dexp-card{
-  background:linear-gradient(135deg, color-mix(in srgb, var(--warn) 8%, var(--card)), var(--card));
-}
+/* Custom Drawer Styling */
+.stereo-card{background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--card)), var(--card));}
+.dexp-card{background:linear-gradient(135deg, color-mix(in srgb, var(--warn) 8%, var(--card)), var(--card));}
+.weird-card{background:linear-gradient(135deg, color-mix(in srgb, #9333ea 7%, var(--card)), var(--card));}
+.cyano-card{background:linear-gradient(135deg, color-mix(in srgb, #0284c7 9%, var(--card)), var(--card));}
+
 .stereo-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .stereo-slot{
   border:1.5px dashed var(--line);border-radius:6px;padding:6px;background:var(--bg);
@@ -352,7 +351,7 @@ button.slot-x{
   align-items:center;flex-wrap:wrap;
 }
 
-/* Zine Maker Studio (Uses main top stage as live preview) */
+/* Zine Maker Studio */
 .phase3-tabs{display:flex;gap:6px;margin-bottom:8px}
 .phase3-tabs button{min-height:34px;padding:6px 8px;font-size:12px}
 .phase3-tabs button.active{background:var(--fg);color:var(--bg)}
@@ -364,8 +363,8 @@ button.slot-x{
 <div class="topbar">
   <div class="conn-group">
     <select id="printerModel" class="model-sel" aria-label="Printer Model" title="Choose Printer Model">
+      <option value="m02x" selected>🖨️ Phomemo M02X</option>
       <option value="cat">🐱 Cat / MXW01</option>
-      <option value="m02x">🖨️ Phomemo M02X</option>
     </select>
     <button id="btnConnect" type="button" class="conn-fuse" title="Connect BLE Printer">
       <svg id="fuseSvg" width="16" height="16" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -467,32 +466,6 @@ button.slot-x{
     </div>
   </div>
 
-  <!-- Weird Scan (Slit-Scan) Utility Row -->
-  <div class="tool-footer-row">
-    <span style="font-size:11px;color:var(--mut);font-weight:700">Weird Scan:</span>
-    <div style="display:flex;gap:6px;align-items:center">
-      <button id="btnSlit" type="button" class="slit-sub">〰 Slit-Scan</button>
-      <button id="btnSlitStop" type="button" class="slit-sub active-toggle" hidden>■ Finish</button>
-    </div>
-  </div>
-
-  <div id="slitOpts" hidden style="margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--line)">
-    <div class="grid2">
-      <label class="sl" style="margin-top:0">Slit Sweep
-        <select id="slitDir">
-          <option value="v">Vertical (Top → Down)</option>
-          <option value="h">Horizontal (Left → Right)</option>
-        </select>
-      </label>
-      <label class="sl" style="margin-top:0">Speed
-        <select id="slitSpd">
-          <option value="2">Normal (2 px)</option>
-          <option value="1">Slow / Long (1 px)</option>
-          <option value="4">Fast (4 px)</option>
-        </select>
-      </label>
-    </div>
-  </div>
   <input id="fCam" type="file" accept="image/*" capture="environment" hidden>
   <input id="fLib" type="file" accept="image/*" hidden>
   <input id="fStereoL" type="file" accept="image/*" hidden>
@@ -536,7 +509,7 @@ button.slot-x{
       <label class="sl" style="margin-top:4px">Frame
         <select id="frame">
           <option value="none">Borderless Full Bleed</option>
-          <option value="polaroid">Instant Film (Polaroid)</option>
+          <option value="polaroid" selected>Instant Film (Polaroid)</option>
           <option value="ticket">Cinema Stub</option>
           <option value="film">35mm Sprocket Strip</option>
           <option value="stamp">Postage Stamp</option>
@@ -548,7 +521,7 @@ button.slot-x{
       <input id="caption" placeholder="Caption (Polaroid / borderless)" maxlength="42">
       <select id="stampOpt">
         <option value="none">No date stamp</option>
-        <option value="date">Date (YYYY.MM.DD)</option>
+        <option value="date" selected>Date (YYYY.MM.DD)</option>
         <option value="datetime">Date + Time</option>
         <option value="sign">Caption only</option>
       </select>
@@ -567,7 +540,7 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Tab 2: Stereoscopic 3D Card Builder (Collapsible + Clear X + Per-Eye Live View + Full 58mm Roll) -->
+<!-- Tab 2: Stereoscopic 3D Card Builder -->
 <div class="card tab-card stereo-card" id="tabStereoCard">
   <button type="button" class="tab-toggle" data-target="tabStereoBody">
     <span class="chev">👓 Stereoscopic 3D Card</span>
@@ -627,7 +600,7 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Tab 3: Double Exposure Tab (Collapsible + Dual Slots + Blend Modes + Hi-to-Lo Threshold) -->
+<!-- Tab 3: Double Exposure Tab -->
 <div class="card tab-card dexp-card" id="tabDexpCard">
   <button type="button" class="tab-toggle" data-target="tabDexpBody">
     <span class="chev">🎞 Double Exposure</span>
@@ -691,7 +664,7 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Tab 4: Poster Strip (Collapsible) -->
+<!-- Tab 4: Poster Strip -->
 <div class="card tab-card poster-card" id="tabPosterCard">
   <button type="button" class="tab-toggle" data-target="tabPosterBody">
     <span class="chev">🧱 Poster Strip</span>
@@ -708,7 +681,7 @@ button.slot-x{
   </div>
 </div>
 
-<!-- Tab 5: Zine Maker (Collapsible + Direct Top Main Viewport Live Preview) -->
+<!-- Tab 5: Zine Maker Studio -->
 <div class="card tab-card" id="tabZineCard">
   <button type="button" class="tab-toggle" data-target="tabZineBody">
     <span class="chev">✦ Zine Maker</span>
@@ -747,7 +720,7 @@ button.slot-x{
       </div>
     </div>
 
-    <!-- Sub-tab 3: Optical Generator (6 Types + 10 Wild Sliders + Optional Text Warp, live on main view) -->
+    <!-- Sub-tab 3: Optical Generator -->
     <div id="p3Optic" hidden>
       <div class="grid2">
         <select id="opticPattern">
@@ -785,6 +758,74 @@ button.slot-x{
   </div>
 </div>
 
+<!-- Tab 6: Weird Scanner (Dedicated Slit-Scan Time-Warp Drawer) -->
+<div class="card tab-card weird-card" id="tabWeirdCard">
+  <button type="button" class="tab-toggle" data-target="tabWeirdBody">
+    <span class="chev">〰 Weird Scanner</span>
+    <span id="weirdBadge" class="poster-badge">Slit-Scan Warp</span>
+  </button>
+  <div class="tab-body" id="tabWeirdBody" hidden>
+    <p style="font-size:11.5px;color:var(--mut);margin:0 0 8px">
+      Continuous slice-by-slice time deformation scanner. Captures movement over time into a warped thermal ribbon.
+    </p>
+    <div class="grid2">
+      <label class="sl" style="margin-top:0">Scan Sweep Direction
+        <select id="weirdSweepDir">
+          <option value="v" selected>Vertical (Top → Down)</option>
+          <option value="h">Horizontal (Left → Right)</option>
+        </select>
+      </label>
+      <label class="sl" style="margin-top:0">Sweep Speed
+        <select id="weirdSpeed">
+          <option value="2" selected>Normal (2 px/frame)</option>
+          <option value="1">Slow / Fine (1 px/frame)</option>
+          <option value="4">Fast (4 px/frame)</option>
+        </select>
+      </label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnStartWeirdScan" type="button" style="background:var(--accent2);color:#fff">▶ Start Weird Scan</button>
+      <button id="btnFinishWeirdScan" type="button" style="flex:0 0 90px" disabled>■ Finish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tab 7: Cyanotype & Caustics (Solar Exposure & Refraction Studio) -->
+<div class="card tab-card cyano-card" id="tabCyanoCard">
+  <button type="button" class="tab-toggle" data-target="tabCyanoBody">
+    <span class="chev">☀️ Cyanotype &amp; Caustics</span>
+    <span id="cyanoBadge" class="poster-badge">Solar &amp; Refraction</span>
+  </button>
+  <div class="tab-body" id="tabCyanoBody" hidden>
+    <p style="font-size:11.5px;color:var(--mut);margin:0 0 8px">
+      Simulates Prussian-blue sun exposure negatives, caustics water refraction, and dichroic light filters optimized for high-contrast 58mm thermal prints.
+    </p>
+    <div class="grid2">
+      <label class="sl" style="margin-top:0">Exposure Mode
+        <select id="cyanoMode">
+          <option value="sunprint" selected>Prussian Solar Negative (High Contrast)</option>
+          <option value="water">Caustic Water Pool Refraction</option>
+          <option value="dichroic">Dichroic Crystal Grid</option>
+        </select>
+      </label>
+      <label class="sl" style="margin-top:0">UV Solar Exposure <b id="uvVal">75%</b>
+        <input id="rngCyanoExpo" type="range" min="10" max="100" value="75">
+      </label>
+    </div>
+    <div class="grid2" style="margin-top:4px">
+      <label class="sl">Refraction Density <b id="refVal">40</b>
+        <input id="rngCyanoRefract" type="range" min="10" max="100" value="40">
+      </label>
+      <label class="sl">Solar Noise Grain <b id="grainVal">25%</b>
+        <input id="rngCyanoGrain" type="range" min="0" max="80" value="25">
+      </label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnRenderCyanotype" type="button" style="background:var(--accent2);color:#fff">☀️ Lock Solar Exposure</button>
+    </div>
+  </div>
+</div>
+
 <!-- Camera Roll / Reprint Queue -->
 <div class="card">
   <div class="row" style="align-items:center;margin-bottom:6px">
@@ -796,7 +837,7 @@ button.slot-x{
 
 <!-- Advanced Console -->
 <div class="card">
-  <details>
+  details>
     <summary class="adv-sum">advanced console</summary>
 
     <div class="sub-box">
@@ -916,20 +957,27 @@ document.querySelectorAll('.tab-toggle').forEach(btn => {
   });
 });
 
-/* ---------- Fused BLE / 35mm Camera Top Button ---------- */
+/* ---------- Fused BLE Driver & Bluefy iOS Fixes ---------- */
 const M02X_ALT_SVC = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 const M02X_ALT_CHAR = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
+const M02X_FF00_SVC = '0000ff00-0000-1000-8000-00805f9b34fb';
+const CAT_AE30_SVC = '0000ae30-0000-1000-8000-00805f9b34fb';
+
+/* Canonical 128-bit lowercase UUID list only — strict Bluefy iOS requirement */
 const SERVICES = [
-  ...['ae30','ae00','af30','ff00','ffe0','fff0','18f0','fee7','180a','180f']
-    .map(s => '0000'+s+'-0000-1000-8000-00805f9b34fb'),
-  M02X_ALT_SVC
+  M02X_FF00_SVC,
+  CAT_AE30_SVC,
+  M02X_ALT_SVC,
+  ...['ae00','af30','ffe0','fff0','18f0','fee7','180a','180f']
+    .map(s => '0000'+s+'-0000-1000-8000-00805f9b34fb')
 ];
+
 const PRINTER_FILTERS = [
+  {namePrefix: 'M02X'},
   {namePrefix: 'MXW01'},
   {namePrefix: 'GB0'},
   {namePrefix: 'GT01'},
-  {namePrefix: 'CAT'},
-  {namePrefix: 'PeriPage'}
+  {namePrefix: 'CAT'}
 ];
 const PROPS = ['read','write','writeWithoutResponse','notify','indicate'];
 let dev = null, server = null, writable = [], catChars = {}, m02xChar = null, printing = false;
@@ -1017,8 +1065,7 @@ async function autoReconnectKnown(){
   try{
     const devices = await navigator.bluetooth.getDevices();
     if(!devices || !devices.length) return;
-    devices.sort((a,b) => (/^MXW01/i.test(b.name||'') ? 1 : 0) - (/^MXW01/i.test(a.name||'') ? 1 : 0));
-    const preferred = devices[0];
+    const preferred = devices.find(d => /M02X|MXW01/i.test(d.name||'')) || devices[0];
     if(preferred && (!dev || !dev.gatt || !dev.gatt.connected)){
       log('Auto-connecting to known device: '+(preferred.name||preferred.id));
       await attachDevice(preferred);
@@ -1035,40 +1082,24 @@ async function connect(){
   const model = $('printerModel').value;
   try{
     let picked = null;
-    if(model === 'm02x'){
-      log('Requesting Phomemo M02X via Bluetooth…');
+    log(`Requesting ${model === 'm02x' ? 'Phomemo M02X' : 'Cat Printer'} via Bluetooth…`);
+    
+    // Strict deduplicated lowercase 128-bit UUID optionalServices array for iOS Bluefy compatibility
+    const cleanOptional = Array.from(new Set(SERVICES.map(s => s.toLowerCase())));
+    
+    try{
       picked = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
-        optionalServices: [0xFF00, M02X_ALT_SVC, ...SERVICES]
+        optionalServices: cleanOptional
       });
-    } else {
-      if(navigator.bluetooth.getDevices){
-        const known = await navigator.bluetooth.getDevices().catch(()=>[]);
-        const mx = known.find(d => /^MXW01/i.test(d.name||''));
-        if(mx && (!dev || !dev.gatt || !dev.gatt.connected)){
-          try{ await attachDevice(mx); return; }catch(_){}
-        }
-      }
-      log('Requesting device (prioritizing MXW01 / cat printers)…');
-      try{
-        picked = await navigator.bluetooth.requestDevice({
-          filters: PRINTER_FILTERS,
-          optionalServices: SERVICES
-        });
-      }catch(e){
-        if(e && e.name === 'NotFoundError'){
-          log('Filtered scan cancelled/empty — opening full device list…');
-        } else {
-          log('Filter scan note: '+errStr(e));
-        }
-      }
-      if(!picked){
-        picked = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: SERVICES
-        });
-      }
+    } catch(err1){
+      log('acceptAllDevices scan note: ' + errStr(err1));
+      picked = await navigator.bluetooth.requestDevice({
+        filters: PRINTER_FILTERS,
+        optionalServices: cleanOptional
+      });
     }
+    
     if(!picked) throw new Error('No device selected');
     log('Selected: "'+(picked.name||'unnamed')+'"');
     await attachDevice(picked);
@@ -1096,7 +1127,7 @@ async function discover(){
       if(short(s.uuid) === 'ae30') catChars[short(c.uuid)] = c;
       if(short(s.uuid) === 'ff00' && short(c.uuid) === 'ff02') m02xChar = c;
       if(s.uuid.toLowerCase() === M02X_ALT_SVC && c.uuid.toLowerCase() === M02X_ALT_CHAR) m02xChar = c;
-      if((c.properties.notify || c.properties.indicate) && short(s.uuid) === 'ae30'){
+      if((c.properties.notify || c.properties.indicate) && (short(s.uuid) === 'ae30' || short(s.uuid) === 'ff00')){
         try{
           c.addEventListener('characteristicvaluechanged', ev => {
             log('RX '+short(c.uuid)+': '+hex(ev.target.value),'rx');
@@ -1110,17 +1141,14 @@ async function discover(){
   }
   if(!m02xChar){
     try{
-      const s = await server.getPrimaryService(0xFF00);
-      m02xChar = await s.getCharacteristic(0xFF02);
+      const s = await server.getPrimaryService(M02X_FF00_SVC);
+      m02xChar = await s.getCharacteristic('0000ff02-0000-1000-8000-00805f9b34fb');
     }catch(_){
       try{
         const s2 = await server.getPrimaryService(M02X_ALT_SVC);
         m02xChar = await s2.getCharacteristic(M02X_ALT_CHAR);
       }catch(__){}
     }
-  }
-  if(m02xChar && !catChars.ae01 && $('printerModel').value !== 'm02x'){
-    $('printerModel').value = 'm02x';
   }
   fillWritable();
   log('Discovery done.','ok');
@@ -1168,7 +1196,7 @@ async function copyLog(){
   log('Clipboard blocked: log selected, use Copy from the iOS menu.','err');
 }
 
-/* ---------- Creative Pipeline: Shaders, Thermal Preview, Frames & Layouts ---------- */
+/* ---------- Creative Pipeline & Unified Frame Stamp Rendering ---------- */
 const W = 384;
 const KERNELS = {
   fs:[[1,0,7/16],[-1,1,3/16],[0,1,5/16],[1,1,1/16]],
@@ -1325,10 +1353,10 @@ function composeWithFrame(photoMono, pw, ph){
   const cap = $('caption').value.trim();
 
   let padTop = 0, padSide = 0, padBot = 0;
-  if(frame === 'polaroid'){ padTop = 18; padSide = 18; padBot = 66; }
+  if(frame === 'polaroid'){ padTop = 18; padSide = 18; padBot = 54; }
   else if(frame === 'ticket'){ padTop = 26; padSide = 22; padBot = 40; }
-  else if(frame === 'film'){ padTop = 14; padSide = 32; padBot = 14; }
-  else if(frame === 'stamp'){ padTop = 16; padSide = 16; padBot = 16; }
+  else if(frame === 'film'){ padTop = 14; padSide = 32; padBot = 28; }
+  else if(frame === 'stamp'){ padTop = 18; padSide = 18; padBot = 32; }
   else if(stamp){ padBot = 26; }
 
   const outW = W;
@@ -1397,19 +1425,44 @@ function composeWithFrame(photoMono, pw, ph){
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(pc, padSide, padTop, innerW, innerH);
 
+  // Unified Single-Line Stamp / Caption Drawing
+  const displayLabel = stamp || cap || '';
+  
   if(frame === 'polaroid'){
     ctx.lineWidth = 2;
     ctx.strokeRect(padSide - 1, padTop - 1, innerW + 2, innerH + 2);
-    ctx.font = 'bold 20px Georgia, serif'; ctx.textAlign = 'center';
-    const label = cap || stamp || '';
-    if(label) ctx.fillText(label, outW/2, outH - 25);
-    if(cap && stamp && cap !== stamp){
-      ctx.font = '11px monospace';
-      ctx.fillText(stamp, outW/2, outH - 9);
+    if(displayLabel){
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 15px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(displayLabel, outW / 2, outH - 20);
     }
-  } else if(frame === 'none' && stamp){
-    ctx.font = 'bold 13px monospace'; ctx.textAlign = 'right';
-    ctx.fillText(stamp, outW - 8, outH - 8);
+  } else if(frame === 'ticket'){
+    if(displayLabel){
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(displayLabel, outW / 2, outH - 12);
+    }
+  } else if(frame === 'film'){
+    if(displayLabel){
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(displayLabel, outW / 2, outH - 10);
+    }
+  } else if(frame === 'stamp'){
+    if(displayLabel){
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(displayLabel, outW / 2, outH - 10);
+    }
+  } else if(frame === 'none' && displayLabel){
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(displayLabel, outW - 10, outH - 8);
   }
 
   const outId = ctx.getImageData(0, 0, outW, outH).data;
@@ -1598,7 +1651,7 @@ $('btnSaveRoll').addEventListener('click', () => {
   log('Saved bitmap to Camera Roll ('+last.w+'×'+last.h+')','ok');
 });
 
-/* ---------- Presets (Default: High-Key Portrait) ---------- */
+/* ---------- Presets ---------- */
 const LOOK_NAMES = {
   natural:'Natural', portrait:'High-Key Portrait', xerox:'Xerox', cool:'❄ Cool (Giveaway)',
   gameboy:'Game Boy', halftone:'Halftone', ascii:'ASCII', blueprint:'Blueprint'
@@ -1632,7 +1685,7 @@ $('presetBar').addEventListener('click', e => {
   if(btn) applyLook(btn.dataset.look);
 });
 
-/* ---------- Camera, Selfie Switch, Weird Scan (Live Slit-Scan) & Booth ---------- */
+/* ---------- Photomaton Booth Auto-Save & Live Automation ---------- */
 function stopCam(){
   slitActive = false;
   cancelAnimationFrame(slitRaf);
@@ -1641,9 +1694,8 @@ function stopCam(){
   vid.srcObject = null; vidWrap.hidden = true; slitCv.hidden = true; view.hidden = false;
   $('ghostOverlay').hidden = true;
   $('cropGuide').hidden = true;
-  $('btnShot').hidden = true; $('btnSlitStop').hidden = true; $('slitOpts').hidden = true;
+  $('btnShot').hidden = true;
   $('btnLive').textContent = 'Live';
-  $('btnSlit').classList.remove('active-toggle');
   if(stereoTabOpen || dexpTabOpen) startDualSlotLive();
 }
 
@@ -1729,65 +1781,21 @@ function shot(){
   log('Captured '+c.width+'×'+c.height);
 }
 
-async function runFastSlitForBooth(durationMs){
-  const ok = await startCam(true, false);
-  if(!ok) return null;
-  const sw = 384, sh = 288;
-  slitCv.width = sw; slitCv.height = sh;
-  vidWrap.hidden = true; view.hidden = true; slitCv.hidden = false;
-  $('btnShot').hidden = true;
-
-  const accum = document.createElement('canvas'); accum.width = sw; accum.height = sh;
-  const actx = accum.getContext('2d');
-  actx.fillStyle = '#111'; actx.fillRect(0, 0, sw, sh);
-
-  const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
-  const tctx = tmp.getContext('2d');
-  const sctx = slitCv.getContext('2d');
-
-  const start = performance.now();
-  await new Promise(resolve => {
-    const step = now => {
-      const elapsed = now - start;
-      const prog = Math.min(1, elapsed / durationMs);
-      const pos = Math.min(sh - 4, Math.floor(prog * sh));
-      const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
-      const scale = Math.max(sw / vw, sh / vh);
-      const dw = vw * scale, dh = vh * scale;
-      tctx.save();
-      if(facing === 'user'){ tctx.translate(sw, 0); tctx.scale(-1, 1); }
-      tctx.drawImage(vid, (sw - dw)/2, (sh - dh)/2, dw, dh);
-      tctx.restore();
-
-      actx.drawImage(tmp, 0, pos, sw, 6, 0, pos, sw, 6);
-      sctx.fillStyle = '#111'; sctx.fillRect(0, 0, sw, sh);
-      sctx.drawImage(accum, 0, 0, sw, pos + 6, 0, 0, sw, pos + 6);
-      sctx.globalAlpha = 0.35;
-      sctx.drawImage(tmp, 0, pos + 6, sw, sh - (pos + 6), 0, pos + 6, sw, sh - (pos + 6));
-      sctx.globalAlpha = 1.0;
-      sctx.fillStyle = '#ff2e63'; sctx.fillRect(0, pos + 6, sw, 3);
-
-      if(prog < 1) requestAnimationFrame(step);
-      else resolve();
-    };
-    requestAnimationFrame(step);
-  });
-
-  triggerFlash();
-  return accum;
-}
-
 async function runPhotoBooth(){
+  // AUTO-SAVE PREVIOUS STAGE IMAGE TO CAMERA ROLL BEFORE BOOTH STARTS
+  if(last){
+    saveToHistory(last);
+    log('Auto-saved previous image to Camera Roll before Photomaton Booth','ok');
+  }
+
   const modeVal = $('boothCount').value;
   const sec = +$('boothDelay').value || 2;
   scrollToStage();
 
-  // Booth always starts in selfie mode
+  // FORCE LIVE VIEW & SWITCH TO SELFIE CAMERA IMMEDIATELY
   await setCameraFacing('user');
-  if(!stream){
-    const ok = await startCam(false, false);
-    if(!ok) return;
-  }
+  const ok = await startCam(false, false);
+  if(!ok) return;
 
   const frames = [];
   const labels = [];
@@ -1897,14 +1905,62 @@ async function runPhotoBooth(){
   log('Booth complete ('+modeVal+': '+frames.length+' frames)','ok');
 }
 
-/* ---------- Weird Scan: Line-by-Line Live Emerging Preview ---------- */
+async function runFastSlitForBooth(durationMs){
+  const ok = await startCam(true, false);
+  if(!ok) return null;
+  const sw = 384, sh = 288;
+  slitCv.width = sw; slitCv.height = sh;
+  vidWrap.hidden = true; view.hidden = true; slitCv.hidden = false;
+  $('btnShot').hidden = true;
+
+  const accum = document.createElement('canvas'); accum.width = sw; accum.height = sh;
+  const actx = accum.getContext('2d');
+  actx.fillStyle = '#111'; actx.fillRect(0, 0, sw, sh);
+
+  const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
+  const tctx = tmp.getContext('2d');
+  const sctx = slitCv.getContext('2d');
+
+  const start = performance.now();
+  await new Promise(resolve => {
+    const step = now => {
+      const elapsed = now - start;
+      const prog = Math.min(1, elapsed / durationMs);
+      const pos = Math.min(sh - 4, Math.floor(prog * sh));
+      const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
+      const scale = Math.max(sw / vw, sh / vh);
+      const dw = vw * scale, dh = vh * scale;
+      tctx.save();
+      if(facing === 'user'){ tctx.translate(sw, 0); tctx.scale(-1, 1); }
+      tctx.drawImage(vid, (sw - dw)/2, (sh - dh)/2, dw, dh);
+      tctx.restore();
+
+      actx.drawImage(tmp, 0, pos, sw, 6, 0, pos, sw, 6);
+      sctx.fillStyle = '#111'; sctx.fillRect(0, 0, sw, sh);
+      sctx.drawImage(accum, 0, 0, sw, pos + 6, 0, 0, sw, pos + 6);
+      sctx.globalAlpha = 0.35;
+      sctx.drawImage(tmp, 0, pos + 6, sw, sh - (pos + 6), 0, pos + 6, sw, sh - (pos + 6));
+      sctx.globalAlpha = 1.0;
+      sctx.fillStyle = '#ff2e63'; sctx.fillRect(0, pos + 6, sw, 3);
+
+      if(prog < 1) requestAnimationFrame(step);
+      else resolve();
+    };
+    requestAnimationFrame(step);
+  });
+
+  triggerFlash();
+  return accum;
+}
+
+/* ---------- Dedicated Weird Scanner Drawer Logic ---------- */
 async function startSlitScan(){
   if(slitActive){ finishSlitScan(); return; }
   if(!stream){
     const ok = await startCam(true, false);
     if(!ok) return;
   }
-  const dir = $('slitDir').value;
+  const dir = $('weirdSweepDir').value;
   const sw = 384, sh = dir === 'v' ? 512 : 384;
   slitCv.width = sw; slitCv.height = sh;
   const ctx = slitCv.getContext('2d');
@@ -1918,8 +1974,9 @@ async function startSlitScan(){
 
   slitPos = 0; slitActive = true;
   vidWrap.hidden = true; view.hidden = true; slitCv.hidden = false;
-  $('btnShot').hidden = true; $('btnSlitStop').hidden = false; $('slitOpts').hidden = false;
-  $('btnSlit').classList.add('active-toggle');
+  $('btnShot').hidden = true;
+  $('btnFinishWeirdScan').disabled = false;
+  $('btnStartWeirdScan').textContent = '⏸ Pause Scan';
   $('info').textContent = 'Weird Scan emerging line by line…';
 
   const tmp = document.createElement('canvas'); tmp.width = sw; tmp.height = sh;
@@ -1927,7 +1984,7 @@ async function startSlitScan(){
 
   const tick = () => {
     if(!slitActive) return;
-    const spd = +$('slitSpd').value || 2;
+    const spd = +$('weirdSpeed').value || 2;
     const vw = vid.videoWidth || 640, vh = vid.videoHeight || 480;
     const scale = Math.max(sw / vw, sh / vh);
     const dw = vw * scale, dh = vh * scale;
@@ -1938,10 +1995,8 @@ async function startSlitScan(){
 
     if(dir === 'v'){
       const sliceH = Math.min(spd, sh - slitPos);
-      // Lock the new line(s) permanently into the emerging scan buffer
       actx.drawImage(tmp, 0, slitPos, sw, sliceH, 0, slitPos, sw, sliceH);
 
-      // Render emerging image clearly on top, dimmed live guide below, and glowing scan laser line
       ctx.fillStyle = '#141210';
       ctx.fillRect(0, 0, sw, sh);
       const emergedH = slitPos + sliceH;
@@ -1953,7 +2008,6 @@ async function startSlitScan(){
         ctx.drawImage(tmp, 0, emergedH, sw, sh - emergedH, 0, emergedH, sw, sh - emergedH);
         ctx.restore();
       }
-      // Active scanline beam
       ctx.fillStyle = '#ff2e63';
       ctx.fillRect(0, emergedH, sw, 3);
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
@@ -1993,18 +2047,108 @@ async function startSlitScan(){
 
 function finishSlitScan(){
   if(!slitAccum) return;
-  const dir = $('slitDir').value;
+  const dir = $('weirdSweepDir').value;
   const finalH = Math.max(48, dir === 'v' ? Math.min(slitAccum.height, slitPos || slitAccum.height) : slitAccum.height);
   const finalW = Math.max(48, dir === 'h' ? Math.min(slitAccum.width, slitPos || slitAccum.width) : slitAccum.width);
   const out = document.createElement('canvas'); out.width = finalW; out.height = finalH;
   out.getContext('2d').drawImage(slitAccum, 0, 0, finalW, finalH, 0, 0, finalW, finalH);
   sidewaysBanner = false;
   $('btnBanner').classList.remove('active-toggle');
+  $('btnStartWeirdScan').textContent = '▶ Start Weird Scan';
+  $('btnFinishWeirdScan').disabled = true;
   src = {el: out, w: finalW, h: finalH};
   rot = 0; stopCam(); draw();
   log('Weird Scan captured ('+finalW+'×'+finalH+')','ok');
 }
 
+$('btnStartWeirdScan').addEventListener('click', () => {
+  if(slitActive) stopCam();
+  else {
+    scrollToStage();
+    startSlitScan();
+  }
+});
+$('btnFinishWeirdScan').addEventListener('click', finishSlitScan);
+
+/* ---------- Cyanotype & Caustics Studio Logic ---------- */
+function renderCyanotypeStudio(){
+  const mode = $('cyanoMode').value;
+  const expo = (+$('rngCyanoExpo').value) / 100;
+  const refract = +$('rngCyanoRefract').value;
+  const grain = (+$('rngCyanoGrain').value) / 100;
+
+  $('uvVal').textContent = Math.round(expo * 100) + '%';
+  $('refVal').textContent = String(refract);
+  $('grainVal').textContent = Math.round(grain * 100) + '%';
+
+  const h = 384;
+  const c = document.createElement('canvas'); c.width = W; c.height = h;
+  const ctx = c.getContext('2d');
+  const id = ctx.createImageData(W, h);
+
+  const cx = W / 2, cy = h / 2;
+
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < W; x++){
+      let v = 0;
+      const dx = x - cx, dy = y - cy;
+      const dist = Math.hypot(dx, dy);
+
+      if(mode === 'sunprint'){
+        const wave = Math.sin(x * 0.05 * (refract / 20)) + Math.cos(y * 0.05 * (refract / 20));
+        const ring = Math.sin(dist * 0.08 - wave * 2);
+        v = (ring * 0.5 + 0.5) * 255 * expo;
+      } else if(mode === 'water'){
+        const w1 = Math.sin((x + dy) * 0.04) * Math.cos((y - dx) * 0.04);
+        const w2 = Math.sin(dist * (refract * 0.003));
+        v = (w1 * 0.5 + w2 * 0.5 + 1) * 127.5 * expo;
+      } else {
+        const grid = (Math.floor(x / (refract * 0.3)) + Math.floor(y / (refract * 0.3))) % 2 === 0;
+        v = (grid ? 240 : 15) * expo;
+      }
+
+      if(grain > 0){
+        const n = (Math.random() - 0.5) * 255 * grain;
+        v = Math.max(0, Math.min(255, v + n));
+      }
+
+      const idx = (y * W + x) * 4;
+      id.data[idx] = id.data[idx+1] = id.data[idx+2] = Math.round(v);
+      id.data[idx+3] = 255;
+    }
+  }
+
+  ctx.putImageData(id, 0, 0);
+
+  // Overlay bold Solar Studio label
+  ctx.save();
+  ctx.font = 'bold 16px monospace';
+  ctx.fillStyle = '#000';
+  ctx.fillRect(16, h - 36, W - 32, 24);
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.fillText(`CYANOTYPE // UV ${Math.round(expo*100)}%`, W/2, h - 20);
+  ctx.restore();
+
+  sidewaysBanner = false;
+  $('btnBanner').classList.remove('active-toggle');
+  if(stream) stopCam();
+  src = {el: c, w: W, h: h};
+  rot = 0;
+  draw();
+}
+
+$('btnRenderCyanotype').addEventListener('click', () => {
+  renderCyanotypeStudio();
+  scrollToStage();
+  log('Rendered Cyanotype & Caustics exposure','ok');
+});
+
+['cyanoMode','rngCyanoExpo','rngCyanoRefract','rngCyanoGrain'].forEach(id => {
+  $(id).addEventListener('input', renderCyanotypeStudio);
+});
+
+/* ---------- File & Basic Source Loading ---------- */
 async function loadFile(f){
   if(!f) return;
   try{
@@ -2018,7 +2162,7 @@ async function loadFile(f){
   }catch(e){ log('Image load failed: '+errStr(e),'err'); }
 }
 
-/* ---------- Shared Dual-Slot Live Stream (Stereoscopic + Double Exposure) ---------- */
+/* ---------- Shared Dual-Slot Live Stream ---------- */
 let stereoL = null, stereoR = null;
 let dexpA = null, dexpB = null;
 let dualSlotStream = null;
@@ -2113,7 +2257,7 @@ function normalizeLandscapeCanvas(el, w, h){
   return norm;
 }
 
-/* ---------- Stereoscopic 3D Engine + Clear X Buttons ---------- */
+/* ---------- Stereoscopic 3D Engine ---------- */
 function setStereoSide(side, el, w, h){
   const norm = normalizeLandscapeCanvas(el, w, h);
   if(side === 'L'){
@@ -2586,7 +2730,7 @@ $('btnDexpSwap').addEventListener('click', () => {
 $('btnDexpBuild').addEventListener('click', () => combineDoubleExposure(true));
 ['dexpMode','dexpMix','dexpThresh'].forEach(id => $(id).addEventListener('input', () => combineDoubleExposure(false)));
 
-/* ---------- Zine Note, QR-First Cipher & 10-Slider Optical Engine (Live on Main Stage) ---------- */
+/* ---------- Zine Maker Studio Logic ---------- */
 let activeZineSubTab = 'p3Type';
 $('p3Tabs').addEventListener('click', e => {
   const btn = e.target.closest('button[data-tab]');
@@ -2885,7 +3029,6 @@ function buildOpticArtCanvas(){
   return c;
 }
 
-/* Live updates directly onto the main top stage */
 function updateZineLivePreview(){
   clearInterval(wiggleTimer);
   let c;
@@ -2952,8 +3095,6 @@ $('stripChoiceBar').addEventListener('click', e => {
   schedule();
   scrollToStage();
 });
-$('btnSlit').addEventListener('click', () => slitActive ? stopCam() : startSlitScan());
-$('btnSlitStop').addEventListener('click', finishSlitScan);
 $('btnCam').addEventListener('click', () => $('fCam').click());
 $('btnLib').addEventListener('click', () => $('fLib').click());
 $('btnRot').addEventListener('click', () => { rot = (rot + 1) % 4; schedule(); });
@@ -3002,7 +3143,7 @@ function renderHistory(){
 }
 $('btnClearHist').addEventListener('click', () => { historyQueue.length = 0; renderHistory(); });
 
-/* ---------- printer driver: MXW01 ---------- */
+/* ---------- Printer Drivers ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function crc8(arr){ const poly = $('crcv').value === '31' ? 0x31 : 0x07; let c = 0; for(const b of arr){ c ^= b; for(let i = 0; i < 8; i++) c = (c & 0x80) ? ((c << 1) ^ poly) & 0xff : (c << 1) & 0xff; } return c; }
 function pkt(cmd, payload){
@@ -3125,6 +3266,7 @@ function testPattern(){
   for(let i = 0; i < m.length; i++) m[i] = d[i*4] < 128 ? 1 : 0;
   return {mono:m, w, h};
 }
+
 const phomemoDriver = {
   name:'Phomemo M02X', widthPx:384,
   connect, disconnect,
@@ -3202,6 +3344,7 @@ function updPrint(){
   $('btnProbe').disabled = !(connected && catChars.ae01 && catChars.ae03 && !printing);
   updateCamSign(connected);
 }
+
 async function probeSize(){
   if(printing) return;
   printing = true; updPrint();
@@ -3228,6 +3371,7 @@ async function probeSize(){
   }catch(e){ log('Probe failed: '+errStr(e),'err'); }
   printing = false; updPrint();
 }
+
 async function doPrint(m, isReprint){
   if(printing || overheated) return;
   printing = true; updPrint();
@@ -3239,6 +3383,7 @@ async function doPrint(m, isReprint){
   catch(e){ log('Print failed: '+errStr(e),'err'); }
   printing = false; updPrint();
 }
+
 $('btnPrint').addEventListener('click', () => last && doPrint(last, false));
 $('btnTest').addEventListener('click', () => doPrint(testPattern(), true));
 $('btnProbe').addEventListener('click', probeSize);
@@ -3252,7 +3397,7 @@ $('inv').textContent = $('inten').value;
 $('coolPause').addEventListener('input', () => { $('cpv').textContent = $('coolPause').value + 's'; });
 $('cpv').textContent = $('coolPause').value + 's';
 
-/* ---------- wiring & startup ---------- */
+/* ---------- Wiring & Initialization ---------- */
 $('printerModel').addEventListener('change', () => {
   if(dev && dev.gatt && dev.gatt.connected) disconnect();
   fillWritable();
