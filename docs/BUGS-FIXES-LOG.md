@@ -2,6 +2,10 @@
 
 Newest first. "Verified" means checked in the jsdom simulation only unless it says hardware.
 
+## V1.1.1 (user-tested: "it works")
+- Top bar logo removed (user: "horrible as is"). Empty-stage artwork added: `#emptyArt` / `#emptyImg`, toggled by `updEmptyArt()` (300 ms poll: `!src && !last && vidWrap.hidden && slitCv.hidden && !slitActive`).
+- Tests updated (`tests/t4.js`): logo absent, art shown at start, hidden with an image, back when cleared. 33 checks pass (simulation).
+
 ## V1.1 changes (all simulation-tested, none hardware-tested)
 | Area | Change | Notes |
 |---|---|---|

@@ -3,7 +3,7 @@
 Single-file web app (`FOTITAS-V1.1.html`, vanilla JS, inline CSS, no libraries). Runs in Bluefy on iPhone (primary) and Chrome on macOS (debug). Project: Tiniburn.
 
 ## 1. Status
-- Current build: **V1.1** (`/mnt/user-data/outputs/FOTITAS-V1.1.html`, ~214 KB). V1 kept as `FOTITAS-V1.html`.
+- Current build: **V1.1.1** (V1.1 + logo removed + empty-stage art); user confirmed it works on the phone (`/mnt/user-data/outputs/FOTITAS-V1.1.html`, ~214 KB). V1 kept as `FOTITAS-V1.html`.
 - Tested only in jsdom with a fake canvas, a fake printer characteristic and fake cameras. Syntax checked with `node --check`.
 - **Never tested on real hardware:** BLE connect and printing, getUserMedia camera, real heat behaviour, Weird Scanner live-print pacing, Web Share and download in Bluefy, large `.fotitas` exports on iPhone memory.
 - Hosting: GitHub Pages (HTTPS). The file-input camera fallback always exists.
@@ -37,7 +37,9 @@ Key globals and functions:
 
 ## 4. UI map
 
-**Top bar:** printer model select · Bluetooth-icon connect button (`btnConnect`) · ALL chip (`bleAll` checkbox) · FOTITAS logo (`.logo-fotitas`) · heat chip · battery chip · red Stop (`btnPanic`).
+**Top bar:** printer model select · Bluetooth-icon connect button (`btnConnect`) · ALL chip (`bleAll` checkbox) · heat chip · battery chip · red Stop (`btnPanic`). No title text (removed in V1.1.1).
+
+**Empty stage:** animated kawaii printer artwork (`#emptyArt`, base64 PNG inside `index.html`) whenever nothing is loaded, live or scanning.
 
 **Capture and Source:**
 1. Live (`btnLive`, orange) | 🤳 Selfie

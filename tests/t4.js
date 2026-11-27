@@ -18,11 +18,15 @@ setTimeout(async ()=>{
  const T=(n,f)=>{try{const r=f();console.log('OK  ',n,r===undefined?'':r)}catch(e){console.log('FAIL',n,e.stack.split('\n').slice(0,4).join(' | '))}};
  const wait=ms=>new Promise(r=>setTimeout(r,ms));
  ev(`window.mk=(W,H,seed,col)=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#000');g.addColorStop(1,'#fff');x.fillStyle=col||g;x.fillRect(0,0,W,H);x.fillStyle='#000';x.font=(H/5)+'px sans-serif';x.fillText('ABC'+(seed||''),W*0.4,H*0.6);return c}`);
- T('top bar',()=>ev(`[!document.querySelector('.verbar'),!!document.querySelector('.logo-fotitas'),!$('btnDisc'),!!$('btnPanic'),!!$('bleAll'),$('printerModel').options[0].textContent,$('printerModel').options[1].textContent,document.querySelectorAll('.topbar button').length+' buttons',$('fuseSvg').innerHTML.slice(0,30)].join(' | ')`));
- T('topbar order',()=>ev(`(()=>{const t=document.querySelector('.topbar');const order=['printerModel','btnConnect','bleAll','.logo-fotitas','heatChip','batChip','btnPanic'].map(i=>i[0]==='.'?document.querySelector(i):$(i));let ok=true;for(let i=1;i<order.length;i++) ok=ok&&!!(order[i-1].compareDocumentPosition(order[i])&4);return ok})()`));
+ await wait(400); T('empty art shown at start',()=>ev(`'hidden='+$('emptyArt').hidden+' imgOK='+($('emptyImg').src.length>1000)`));
+ T('top bar',()=>ev(`[!document.querySelector('.verbar'),!document.querySelector('.logo-fotitas'),!$('btnDisc'),!!$('btnPanic'),!!$('bleAll'),$('printerModel').options[0].textContent,$('printerModel').options[1].textContent,document.querySelectorAll('.topbar button').length+' buttons',$('fuseSvg').innerHTML.slice(0,30)].join(' | ')`));
+ T('topbar order',()=>ev(`(()=>{const t=document.querySelector('.topbar');const order=['printerModel','btnConnect','bleAll','heatChip','batChip','btnPanic'].map(i=>i[0]==='.'?document.querySelector(i):$(i));let ok=true;for(let i=1;i<order.length;i++) ok=ok&&!!(order[i-1].compareDocumentPosition(order[i])&4);return ok})()`));
  T('capture order',()=>ev(`(()=>{const ids=['btnLive','btnSelfie','btnScan','btnBooth','btnCam','btnLib'].map(i=>$(i));let ok=true;for(let i=1;i<ids.length;i++) ok=ok&&!!(ids[i-1].compareDocumentPosition(ids[i])&4);return ok+' banner='+!!$('btnBanner')+' scanModes='+[...$('scanDir').options].map(o=>o.value).join('')+' secs='+$('scanSecs').options.length})()`));
  T('tabs dots',()=>ev(`['dotStereo','dotDexp','dotPoster','dotZine','dotWeird','dotPara','dotPano'].map(i=>!!$(i)).join()+' badges left: '+document.querySelectorAll('.tab-toggle .poster-badge').length`));
  T('look custom',()=>{ev(`applyLook('portrait')`);const a=ev(`$('lookBadge').textContent`);ev(`$('br').value=30;$('br').dispatchEvent(new Event('input'))`);const b=ev(`$('lookBadge').textContent`);ev(`applyLook('gameboy')`);return a+' -> '+b+' -> '+ev(`$('lookBadge').textContent`)});
+ T('empty art hidden after image',()=>{ev(`src={el:mk(400,300),w:400,h:300};draw()`);return 'x'});
+ await wait(400); T('  hidden?',()=>ev(`$('emptyArt').hidden`));
+ ev(`src=null;last=null;lastSrcRef=null`);await wait(400); T('  back when cleared',()=>ev(`$('emptyArt').hidden`));
  // random scan
  ev(`src=null;stream={getTracks:()=>[]};$('scanSecs').value=1;$('scanDir').value='r';`);
  ev(`startScanOnce()`); await wait(1700);
