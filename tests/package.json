@@ -1,0 +1,1 @@
+{"name":"fotitas-tests","private":true,"scripts":{"test":"node t4.js ../index.html"},"devDependencies":{"jsdom":"*","@napi-rs/canvas":"*"}}
