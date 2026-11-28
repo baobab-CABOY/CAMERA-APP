@@ -2,6 +2,17 @@
 
 Newest first. "Verified" means checked in the jsdom simulation only unless it says hardware.
 
+## V1.2 (simulation-tested only, not yet on the phone)
+| Item | Change | Notes |
+|---|---|---|
+| Live view on computer cropped | `#vidWrap` was `aspect-ratio:4/3` + `object-fit:cover`. Desktop now sets the aspect ratio from `videoWidth/videoHeight` and `object-fit:contain`; `html.desktop` raises max-height to 64vh | `DESKTOP` = fine pointer, no coarse pointer, not iPhone/iPad/Android |
+| Live view inverted on computer | Webcam reports no `facingMode`, so `facing` stayed `environment` (no mirror). Desktop with no facingMode now sets `facing='user'` | Capture and scans mirror with the preview (existing `facing==='user'` logic) |
+| Polaroid | Thick black outline (6 px) + thin photo outline in `composeWithFrame` | Postage Stamp frame removed (option, pads, drawing). Old roll items with `frame=stamp` fall back to no frame |
+| Endless Weird | Rewritten: `endlessAppend` (1024-row segment canvases), `grabWeirdSlice(...up)` reverses rows in the slice on the up pass, tail canvas scrolls on screen, sender merges queued slices (≤12 rows per push), gate = queued rows ≥ max(2·step, 12) | Step 1 added; per-RAF cap 8 → 24 slices. Stored image cap 24000 rows. Roll export no longer shrinks long thin images (`encodeEl` area rule) |
+| Tab indicator | `.tab-dot` is a 34×18 toggle switch; `.on` = green with glow | Per-tab colours no longer used (`--dotc` ignored) |
+| Fresco | `panoMaxCm` removed; `FR_MAXROWS = 40000` silent cap; added `panoLineMs` (per-row pacing, M02X bands and cat data loop) and `panoRest` (rest every 800 rows, M02X only) | Both ids in `FORM_SKIP` (printer settings, not roll content). Cat/MXW01 rest breaks not implemented (pausing mid-job unverified) |
+| Tests | 38 checks incl. endless length grows with time (1.5 s → ~950 rows, 3 s → ~1900 rows at 640 lines/s), polaroid outline row black, rest breaks counted (3200 rows → 3 rests) | Simulation only |
+
 ## V1.1.1 (user-tested: "it works")
 - Top bar logo removed (user: "horrible as is"). Empty-stage artwork added: `#emptyArt` / `#emptyImg`, toggled by `updEmptyArt()` (300 ms poll: `!src && !last && vidWrap.hidden && slitCv.hidden && !slitActive`).
 - Tests updated (`tests/t4.js`): logo absent, art shown at start, hidden with an image, back when cleared. 33 checks pass (simulation).
@@ -34,6 +45,8 @@ Newest first. "Verified" means checked in the jsdom simulation only unless it sa
 Top bar and order · capture order · no `btnBanner` · scan modes `v h r` · random and vertical scan end with `src.mod='scan'` · weird scanner prints (writes counted), stops and keeps the image · print-off writes 0 · fresco add 6 frames, reorder, paper limit refusal · view zoom leaves `last` unchanged · roll save / load for fresco and photo · export → import round trip restores fresco and photo · themes switch · M02X dry-run print adds heat.
 
 ## Open observations (not yet bugs)
+- Endless Weird up-pass "reverse" is read as: rows inside each slice are flipped on the up pass (with step 1 the up pass is the scene mirrored vertically). If you meant something else (e.g. the whole up-pass strip reversed), tell me.
+- Fresco rest/line-delay timing is unverified on hardware.
 - Imported fresco rebuilt to 384×2458 vs 384×2432 for the in-memory one. Likely caption or stamp rows or the re-encoded frames; check on the phone, and compare exact heights in the next test pass.
 - Roll is memory-only (lost on page reload unless exported).
 - The `.fotitas` file can get large (~280 KB for 2 items in test; real photos will be several MB each). Watch iPhone memory with 30 items.

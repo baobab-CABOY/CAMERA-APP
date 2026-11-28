@@ -18,7 +18,7 @@ setTimeout(async ()=>{
  const T=(n,f)=>{try{const r=f();console.log('OK  ',n,r===undefined?'':r)}catch(e){console.log('FAIL',n,e.stack.split('\n').slice(0,4).join(' | '))}};
  const wait=ms=>new Promise(r=>setTimeout(r,ms));
  ev(`window.mk=(W,H,seed,col)=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#000');g.addColorStop(1,'#fff');x.fillStyle=col||g;x.fillRect(0,0,W,H);x.fillStyle='#000';x.font=(H/5)+'px sans-serif';x.fillText('ABC'+(seed||''),W*0.4,H*0.6);return c}`);
- await wait(400); T('empty art shown at start',()=>ev(`'hidden='+$('emptyArt').hidden+' imgOK='+($('emptyImg').src.length>1000)`));
+ await wait(400); T('empty art shown at start',()=>ev(`'hidden='+$('emptyArt').hidden+' gif='+$('emptyImg').src.startsWith('data:image/gif')`));
  T('top bar',()=>ev(`[!document.querySelector('.verbar'),!document.querySelector('.logo-fotitas'),!$('btnDisc'),!!$('btnPanic'),!!$('bleAll'),$('printerModel').options[0].textContent,$('printerModel').options[1].textContent,document.querySelectorAll('.topbar button').length+' buttons',$('fuseSvg').innerHTML.slice(0,30)].join(' | ')`));
  T('topbar order',()=>ev(`(()=>{const t=document.querySelector('.topbar');const order=['printerModel','btnConnect','bleAll','heatChip','batChip','btnPanic'].map(i=>i[0]==='.'?document.querySelector(i):$(i));let ok=true;for(let i=1;i<order.length;i++) ok=ok&&!!(order[i-1].compareDocumentPosition(order[i])&4);return ok})()`));
  T('capture order',()=>ev(`(()=>{const ids=['btnLive','btnSelfie','btnScan','btnBooth','btnCam','btnLib'].map(i=>$(i));let ok=true;for(let i=1;i<ids.length;i++) ok=ok&&!!(ids[i-1].compareDocumentPosition(ids[i])&4);return ok+' banner='+!!$('btnBanner')+' scanModes='+[...$('scanDir').options].map(o=>o.value).join('')+' secs='+$('scanSecs').options.length})()`));
@@ -49,8 +49,8 @@ setTimeout(async ()=>{
  ev(`src=null;panoFrames=[];$('panoDir').value='horizontal'`);
  T('fresco add 6 frames (no max)',()=>{for(let i=0;i<6;i++) ev(`addPanoCanvas(mk(1200,900,'${i}','#'+(${i}*30+60).toString(16).padStart(2,'0').repeat(3)))`);return ev(`panoFrames.length+' frames, '+$('panoBadge').textContent+' | dotPano='+$('dotPano').classList.contains('on')+' maxFramesEl='+!!$('panoMaxFrames')+' stitchBtn='+!!$('btnPanoStitch')`)});
  T('fresco reorder',()=>{ev(`const a=panoFrames[2];moveFrame(2,-1);window.__ok=panoFrames[1]===a`);return ev(`__ok+' btns='+document.querySelectorAll('#panoFrameList button').length`)});
- T('paper limit refuses',()=>{ev(`$('panoMaxCm').innerHTML+='<option value="20">20</option>';$('panoMaxCm').value='20';window.__n=panoFrames.length;addPanoCanvas(mk(1200,900,'z'))`);return ev(`'frames '+__n+' -> '+panoFrames.length+' | '+$('panoBadge').textContent+' bad='+$('panoBadge').classList.contains('bad')`)});
- ev(`$('panoMaxCm').value='200';stitchPanorama(false,true)`);
+ T('no paper limit setting',()=>ev(`'panoMaxCm='+!!$('panoMaxCm')+' lineMs='+!!$('panoLineMs')+' rest='+$('panoRest').value+' status='+$('panoBadge').textContent`));
+ ev(`stitchPanorama(false,true)`);
  T('view-only zoom',()=>{const h1=ev(`(()=>{let s=0;const m=last.mono;for(let i=0;i<m.length;i+=7)s=(s*31+m[i])%1000003;return s+':'+last.w+'x'+last.h+':'+view.width+'x'+view.height})()`);
    ev(`currentZoom=400;cropCx=.3;cropCy=.5;$('zoomSlider').value=400;$('zoomSlider').dispatchEvent(new Event('input'))`);return h1});
  await wait(100);
@@ -85,4 +85,24 @@ setTimeout(async ()=>{
  T('heat dry run',()=>{ev(`window.__w=[];src={el:mk(800,600),w:800,h:600};draw();heat.pct=0`);return 'ready'});
  await ev(`(async()=>{const jid=sessionOpen();await phomemoDriver.printBitmap(last.mono,last.w,last.h,jid);sessionClose();})()`).catch(e=>console.log('printerr',e.message));
  T('  after',()=>ev(`'writes='+__w.length+' heat='+Math.round(heat.pct)+'%'`));
+
+ T('polaroid, no stamp frame',()=>{ev(`$('frame').value='polaroid';draw()`);return ev(`'stampOption='+!![...$('frame').options].find(o=>o.value==='stamp')+' size='+last.w+'x'+last.h`)});
+ T('  polaroid outline black',()=>ev(`(()=>{const m=last.mono,w=last.w;let edge=0;for(let x=0;x<w;x++){edge+=m[2*w+x]}return 'top rows black px='+edge+'/'+w})()`));
+ ev(`$('frame').value='none';draw()`);
+ T('tab dot style',()=>ev(`getComputedStyle?'w='+getComputedStyle($('dotPano')).width:'n/a'`));
+ // endless weird: sizes and reverse
+ ev(`src=null;panoFrames=[];$('weirdPrint').value='off';$('weirdStep').value='1';$('weirdScanSpeed').value='640';stream={getTracks:()=>[]};startWeirdScan()`);
+ await wait(1500); ev(`$('btnStartWeirdScan').click()`); await wait(200);
+ T('endless weird 1 line/step, 1.5s',()=>ev(`'src '+src.w+'x'+src.h+' mod='+src.mod+' rows>=300:'+(src.h>=300)`));
+ ev(`src=null;$('weirdStep').value='1';$('weirdScanSpeed').value='640';stream={getTracks:()=>[]};startWeirdScan()`);
+ await wait(3000); ev(`$('btnStartWeirdScan').click()`); await wait(200);
+ const h2=ev(`src.h`);
+ T('  longer scan = longer image',()=>'3s -> '+h2+' rows');
+ ev(`window.__w.length=0;window.__rowsPrinted=0;$('weirdPrint').value='on';$('weirdStep').value='10';$('weirdLineMs').value='12';$('weirdScanSpeed').value='320';src=null;stream={getTracks:()=>[]};startWeirdScan()`);
+ await wait(2000); ev(`$('btnStartWeirdScan').click()`); await wait(1200);
+ T('endless weird live print',()=>ev(`'writes='+__w.length+' src.h='+src.h+' session='+isPrintingSessionActive`));
+ // fresco rest + delay on M02X: instrumented
+ ev(`src=null;panoFrames=[];$('panoDir').value='horizontal';$('panoRest').value='4';$('panoLineMs').value='10';for(let i=0;i<8;i++) addPanoCanvas(mk(1200,900,''+i))`);
+ await ev(`(async()=>{const jid=sessionOpen();await phomemoDriver.printBitmap(last.mono,last.w,last.h,jid);sessionClose();})()`).catch(e=>console.log('printerr',e.message));
+ T('fresco rest breaks',()=>ev(`(()=>{const t=document.getElementById('log').textContent;return 'rests='+(t.match(/Overheat guard: resting/g)||[]).length+' rows='+last.h+' pano='+!!src.pano})()`));
  process.exit()},1500);
