@@ -105,4 +105,21 @@ setTimeout(async ()=>{
  ev(`src=null;panoFrames=[];$('panoDir').value='horizontal';$('panoRest').value='4';$('panoLineMs').value='10';for(let i=0;i<8;i++) addPanoCanvas(mk(1200,900,''+i))`);
  await ev(`(async()=>{const jid=sessionOpen();await phomemoDriver.printBitmap(last.mono,last.w,last.h,jid);sessionClose();})()`).catch(e=>console.log('printerr',e.message));
  T('fresco rest breaks',()=>ev(`(()=>{const t=document.getElementById('log').textContent;return 'rests='+(t.match(/Overheat guard: resting/g)||[]).length+' rows='+last.h+' pano='+!!src.pano})()`));
+
+ T('fresco controls inside tab body',()=>ev(`'overlapInBody='+$('tabPanoBody').contains($('panoOverlap'))+' restInBody='+$('tabPanoBody').contains($('panoRest'))+' every='+$('panoRestEvery').options.length+' rest='+$('panoRest').options.length`));
+ T('tab dot is a round dot, hidden when off',()=>ev(`(()=>{const e=$('dotPano');const cs=getComputedStyle(e);return 'w='+cs.width+' h='+cs.height+' radius='+cs.borderRadius+' hasOnClass='+e.classList.contains('on')})()`));
+ T('reverse option',()=>{ev(`(()=>{const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d');for(let y=0;y<512;y++){x.fillStyle='rgb('+(y%256)+',0,0)';x.fillRect(0,y,384,1)}window.__t=x})()`);
+   return ev(`(()=>{const a=grabWeirdSlice(__t,'v',100,5,384,512,false).data, b=grabWeirdSlice(__t,'v',100,5,384,512,true).data;return 'down first row R='+a[0]+' last='+a[4*384*4]+' | up first='+b[0]+' last='+b[4*384*4]+' optionYes='+$('weirdReverse').value})()`)});
+
+ ev(`src={el:mk(800,600,'q','#3a7bd5'),w:800,h:600};rot=0;mirror=false;panoFrames=[];$('frame').value='polaroid';applyLook('off')`); await wait(300);
+ T('OFF look',()=>ev(`'mode='+$('mode').value+' badge='+$('lookBadge').textContent+' color='+(last.color?last.color.width+'x'+last.color.height:'none')+' printMono='+last.w+'x'+last.h+' note='+!$('offNote').hidden+' smoothing='+view.style.imageRendering`));
+ ev(`$('btnRot').click()`); await wait(300);
+ T('  OFF keeps crop/rotate',()=>ev(`'rot='+rot+' color='+last.color.width+'x'+last.color.height`));
+ ev(`applyLook('natural')`); await wait(300);
+ T('  OFF to Natural brings filters back',()=>ev(`'color='+(last.color?'yes':'no')+' mono='+last.w+'x'+last.h+' note='+!$('offNote').hidden`));
+ ev(`panoFrames=[];src=null;for(let i=0;i<3;i++) addPanoCanvas(mk(1200,900,''+i));applyLook('off')`); await wait(500);
+ T('  OFF with fresco',()=>ev(`'color='+(last.color?last.color.width+'x'+last.color.height:'none')+' rot='+rot`));
+ ev(`saveToHistory(last)`);
+ T('  OFF roll round trip',()=>ev(`historyQueue[0].form.mode+' '+historyQueue[0].kind`));
+ ev(`applyLook('natural');panoFrames=[];src={el:mk(800,600),w:800,h:600};draw()`);
  process.exit()},1500);

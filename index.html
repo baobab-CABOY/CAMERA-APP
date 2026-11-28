@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zinester Print Lab — FOTITAS V1.2</title>
+<title>Zinester Print Lab — FOTITAS V1.2.1</title>
 <style>
 :root{
   --bg:#f4efe6;--fg:#181512;--mut:#685f56;--card:#fffdf9;--line:#181512;
@@ -435,10 +435,8 @@ select.model-sel{font-size:11px;padding:3px 3px}
 .opt-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
 .opt-pair{display:flex;gap:4px;min-width:0}
 .opt-pair select{margin-top:0;min-height:34px;padding:3px 4px;font-size:11.5px;min-width:0;flex:1 1 0}
-.tab-dot{position:relative;width:34px;height:18px;border-radius:999px;border:2px solid var(--line);background:#3a3631;flex:0 0 auto;transition:all .2s;box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
-.tab-dot::after{content:"";position:absolute;top:1px;left:1px;width:12px;height:12px;border-radius:50%;background:#9b948a;transition:all .2s}
-.tab-dot.on{background:#16a34a;border-color:#4ade80;box-shadow:0 0 0 2px rgba(74,222,128,.35),0 0 12px #22c55e;animation:pulse 2s infinite}
-.tab-dot.on::after{left:17px;background:#fff}
+.tab-dot{width:14px;height:14px;border-radius:50%;flex:0 0 auto;background:transparent;opacity:0;transition:opacity .2s}
+.tab-dot.on{opacity:1;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.3),0 0 10px #22c55e;animation:pulse 2s infinite}
 .pano-status{margin-top:8px;font-size:11.5px;font-weight:700;color:var(--mut)}
 .pano-status.bad{color:var(--danger)}
 .roll-btns{display:flex;gap:4px;flex:0 0 auto}
@@ -608,6 +606,7 @@ html[data-theme="blueprint"] .tab-dot,html[data-theme="blueprint"] .chip-toggle 
     <span id="lookBadge" class="poster-badge">High-Key Portrait</span>
   </button>
   <div class="tab-body" id="tabLookBody" hidden>
+    <p id="offNote" class="pano-status" hidden>Filters OFF: the photo keeps its original colors and resolution. Save exports it untouched (crop, rotate and flip still apply). Frame, caption and strips are ignored. Print uses a basic dither.</p>
     <div class="presets" id="presetBar">
       <button type="button" class="pill" data-look="natural">Natural</button>
       <button type="button" class="pill active" data-look="portrait">High-Key Portrait</button>
@@ -616,6 +615,7 @@ html[data-theme="blueprint"] .tab-dot,html[data-theme="blueprint"] .chip-toggle 
       <button type="button" class="pill" data-look="halftone">Halftone</button>
       <button type="button" class="pill" data-look="ascii">ASCII</button>
       <button type="button" class="pill" data-look="blueprint">Blueprint</button>
+      <button type="button" class="pill" data-look="off" title="No filter at all: original colors and resolution (for Save / Export)">⊘ Off</button>
     </div>
 
     <div class="grid2" style="margin-top:6px">
@@ -630,6 +630,7 @@ html[data-theme="blueprint"] .tab-dot,html[data-theme="blueprint"] .chip-toggle 
           <option value="lines">Engraved Scanlines</option>
           <option value="ascii">ASCII Text Matrix</option>
           <option value="soft">Soft Threshold</option>
+          <option value="off">Off · no filter, original colors</option>
         </select>
       </label>
       <label class="sl" style="margin-top:4px">Frame
@@ -989,7 +990,7 @@ html[data-theme="blueprint"] .tab-dot,html[data-theme="blueprint"] .chip-toggle 
       <div><strong>PAPER WARNING:</strong> with live print ON the paper keeps coming out, endlessly, until you press Stop.</div>
     </div>
     <p style="font-size:11.5px;color:var(--mut);margin:0 0 8px">
-      The slit sweeps up and down over the live camera and every line is added to ONE endless image: scan twice as long and the image is twice as long. Going up, each step is read in reverse. Stop keeps the image so you can print it normally.
+      The slit sweeps up and down over the live camera and every line is added to ONE endless image: scan twice as long and the image is twice as long. Going up, each step can be read in reverse (option). Stop keeps the image so you can print it normally.
     </p>
     <div class="grid2">
       <label class="sl" style="margin-top:0">Sweep direction
@@ -1000,6 +1001,9 @@ html[data-theme="blueprint"] .tab-dot,html[data-theme="blueprint"] .chip-toggle 
       </label>
       <label class="sl">Lines per step
         <select id="weirdStep"><option value="1">1 · continuous, no steps</option><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select>
+      </label>
+      <label class="sl">Reverse on the way up
+        <select id="weirdReverse"><option value="yes" selected>Yes · steps read in reverse going up</option><option value="no">No · every step read the same way</option></select>
       </label>
       <label class="sl">Scan speed
         <select id="weirdScanSpeed"><option value="20">Very slow · 20 lines/s</option><option value="40">Slow · 40</option><option value="80" selected>Normal · 80</option><option value="160">Fast · 160</option><option value="320">Very fast · 320</option><option value="640">Max · 640</option></select>
@@ -1092,11 +1096,15 @@ html[data-theme="blueprint"] .tab-dot,html[data-theme="blueprint"] .chip-toggle 
         <select id="panoLineMs"><option value="0" selected>Default</option><option value="10">10 ms / line</option><option value="20">20 ms</option><option value="30">30 ms</option><option value="45">45 ms</option><option value="60">60 ms · slowest</option></select>
       </label>
     </div>
-    <label class="sl">Overheat guard (long frescos)
-      <select id="panoRest"><option value="0">Off</option><option value="4">Light · rest 4 s every 10 cm</option><option value="8" selected>Normal · rest 8 s every 10 cm</option><option value="15">Strong · rest 15 s every 10 cm</option></select>
-    </label>
-    <p style="font-size:11px;color:var(--mut);margin:4px 0 0">The printer pauses between blocks so the head cools and never jams. Used only when printing a fresco.</p>
+    <div class="grid2">
+      <label class="sl">Rest every
+        <select id="panoRestEvery"><option value="0.5">0.5 cm</option><option value="1">1 cm</option><option value="2">2 cm</option><option value="3" selected>3 cm</option><option value="5">5 cm</option><option value="10">10 cm</option></select>
+      </label>
+      <label class="sl">Rest for
+        <select id="panoRest"><option value="0">Off (no rest)</option><option value="1">1 s</option><option value="2" selected>2 s</option><option value="3">3 s</option><option value="4">4 s</option><option value="6">6 s</option><option value="8">8 s</option><option value="12">12 s</option><option value="15">15 s</option></select>
+      </label>
     </div>
+    <p style="font-size:11px;color:var(--mut);margin:4px 0 0">The printer pauses between blocks so the head cools and never jams. Used only when printing a fresco.</p>
     <label class="sl">Overlap &amp; Feather Blend <b id="povOverlap">25%</b>
       <input id="panoOverlap" type="range" min="5" max="60" value="25">
     </label>
@@ -1128,7 +1136,7 @@ html[data-theme="blueprint"] .tab-dot,html[data-theme="blueprint"] .chip-toggle 
   </button>
   <div id="advConsoleBody" hidden>
     <div class="sub-box" style="margin-top:0;padding-top:0;border-top:0">
-      <p class="label">FOTITAS V1.2</p>
+      <p class="label">FOTITAS V1.2.1</p>
       <button id="btnStyling" type="button">🎨 Styling</button>
       <div id="stylePanel" class="style-grid" hidden>
         <button type="button" data-theme="zine"><i style="background:linear-gradient(135deg,#f4efe6 50%,#d9385a 50%)"></i>Zine</button>
@@ -1668,6 +1676,7 @@ function getStampText(){
 
 /* ditherGrayToMono with optional dotScale (1 = 1px dot, 2 = 2x2 dot cell, 3 = 3x3 dot cell) */
 function ditherGrayToMono(g, w, h, mode, t, sfVal, yOff, dotScale){
+  if(mode === 'off') mode = 'fs';   /* Off look has no dither of its own; print fallback */
   yOff = yOff || 0;
   dotScale = Math.max(1, dotScale || 1);
   const mono = new Uint8Array(w * h);
@@ -1893,11 +1902,12 @@ function renderBitmapToView(imgObj, tagNote, disp, ov){
   const dsrc = ov || imgObj;
   const w = dsrc.w, h = dsrc.h, m = dsrc.mono;
   /* disp = true: bitmap is printed sideways (rotated 90° CW); show it upright */
-  const vw = disp ? h : w, vh = disp ? w : h;
+  const vw = imgObj.color ? imgObj.color.width : (disp ? h : w), vh = imgObj.color ? imgObj.color.height : (disp ? w : h);
   let full = document.createElement('canvas'); full.width = vw; full.height = vh;
   const fctx = full.getContext('2d');
   const outId = fctx.createImageData(vw, vh), d = outId.data;
-  if(!disp){
+  if(imgObj.color){ /* Off look: original colours */ }
+  else if(!disp){
     for(let i = 0; i < w*h; i++){
       const j = i * 4, v = m[i] ? 0 : 255;
       d[j] = d[j+1] = d[j+2] = v; d[j+3] = 255;
@@ -1908,7 +1918,8 @@ function renderBitmapToView(imgObj, tagNote, disp, ov){
       d[j] = d[j+1] = d[j+2] = v; d[j+3] = 255;
     }
   }
-  fctx.putImageData(outId, 0, 0);
+  if(imgObj.color){ full = imgObj.color; }
+  else fctx.putImageData(outId, 0, 0);
   if(ov){
     const sw = imgObj.w, n = ov.n;
     fctx.fillStyle = '#9ca3af';
@@ -1939,6 +1950,7 @@ function renderBitmapToView(imgObj, tagNote, disp, ov){
   }
   view.width = cur.width; view.height = cur.height;
   view.getContext('2d').drawImage(cur, 0, 0);
+  view.style.imageRendering = imgObj.color ? 'auto' : '';   /* colour photo (Off look) must stay smooth */
   last = imgObj;
   applyZoom();
   updBurn();
@@ -2139,8 +2151,59 @@ function buildPosterStrips(R, numStrips){
   return posterStrips[activeStripIdx];
 }
 
+/* Colour copy of a view-frame region, no filter (Off look) */
+function drawRegionColor(targetW, targetH, reg){
+  const s = targetW / reg.w, odd = rot % 2 === 1;
+  let S = {w: src.w, h: src.h}, R = reg, img;
+  if(src.layers){
+    const bb = srcBoxFor(reg);
+    img = composeFresco(bb, s);
+    S = {w: bb.w, h: bb.h};
+    R = {x: 0, y: 0, w: odd ? bb.h : bb.w, h: odd ? bb.w : bb.h};
+  } else {
+    let lvl = 0, k = s;
+    while(k < 0.5 && lvl < 10){ k *= 2; lvl++; }
+    img = lvl ? srcMip(lvl) : src.el;
+  }
+  const vw = odd ? S.h : S.w, vh = odd ? S.w : S.h;
+  const cv = document.createElement('canvas'); cv.width = targetW; cv.height = targetH;
+  const c = cv.getContext('2d');
+  c.fillStyle = '#fff'; c.fillRect(0, 0, targetW, targetH);
+  c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  c.save();
+  c.translate(targetW / 2, targetH / 2);
+  c.scale(s, s);
+  c.translate(-(R.x + R.w / 2), -(R.y + R.h / 2));
+  c.translate(vw / 2, vh / 2);
+  if(mirror) c.scale(-1, 1);
+  c.rotate(rot * Math.PI / 2);
+  c.drawImage(img, -S.w / 2, -S.h / 2, S.w, S.h);
+  c.restore();
+  return cv;
+}
+function drawOff(){
+  const sr = rot, sb = sidewaysBanner;
+  let cv;
+  try{
+    if(src.pano && rot === 3) rot = 0;   /* vertical fresco: show it upright */
+    sidewaysBanner = false;
+    const vd = viewDims(), R = src.pano ? {x: 0, y: 0, w: vd.vw, h: vd.vh} : cropRect();
+    const cap = Math.min(1, Math.sqrt(16e6 / Math.max(1, R.w * R.h)), 8192 / Math.max(R.w, R.h));
+    cv = drawRegionColor(Math.max(1, Math.round(R.w * cap)), Math.max(1, Math.round(R.h * cap)), R);
+  } finally { rot = sr; sidewaysBanner = sb; }
+  /* basic 1-bit copy so Print still works */
+  const pw = W, ph = Math.min(8000, Math.max(8, Math.round(cv.height * W / cv.width)));
+  const sm = document.createElement('canvas'); sm.width = pw; sm.height = ph;
+  const sx = sm.getContext('2d', {willReadFrequently: true});
+  sx.fillStyle = '#fff'; sx.fillRect(0, 0, pw, ph); sx.imageSmoothingQuality = 'high'; sx.drawImage(cv, 0, 0, pw, ph);
+  const d = sx.getImageData(0, 0, pw, ph).data, g = new Float32Array(pw * ph);
+  for(let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = 0.299 * d[j] + 0.587 * d[j+1] + 0.114 * d[j+2];
+  renderBitmapToView({mono: ditherGrayToMono(g, pw, ph, 'fs', 128, +$('sf').value, 0, 1), w: pw, h: ph, color: cv}, 'Original colors ' + cv.width + '×' + cv.height + ' (Save exports this)', false, null);
+}
+
 function draw(){
   ['br','ct','gm','th','sf'].forEach(k => { $(k+'v').textContent = $(k).value; });
+  $('offNote').hidden = $('mode').value !== 'off';
   syncSoftSliderVisibility();
   if(!src) return;
   if(src !== lastSrcRef){
@@ -2148,6 +2211,7 @@ function draw(){
     lastSrcRef = src;
   }
   clampCrop();
+  if($('mode').value === 'off'){ drawOff(); return; }
   const chosen = buildPosterStrips(cropRect(), selectedStrips);
   renderBitmapToView(chosen, (selectedStrips > 1 ? 'Strip '+(activeStripIdx+1)+'/'+selectedStrips+' selected' : '') + (sidewaysBanner ? ' Sideways' : ''), sidewaysBanner, posterOverview);
 }
@@ -2155,22 +2219,26 @@ function draw(){
 /* ---------- Export PNG & Save to Roll ---------- */
 function exportCurrentImage(){
   if(!last) return;
-  const sc = document.createElement('canvas');
-  sc.width = last.w; sc.height = last.h;
-  const id = sc.getContext('2d').createImageData(last.w, last.h);
-  for(let i = 0, j = 0; i < last.mono.length; i++, j += 4){
-    const v = last.mono[i] ? 0 : 255;
-    id.data[j] = id.data[j+1] = id.data[j+2] = v; id.data[j+3] = 255;
+  let sc;
+  if(last.color){ sc = last.color; }
+  else {
+    sc = document.createElement('canvas');
+    sc.width = last.w; sc.height = last.h;
+    const id = sc.getContext('2d').createImageData(last.w, last.h);
+    for(let i = 0, j = 0; i < last.mono.length; i++, j += 4){
+      const v = last.mono[i] ? 0 : 255;
+      id.data[j] = id.data[j+1] = id.data[j+2] = v; id.data[j+3] = 255;
+    }
+    sc.getContext('2d').putImageData(id, 0, 0);
   }
-  sc.getContext('2d').putImageData(id, 0, 0);
   sc.toBlob(async blob => {
     if(!blob) return;
-    const fname = `zinester-${Date.now()}.png`;
+    const fname = `fotitas-${Date.now()}.png`;
     const file = new File([blob], fname, {type: 'image/png'});
     if(navigator.canShare && navigator.canShare({files: [file]})){
       try{
-        await navigator.share({files: [file], title: 'Zinester Thermal Print'});
-        log('Exported / Shared PNG ('+last.w+'×'+last.h+')','ok');
+        await navigator.share({files: [file], title: 'FOTITAS'});
+        log('Exported / Shared PNG ('+sc.width+'×'+sc.height+')','ok');
         return;
       }catch(e){
         if(e && e.name === 'AbortError') return;
@@ -2184,7 +2252,7 @@ function exportCurrentImage(){
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
-    log('Exported PNG ('+last.w+'×'+last.h+')','ok');
+    log('Exported PNG ('+sc.width+'×'+sc.height+')','ok');
   }, 'image/png');
 }
 $('btnSave').addEventListener('click', exportCurrentImage);
@@ -2202,7 +2270,7 @@ $('btnSaveRoll').addEventListener('click', () => {
 /* ---------- Presets (Cutest replaces Cool giveaway; Xerox removed; Natural & Game Boy tuned) ---------- */
 const LOOK_NAMES = {
   natural:'Natural', portrait:'High-Key Portrait', cutest:'💖 Cutest',
-  gameboy:'Game Boy', halftone:'Halftone', ascii:'ASCII', blueprint:'Blueprint'
+  gameboy:'Game Boy', halftone:'Halftone', ascii:'ASCII', blueprint:'Blueprint', off:'Off'
 };
 const LOOKS = {
   natural:   {mode:'atk',      br:0,   ct:0,   gm:1.0,  th:132, inv:false, inten:85, coolPause:0},
@@ -2211,7 +2279,8 @@ const LOOKS = {
   gameboy:   {mode:'gameboy',  br:0,   ct:0,   gm:1.0,  th:128, inv:false, inten:88, coolPause:0},
   halftone:  {mode:'halftone', br:14,  ct:12,  gm:1.05, th:130, inv:false, inten:88, coolPause:0},
   ascii:     {mode:'ascii',    br:15,  ct:20,  gm:1.1,  th:128, inv:false, inten:92, coolPause:0},
-  blueprint: {mode:'stucki',   br:10,  ct:10,  gm:1.0,  th:128, inv:true,  inten:72, coolPause:1}
+  blueprint: {mode:'stucki',   br:10,  ct:10,  gm:1.0,  th:128, inv:true,  inten:72, coolPause:1},
+  off:       {mode:'off',      br:0,   ct:0,   gm:1.0,  th:128, inv:false, inten:85, coolPause:0}
 };
 
 function setLookUI(){
@@ -2743,7 +2812,7 @@ async function startWeirdScan(){
         tctx.restore();
         grabbed = true;
       }
-      const img = grabWeirdSlice(tctx, dir, slitPos, chunk, sw, sh, slitDirOsc < 0);
+      const img = grabWeirdSlice(tctx, dir, slitPos, chunk, sw, sh, slitDirOsc < 0 && $('weirdReverse').value === 'yes');
       endlessAppend(img); tailAppend(img);
       if(printing()) queueWeirdImg(img);
       const lim = (dir === 'v' ? sh : sw) - chunk;
@@ -4135,7 +4204,7 @@ const historyQueue = [];
 const ROLL_MAX = 30;
 const FORM_SKIP = new Set(['bleAll','wsel','hexin','printerModel','crcv','rq3','rq4','bits','preset','chunk','delay','autoDisc','poll','feed','rot180',
   'heatBudget','heatSafe','scanSecs','scanDir','boothCount','boothDelay','weirdSweepDir','weirdPrint','weirdStep','weirdScanSpeed','weirdLineMs',
-  'rngGhostOp','zoomSlider','panX','panY','panoLineMs','panoRest']);
+  'rngGhostOp','zoomSlider','panX','panY','panoLineMs','panoRest','panoRestEvery','weirdReverse']);
 const MOD_LABEL = {fresco:'Fresco', stereo:'3D', para:'Parallax', dexp:'Double exp', zine:'Zine', optic:'Optic', weird:'Endless weird', scan:'Scan', booth:'Booth'};
 function collectForm(){
   const o = {};
@@ -4282,7 +4351,7 @@ async function deserializeItem(o){
 async function exportRoll(){
   if(!historyQueue.length){ log('The roll is empty, nothing to export.', 'err'); return; }
   try{
-    const parts = ['{"magic":"FOTITAS-ROLL","version":1,"app":"FOTITAS V1.2","created":' + JSON.stringify(new Date().toISOString()) + ',"items":['];
+    const parts = ['{"magic":"FOTITAS-ROLL","version":1,"app":"FOTITAS V1.2.1","created":' + JSON.stringify(new Date().toISOString()) + ',"items":['];
     for(let i = 0; i < historyQueue.length; i++){
       $('info').textContent = 'Exporting roll ' + (i + 1) + ' / ' + historyQueue.length + '…';
       parts.push((i ? ',' : '') + JSON.stringify(await serializeItem(historyQueue[i])));
@@ -4467,8 +4536,7 @@ function m02xBlock(m, w, y0, rows, srcH){
   }
   return out;
 }
-const REST_ROWS = 800;   /* 10 cm */
-function frescoPace(){ return (src && src.pano) ? {ms: +$('panoLineMs').value || 0, rest: +$('panoRest').value || 0} : {ms: 0, rest: 0}; }
+function frescoPace(){ return (src && src.pano) ? {ms: +$('panoLineMs').value || 0, rest: +$('panoRest').value || 0, rows: Math.max(40, Math.round((+$('panoRestEvery').value || 3) * 80))} : {ms: 0, rest: 0, rows: 0}; }
 async function restSleep(ms){ for(let t = 0; t < ms && !streamAbort; t += 250) await sleep(Math.min(250, ms - t)); }
 async function m02xWrite(bytes){
   const useWoR = m02xChar.properties.writeWithoutResponse && m02xChar.writeValueWithoutResponse;
@@ -4518,10 +4586,11 @@ const phomemoDriver = {
     if(safe && heatTick() > 75) await heatWait(55, jobId);
     await m02xWrite(m02xHeader());
     const fp = frescoPace(); let sinceRest = 0;
-    for(let y0 = 0; y0 < h; y0 += band){
+    const bandRows = fp.rest ? Math.min(band, fp.rows) : band;
+    for(let y0 = 0; y0 < h; y0 += bandRows){
       if(jobId !== currentPrintJobId || streamAbort) break;
       const tb = performance.now();
-      const rows = Math.min(band, h - y0);
+      const rows = Math.min(bandRows, h - y0);
       const dots = monoDots(m, y0 * w, (y0 + rows) * w);
       if(safe){
         const room = 100 - dots / heatBudget() * 100;
@@ -4532,7 +4601,7 @@ const phomemoDriver = {
       heatAdd(dots);
       if(fp.ms){ const want = rows * fp.ms, spent = performance.now() - tb; if(spent < want) await sleep(want - spent); }
       sinceRest += rows;
-      if(fp.rest && sinceRest >= REST_ROWS && y0 + rows < h){
+      if(fp.rest && sinceRest >= fp.rows && y0 + rows < h){
         log('Overheat guard: resting '+fp.rest+' s…'); $('info').textContent = 'Resting '+fp.rest+' s to cool the head…';
         await restSleep(fp.rest * 1000); sinceRest = 0;
       }

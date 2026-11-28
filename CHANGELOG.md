@@ -1,5 +1,12 @@
 # Changelog
 
+## V1.2.1
+- **Bug fix:** a stray `</div>` in the V1.2 Fresco tab closed the tab body early, so the Overlap and Exposure sliders showed outside the closed tab.
+- **Tabs:** indicator is now just a round green dot, visible only when the module is in use (no switch look).
+- **Endless Weird:** new "Reverse on the way up" option (Yes / No).
+- **Look:** new **Off** look (after Blueprint, also Shader "Off"): no filter at all. Preview and Save keep original colors and full resolution (crop, rotate and flip still apply; frame, caption and strips are ignored; capped at 16 MP / 8192 px). Print still works with a basic Floyd-Steinberg fallback. Export file is now `fotitas-<time>.png`.
+- **Fresco cool-off:** two settings: Rest every 0.5 / 1 / 2 / 3 (default) / 5 / 10 cm, and Rest for Off / 1 / 2 (default) / 3 / 4 / 6 / 8 / 12 / 15 s. Print blocks shrink to the rest interval (min 40 rows).
+
 ## V1.2
 - **Intro art:** replaced by the new animated GIF (384 px wide, 4 colours, 72 KB), shown on a white paper-shaped sheet (16:9) in the black stage, as it would print.
 - **Desktop live view:** the webcam now shows the whole frame (no crop) and behaves like a mirror (move left, image moves left). Desktop only; phones unchanged. The captured photo matches the preview.

@@ -2,6 +2,15 @@
 
 Newest first. "Verified" means checked in the jsdom simulation only unless it says hardware.
 
+## V1.2.1 (simulation-tested only)
+| Item | Change | Notes |
+|---|---|---|
+| Fresco tab layout bug | My V1.2 HTML edit left an extra `</div>`; the Overlap/Exposure sliders fell outside `#tabPanoBody` (seen in the user's screenshot). Removed it | Test: `tabPanoBody.contains(panoOverlap)` |
+| Tab dot | `.tab-dot` = 14 px round, `opacity:0` when off, green glow when `.on` | Toggle look removed (looked clickable) |
+| Endless reverse | `weirdReverse` select (yes default); in `FORM_SKIP` | |
+| Off look | `LOOKS.off`, Shader option `off`, `drawOff()` + `drawRegionColor()`; `last.color` holds the colour canvas; `renderBitmapToView` draws it (smooth, not pixelated); `exportCurrentImage` saves `last.color`; `ditherGrayToMono` maps `off` to `fs` for any other caller | Vertical fresco drawn upright (rot 3 → 0 temporarily). Roll restores via form (`mode=off`) + source |
+| Fresco cool-off | `panoRestEvery` (cm) + `panoRest` (s); `frescoPace().rows`; bands shrink to the interval | M02X only. Cat/MXW01 still no rests (unverified) |
+
 ## V1.2 (simulation-tested only, not yet on the phone)
 | Item | Change | Notes |
 |---|---|---|

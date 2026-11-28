@@ -3,7 +3,7 @@
 Single-file web app (`FOTITAS-V1.1.html`, vanilla JS, inline CSS, no libraries). Runs in Bluefy on iPhone (primary) and Chrome on macOS (debug). Project: Tiniburn.
 
 ## 1. Status
-- Current build: **V1.2** (V1.1 confirmed working on the phone by the user; V1.2 changes simulation-tested only) (`/mnt/user-data/outputs/FOTITAS-V1.1.html`, ~214 KB). V1 kept as `FOTITAS-V1.html`.
+- Current build: **V1.2.1** (V1.1 confirmed working on the phone by the user; V1.2 changes simulation-tested only) (`/mnt/user-data/outputs/FOTITAS-V1.1.html`, ~214 KB). V1 kept as `FOTITAS-V1.html`.
 - Tested only in jsdom with a fake canvas, a fake printer characteristic and fake cameras. Syntax checked with `node --check`.
 - **Never tested on real hardware:** BLE connect and printing, getUserMedia camera, real heat behaviour, Weird Scanner live-print pacing, Web Share and download in Bluefy, large `.fotitas` exports on iPhone memory.
 - Hosting: GitHub Pages (HTTPS). The file-input camera fallback always exists.
@@ -47,12 +47,12 @@ Key globals and functions:
 3. Camera | Library
 4. Rotate | Flip
 
-**Tabs** (each has a `.tab-dot` toggle switch, green = in use, glowing when the module is active; only Look shows text):
+**Tabs** (each has a `.tab-dot` round green dot, visible only when in use, glowing when the module is active; only Look shows text):
 Look (`lookBadge`, shows "Custom" when edited) · Stereo / 3D · Double exposure · Poster · Zine maker (Type, Cipher, Optic) · Endless Weird · Parallax · Fresco.
 
-**Endless Weird controls** (tab renamed from Weird Scanner; ids unchanged): `weirdSweepDir` (v/h), `weirdPrint` (on/off), `weirdStep` (1 = continuous, 5–30), `weirdScanSpeed` (20–640 lines/s, default 80), `weirdLineMs` (12–80 ms per line sent, default 25), single toggle `btnStartWeirdScan` ("▶ Start Endless" / "■ Stop & keep image"). Every line is appended to one endless image (stored: newest 24000 rows); up-pass slices are row-reversed.
+**Endless Weird controls** (tab renamed from Weird Scanner; ids unchanged): `weirdSweepDir` (v/h), `weirdPrint` (on/off), `weirdReverse` (yes/no), `weirdStep` (1 = continuous, 5–30), `weirdScanSpeed` (20–640 lines/s, default 80), `weirdLineMs` (12–80 ms per line sent, default 25), single toggle `btnStartWeirdScan` ("▶ Start Endless" / "■ Stop & keep image"). Every line is appended to one endless image (stored: newest 24000 rows); up-pass slices are row-reversed.
 
-**Fresco controls:** Snap Frame, Add Files, Clear, frame list (reorder / remove), `panoDir`, `panoLineMs` (line send delay, 0 = default), `panoRest` (overheat guard: rest 4/8/15 s every 10 cm, default 8), `panoOverlap`, `panoExp`, status line `panoBadge`. No max-frame, no paper limit (silent cap `FR_MAXROWS=40000`), no Stitch button (auto).
+**Fresco controls:** Snap Frame, Add Files, Clear, frame list (reorder / remove), `panoDir`, `panoLineMs` (line send delay, 0 = default), `panoRestEvery` (0.5–10 cm, default 3) + `panoRest` (Off, 1–15 s, default 2), `panoOverlap`, `panoExp`, status line `panoBadge`. No max-frame, no paper limit (silent cap `FR_MAXROWS=40000`), no Stitch button (auto).
 
 **Camera Roll:** Export (`btnRollExport`), Import (`btnRollImport`, `fRoll`), Clear, items with Load and ✕.
 
@@ -66,6 +66,8 @@ Look (`lookBadge`, shows "Custom" when edited) · Stereo / 3D · Double exposure
 - **Roll items** are snapshots: all form values except connection, scan and zoom settings; the view globals; the source image or frames; module inputs. Auto-saves are de-duplicated. Max 30 items.
 - **`.fotitas` file:** JSON with `magic: "FOTITAS-ROLL"` and `version: 1`. Sources are PNG when ≤ 1.6 MP, else JPEG 0.9, capped at ~2600 px (frames 3000, mods 1600). Mono-only items are bit-packed base64. Export uses Web Share when possible, else a download.
 - **Look badge:** shows "Custom" when mode, br, ct, gm, th or invert differ from the active look.
+
+**Off look:** Look pill "⊘ Off" / Shader `off`. `drawOff()` renders the cropped, rotated colour region (`last.color`, ≤16 MP); Save exports it as is; Print uses a Floyd-Steinberg fallback; frame/caption/strips ignored.
 
 **Desktop webcam:** `DESKTOP` flag (fine pointer, not touch/phone); full-frame `contain` view and mirrored (`facing='user'`) when the camera reports no facingMode.
 
