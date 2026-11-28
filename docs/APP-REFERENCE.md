@@ -83,3 +83,9 @@ Look (`lookBadge`, shows "Custom" when edited) · Stereo / 3D · Double exposure
 - Tune `weirdLineMs` and heat limits on hardware.
 - Roll lives in memory only. It is lost on reload unless exported (no IndexedDB yet).
 - Possible later phase: ESP32-S3 serving the UI over its own Wi-Fi AP (file-input camera only).
+
+
+## 8. BETA lab (V1.3)
+Separate script block `betaScript`, exposed as `window.__beta`. Tab `#tabBetaCard`, selector `#betaMod`, one `.bpanel[data-bm]` per module, Stop `#btnBetaStop`. Output: `src={el,w,h,mod:'beta'}`; `current()` returns the original colour photo while the stage still shows a beta output.
+Modules: sticker, receipt, strip, smear, qr (QR + tag), collage, doodle, ascii, timelapse, sketch, haiku, morph.
+Status: simulation tested (jsdom), QR decoded with OpenCV. Untested on phone: camera modules (strip, smear, time-lapse), doodle touch, file picker (`fileToCanvas`).

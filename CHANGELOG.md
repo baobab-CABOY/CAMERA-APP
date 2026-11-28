@@ -1,5 +1,10 @@
 # Changelog
 
+## V1.3 BETA
+- **New 🧪 BETA lab tab** (separate `<script id="betaScript">`, nothing in the main app changed except the tab dot and roll label). 12 modules, one selector, each result goes to the main stage as a normal photo (Look / Print / Save / Roll all work on it):
+  1 Sticker sheet, 2 Receipt zine, 3 Photo strip booth, 4 Time smear (slit-scan), 5 QR and text tags, 6 Collage grid, 7 Doodle pad, 8 ASCII 2.0, 9 Time-lapse strip, 10 Sketch / edges, 11 HAIKU (photo mood + season pick a 5-7-5 poem from offline word banks, enso ring and red seal), 12 MORPH (grain dissolve A to B, pixel to sharp, whirlpool).
+- QR encoder is our own (byte mode, v1-10, ECC L/M/Q). Verified by decoding 105 generated codes with OpenCV: 99 pass, the other 6 fail only on one mask each while the other masks decode (decoder flakiness, not an encoder fault).
+
 ## V1.2.1
 - **Bug fix:** a stray `</div>` in the V1.2 Fresco tab closed the tab body early, so the Overlap and Exposure sliders showed outside the closed tab.
 - **Tabs:** indicator is now just a round green dot, visible only when the module is in use (no switch look).

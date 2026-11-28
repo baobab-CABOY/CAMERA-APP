@@ -53,6 +53,10 @@ Newest first. "Verified" means checked in the jsdom simulation only unless it sa
 ## Test results (V1.1 suite `t4.js`, all pass)
 Top bar and order · capture order · no `btnBanner` · scan modes `v h r` · random and vertical scan end with `src.mod='scan'` · weird scanner prints (writes counted), stops and keeps the image · print-off writes 0 · fresco add 6 frames, reorder, paper limit refusal · view zoom leaves `last` unchanged · roll save / load for fresco and photo · export → import round trip restores fresco and photo · themes switch · M02X dry-run print adds heat.
 
+## V1.3 BETA fixes (found in testing)
+- QR: column zig-zag skipped the wrong column after the timing pattern (left holes in the matrix). Fixed (`col === 6 → 5`).
+- QR: alignment patterns on the timing row/column (v7+) were skipped because timing cells counted as taken. Now only finder corners are skipped.
+
 ## Open observations (not yet bugs)
 - Endless Weird up-pass "reverse" is read as: rows inside each slice are flipped on the up pass (with step 1 the up pass is the scene mirrored vertically). If you meant something else (e.g. the whole up-pass strip reversed), tell me.
 - Fresco rest/line-delay timing is unverified on hardware.
@@ -73,3 +77,9 @@ Top bar and order · capture order · no `btnBanner` · scan modes `v h r` · ra
 3. Fresco 3+ frames: limit, zoom, print.
 4. Roll Load exactness, then Export, reload, Import.
 5. MXW01 connect: paste the debug log (device name, services, characteristics).
+
+## BETA lab: to verify on the phone
+1. Strip booth, Time smear, Time-lapse: camera start, countdown, Stop.
+2. Doodle: finger drawing, undo, page scroll not hijacked.
+3. Add photos (file picker) in Sticker, Collage, Morph B.
+4. Scan a printed QR with a phone camera.
